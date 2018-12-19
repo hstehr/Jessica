@@ -1,4 +1,4 @@
-#### Patient database
+## Patient database
 **20181113_syapse_export_all_variants_QC.R**
 ```
 ## Clean up 20181018_syapse_export_all_variants_patientNameAndMrnRemoved.csv
@@ -20,7 +20,7 @@
 ## Output: "ClinicalTrialMatching/20181114_syapse_export_DF_STAMP_VariantAnno.csv"
 ```
 
-#### Active clinical trials
+## Active clinical trials
 **Biomarker_Report_Convert2Long.R**
 ```
 ## Clean up Biomarker Report_2018-10_OnCore_Biomarker_Report.csv
