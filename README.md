@@ -1,10 +1,11 @@
-# Patient database
-#----------------------------------------------
-20181113_syapse_export_all_variants_QC.R
-## Clean up 20181018_syapse_export_all_variants_patientNameAndMrnRemoved.csv
-## Specific parameters that are quality checked
-## smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding
-## Output: "20181113_syapse_export_all_variants_QC.csv"
+###### Patient database
+**20181113_syapse_export_all_variants_QC.R**
+```
+Clean up 20181018_syapse_export_all_variants_patientNameAndMrnRemoved.csv
+Specific parameters that are quality checked
+smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding
+Output: "20181113_syapse_export_all_variants_QC.csv"
+```
 
 20181113_syapse_export_all_variants_QC_STAMP_VariantAnno.R
 ## Subset 20181113_syapse_export_all_variants_QC.csv based on mutation type = 9918 total STAMP entries
