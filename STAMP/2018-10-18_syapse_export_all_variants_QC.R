@@ -1,18 +1,12 @@
-## Clean up 20181018_syapse_export_all_variants_patientNameAndMrnRemoved.csv
-## Specific parameters that are quality checked
-## smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding
-## Output: "20181113_syapse_export_all_variants_QC.csv"
-
-rm(list=ls())
 setwd("~/Documents/ClinicalDataScience_Fellowship/STAMP/")
+
+print(paste("Timestamp of Syapse_Report: ", Syapse_Export_timestamp, sep=""))
 
 # Load relevant file
 #----------------------------------------------
-DF_Full <- read.csv(file = "20181018_syapse_export_all_variants_patientNameAndMrnRemoved.csv",
-                    header = TRUE,
-                    na.strings = c(""," ","NA"),
-                    stringsAsFactors = FALSE,
-                    sep = ",")
+DF_Full <- read.csv(file = paste(Syapse_Export_timestamp, "_syapse_export_all_variants_patientNameAndMrnRemoved.csv", sep=""),
+                    header = TRUE, na.strings = c(""," ","NA"), stringsAsFactors = FALSE, sep = ",")
+
 # Shorten column names of DF
 colnames(DF_Full) <- gsub("smpl.[a-zA-Z]+[.]{3}", "", colnames(DF_Full))
 
@@ -324,7 +318,7 @@ DF_Full <- DF_Full_AMENDED
 remove(DF_Full_AMENDED, DF_Full_AMENDED_pre,assay_list,assay_id,assay_num,
        patient_list,patient_id,id_num,created_list)
 
-# ## Simple review of data
+# ## Data Review
 # #----------------------------------------------
 # print(paste("Total number of unique patient_id: ", length(unique(DF_Full$sys.uniqueId)), sep=""))
 # print(paste("Total number of unique specimen sites: ", length(sort(unique(DF_Full$smpl.specimenSite))), sep=""))
@@ -338,5 +332,5 @@ remove(DF_Full_AMENDED, DF_Full_AMENDED_pre,assay_list,assay_id,assay_num,
 
 ## Write to local computer
 #----------------------------------------------
-write.csv(DF_Full, file = "20181113_syapse_export_all_variants_QC.csv",
+write.csv(DF_Full, file = paste(Syapse_Export_timestamp, "_syapse_export_all_variants_QC.csv", sep=""),
           na = "NA", row.names = FALSE)
