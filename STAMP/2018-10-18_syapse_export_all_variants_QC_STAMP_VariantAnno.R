@@ -345,9 +345,9 @@ cat("\n")
 
 ## Write to local computer
 #----------------------------------------------
-write.csv(DF_STAMP_4Map, file = paste("STAMP/Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_4Map.csv", sep=""),
+write.csv(DF_STAMP_4Map, file = paste("Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_4Map.csv", sep=""),
           na = "NA", row.names = FALSE)
-write.csv(DF_NAprotein[,1:64], file = paste("STAMP/Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_NAprotein.csv", sep=""),
+write.csv(DF_NAprotein[,1:64], file = paste("Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_NAprotein.csv", sep=""),
           na = "NA", row.names = FALSE)
 
 # Extract variant positions
