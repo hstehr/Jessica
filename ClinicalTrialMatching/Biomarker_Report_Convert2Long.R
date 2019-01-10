@@ -2,352 +2,204 @@ setwd("~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/")
 
 ## Load relevant file
 #----------------------------------------------
-## Import excel file as single list
-PATIENT_VARIANT_REPORT <- 
-  import_list(paste("PATIENT_VARIANT_REPORT_TEMPLATE_", Patient_Variant_Report_timestamp, ".xlsx", sep=""), setclass = "tbl")
+OnCore_Biomarker_Report <- read.csv(file = paste("Biomarker Report_", OnCore_Biomarker_Report_timestamp, ".csv", sep=""),
+                                    header = TRUE, na.strings = c("NA", ""),
+                                    stringsAsFactors = FALSE, sep = ",")
 
-## Generate individual DF per worksheet in excel file
-# invisible(capture.output(lapply(names(PATIENT_VARIANT_REPORT), 
-#                                 function(x) assign(x, PATIENT_VARIANT_REPORT[[x]],
-#                                                    envir = .GlobalEnv))))
-# remove(`ARM-GENE LOOK-UP TABLE`,Version,`Disease Exclusion LOOK-UP Table`,
-#        `GENE-STRAND Look-up table`,`Gene Ref Seq Look-up table`,`EXAMPLE DATA for Standard aMOIs`,
-#        `Patient ID information`,MOIs,`lab list`,`Variant Type`)
-# 
-# ## Extract names of dataframes in global environment
-# names(PATIENT_VARIANT_REPORT)
-# # Total number of Arms
-# length(unique(PATIENT_VARIANT_REPORT$`ARM-GENE LOOK-UP TABLE`$ARM))
+print(paste("Timestamp of OnCore_Biomarker_Report: ", OnCore_Biomarker_Report_timestamp, sep=""))
 
-print(paste("Timestamp of Patient_Variant_Report: ", Patient_Variant_Report_timestamp, sep=""))
-
-################################
-## Manual removal of ARMs based on information in "ARM-GENE-LOOK-UP-TABLE"
-################################
-if (isTRUE(Patient_Variant_Report_timestamp == "2018-12-11")) {
-  print("ARM-Z1C and ARM-Z1F have been removed based on comments in ARM-GENE-LOOK-UP-TABLE")
+## Confirm Current.Status are OPEN TO ACCRUAL
+#----------------------------------------------
+if (length(OnCore_Biomarker_Report$Current.Status[!grepl("OPEN TO ACCRUAL", OnCore_Biomarker_Report$Current.Status)]) > 0) {
+  print("Current status of clinical trials from Biomarker Report that are not OPEN TO ACCRUAL:")
+  print(paste("NOTE: corresponding rows (n=", length(which(OnCore_Biomarker_Report$Current.Status != "OPEN TO ACCRUAL")),
+  ") have been removed from downstream processing", sep=""))
   cat("\n")
+  print(OnCore_Biomarker_Report[which(OnCore_Biomarker_Report$Current.Status != "OPEN TO ACCRUAL"), ], 
+        row.names = FALSE)
   
-  # names(PATIENT_VARIANT_REPORT)
-  PATIENT_VARIANT_REPORT <- PATIENT_VARIANT_REPORT[-21]
-  PATIENT_VARIANT_REPORT <- PATIENT_VARIANT_REPORT[-22]
-  # names(PATIENT_VARIANT_REPORT)
+  ## Remove clinical trials not OPEN TO ACCRUAL from spreadsheet
+  rowkeep <- which(OnCore_Biomarker_Report$Current.Status == "OPEN TO ACCRUAL")
+  OnCore_Biomarker_Report <- OnCore_Biomarker_Report[rowkeep, ]
+} else {
+  print("Current.Status of all clinical trials from Biomarker Report are OPEN TO ACCRUAL")
 }
 
-## Specify parameters of output files 
+## Confirm Protocol.Type are Treatment
 #----------------------------------------------
-DF_Inclusion_NonHotspot_Rules <- data.frame(matrix(NA, ncol = 16))
-colnames(DF_Inclusion_NonHotspot_Rules) <- c("Arm_Name", "Description", "oncominevariantclass",
-                                             "Gene_Name","Exon","Function",	"Level_of_Evidence",
-                                             "PRESENT", "Protein","VARIANT_TYPE","Chromosome",
-                                             "position","Ref","Alt","ALLELE_FREQ","Variant_ID")
+if (length(OnCore_Biomarker_Report$Protocol.Type[!grepl("Treatment", OnCore_Biomarker_Report$Protocol.Type)]) > 0) {
+  print("Protocol type of clinical trials from Biomarker Report that are not TREATMENT:")
+  print(paste("NOTE: corresponding rows (n=", length(which(OnCore_Biomarker_Report$Protocol.Type != "Treatment")),
+              ") have been removed from downstream processing", sep=""))
+  cat("\n")
+  print(OnCore_Biomarker_Report[which(OnCore_Biomarker_Report$Protocol.Type != "Treatment"), ], 
+        row.names = FALSE)
 
-DF_Exclusion_NonHotspot_Rules <- data.frame(matrix(NA, ncol = 16))
-colnames(DF_Exclusion_NonHotspot_Rules) <- colnames(DF_Inclusion_NonHotspot_Rules)
-
-DF_Exclusion_Variants <- data.frame(matrix(NA, ncol = 16))
-colnames(DF_Exclusion_Variants) <- c("Arm_Name", "Gene_Name","Variant_ID","Variant_Type",
-                                     "Protein","Level_of_Evidence","HGVS","Chromosome",
-                                     "Position","Ref","Alt","PRESENT","ALLELE_FREQ",
-                                     "CN_value","FUSION_READ_DEPTH","Variant Source")
-
-DF_Inclusion_Variants <- data.frame(matrix(NA, ncol = 16))
-colnames(DF_Inclusion_Variants) <- colnames(DF_Exclusion_Variants)
-
-DF_IHC_Results <- data.frame(matrix(NA, ncol = 7))
-colnames(DF_IHC_Results) <- c("Arm_Name","Gene","Status_POSITIVE_NEGATIVE_INDETERMINATE",
-                           "Variant_PRESENT_NEGATIVE_EMPTY","Description","LOE","IHC_RESULT")
-
-DF_Comments <- data.frame(matrix(NA, ncol = 16))
-colnames(DF_Comments) <- c("Arm_Name","Gene","X__1","X__2","X__3",
-                           "X__4","X__5","X__6","X__7","X__8","X__9",
-                           "X__10","X__11","X__12","X__13","X__14")
-
-DF_Histologic_Disease_Exclusion_Codes <- data.frame(matrix(NA, ncol = 6))
-
-## Parse info across ARMs from "Disease Exclusion LOOK-UP Table"
-#----------------------------------------------
-for (tab_No in which(names(PATIENT_VARIANT_REPORT) == "Disease Exclusion LOOK-UP Table")) {
-  Disease_Exclusion_file <- PATIENT_VARIANT_REPORT[[tab_No]]
-  
-  ## Remove rows that are all empty
-  Disease_Exclusion_file <- 
-    Disease_Exclusion_file[rowSums(is.na(Disease_Exclusion_file)) != 
-                                           ncol(Disease_Exclusion_file),]  
-  
-  row_start_list = (which(Disease_Exclusion_file[[1]] == "Histologic Disease Exclusion Codes"))
-  
-  for (Histo_No in 1:length(row_start_list)) {
-    row_start = row_start_list[Histo_No] +2
-      
-    # Extract ARM_Name
-    if (isTRUE(row_start_list[Histo_No] == 1)) {
-       Arm_Name <- colnames(Disease_Exclusion_file)[2]
-    } else {
-      Arm_Name <- as.character(Disease_Exclusion_file[row_start_list[Histo_No] -1,2])
-    }
-    Arm_Name <- gsub("^(EAY131)(.*)", "ARM\\2", Arm_Name)
-    
-    if (isTRUE(Histo_No == length(row_start_list))) {
-      row_end = as.numeric(nrow(Disease_Exclusion_file))
-    } else {
-      row_end = row_start_list[Histo_No +1] -2
-    }
-    
-    # Extract rows per ARM_Name
-    DF_Histologic_Disease_Exclusion_pre <- Disease_Exclusion_file[c(row_start:row_end),1:5]
-    DF_Histologic_Disease_Exclusion_pre$Arm_Name <- Arm_Name
-    # Reorder columns for consistency
-    DF_Histologic_Disease_Exclusion_pre <- data.frame(DF_Histologic_Disease_Exclusion_pre[,c(6,1:5)])
-
-    if (isTRUE(row_start_list[Histo_No] == 1)) {
-      DF_Histologic_Disease_Exclusion_Codes <- DF_Histologic_Disease_Exclusion_pre
-    } else {
-      DF_Histologic_Disease_Exclusion_Codes <- rbind(DF_Histologic_Disease_Exclusion_Codes,
-                                                     DF_Histologic_Disease_Exclusion_pre)
-    }
-  }
-  remove(DF_Histologic_Disease_Exclusion_pre, Disease_Exclusion_file,
-         Arm_Name,Histo_No,row_end,row_start,row_start_list,tab_No)
+  ## Remove clinical trials not OPEN TO ACCRUAL from spreadsheet
+  rowkeep <- which(OnCore_Biomarker_Report$Protocol.Type == "Treatment")
+  OnCore_Biomarker_Report <- OnCore_Biomarker_Report[rowkeep, ]
+} else {
+  print("Protocol.Type of all clinical trials from Biomarker Report are TREATMENT")
 }
-  
-colnames(DF_Histologic_Disease_Exclusion_Codes) <- c("Arm_Name","CTEP.CATEGORY","CTEP.SUBCATEGORY",
-                                                     "CTEP.TERM","SHORT.NAME","MedDRA.CODE")
-## Remove rows that are all empty
-DF_Histologic_Disease_Exclusion_Codes <- 
-  DF_Histologic_Disease_Exclusion_Codes[which(DF_Histologic_Disease_Exclusion_Codes$CTEP.CATEGORY != "None"),]
- 
-## Parse info across ARMs from original file into corresponding output files
+
+
+## Match Age.Group column with patient DOB
 #----------------------------------------------
-arm_start = which(names(PATIENT_VARIANT_REPORT) == "Patient ID information") +1
-arm_end = which(names(PATIENT_VARIANT_REPORT) == "MOIs") -1
+for (x in 1:nrow(OnCore_Biomarker_Report)) {
+  if (OnCore_Biomarker_Report$Age.Group[x] == "A") {
+    OnCore_Biomarker_Report$Age.Group[x] <- "Adult"
+  }
+}
+print(paste("Age.Group of clinical trials from Biomarker Report: ", 
+            unique(OnCore_Biomarker_Report$Age.Group), sep=""))
 
-for (Arm_No in arm_start:arm_end) {
-  DF <- PATIENT_VARIANT_REPORT[[Arm_No]]
-  Arm_Name <- colnames(DF)[1]
-  ## Remove rows that are all empty
-  DF <- DF[rowSums(is.na(DF)) != ncol(DF),]  
+# Convert Biomarker.Description to long format
+#----------------------------------------------
+colname_keep <- colnames(OnCore_Biomarker_Report)
 
-  row_end = (which(DF[[2]] == "Exclusion Variants")) -1
+## Columns appended to end of dataframe
+OnCore_Biomarker_Report$Biomarker <- OnCore_Biomarker_Report$Biomarker.Description
+OnCore_Biomarker_Report <- cSplit(OnCore_Biomarker_Report, "Biomarker", ",", 
+                                  stripWhite = TRUE, type.convert="as.character",
+                                  drop = FALSE)
+
+## Convert to long format 
+OnCore_Biomarker_Report <- melt(OnCore_Biomarker_Report, 
+                                id.vars=colname_keep)
+OnCore_Biomarker_Report <- 
+  OnCore_Biomarker_Report[which(OnCore_Biomarker_Report$variable != "Biomarker" &
+                                  !is.na(OnCore_Biomarker_Report$value)), ]
+
+## Strip Biomarker.Description into components
+#----------------------------------------------
+OnCore_Biomarker_Report <- cSplit(OnCore_Biomarker_Report, "value", "|", 
+                                  stripWhite = TRUE, type.convert="as.character")
+colnames(OnCore_Biomarker_Report)[17:19] <- 
+  c("Biomarker_GeneName","Biomarker_Condition","Biomarker_Detail")
+OnCore_Biomarker_Report$Biomarker_Comment <- NA
+colname_keep <- append(colname_keep, colnames(OnCore_Biomarker_Report)[17:20])
+OnCore_Biomarker_Report <- subset(OnCore_Biomarker_Report, select = colname_keep)
+
+## Confirm Biomarker Gene alterations are within permitted terms
+#----------------------------------------------
+alterations_okay <- c("AMPLIFICATION", "DELETION","FUSION","MUTATION","All alterations")
+rowkeep <- which(OnCore_Biomarker_Report$Biomarker_Condition %in% alterations_okay)
+                   
+if (nrow(OnCore_Biomarker_Report) != length(rowkeep)) {
+  rowNA <- which(!OnCore_Biomarker_Report$Biomarker_Condition %in% alterations_okay)
+
+  print("Biomarker Gene alterations from Biomarker Report that are not defined using the following terms:")
+  print(alterations_okay)
+  print(paste("NOTE: corresponding rows (n=", 
+              length(rowNA), ") have been removed from downstream processing", sep=""))
+  cat("\n")
+  print(OnCore_Biomarker_Report[rowNA,c(1:15)], row.names = FALSE)
   
-  if (isTRUE(row_end > 2)) {
-    if (isTRUE(which(DF[[2]] == "Exclusion Non-Hotspot Rules") > 0)) {
-      row_int_end = (which(DF[[2]] == "Exclusion Non-Hotspot Rules")) -1
-      row_int_start = row_int_end +3
-      
-      DF_Inclusion_NonHotspot_Rules_pre <- DF[c(2:row_int_end),1:16]
-      colnames(DF_Inclusion_NonHotspot_Rules_pre) <- colnames(DF_Inclusion_NonHotspot_Rules) 
-      DF_Inclusion_NonHotspot_Rules_pre$Arm_Name <- Arm_Name
-      DF_Inclusion_NonHotspot_Rules <- rbind(DF_Inclusion_NonHotspot_Rules, DF_Inclusion_NonHotspot_Rules_pre)
-      
-      DF_Exclusion_NonHotspot_Rules_pre <- DF[c(row_int_start:row_end),1:16]
-      colnames(DF_Exclusion_NonHotspot_Rules_pre) <- colnames(DF_Exclusion_NonHotspot_Rules) 
-      DF_Exclusion_NonHotspot_Rules_pre$Arm_Name <- Arm_Name
-      DF_Exclusion_NonHotspot_Rules <- rbind(DF_Exclusion_NonHotspot_Rules, DF_Exclusion_NonHotspot_Rules_pre)
-      
-    } else {
-      DF_Inclusion_NonHotspot_Rules_pre <- DF[c(2:row_end),1:16]
-      colnames(DF_Inclusion_NonHotspot_Rules_pre) <- colnames(DF_Inclusion_NonHotspot_Rules) 
-      DF_Inclusion_NonHotspot_Rules_pre$Arm_Name <- Arm_Name
-      DF_Inclusion_NonHotspot_Rules <- rbind(DF_Inclusion_NonHotspot_Rules, DF_Inclusion_NonHotspot_Rules_pre)
-    }
+  ## Remove respective rows from spreadsheet
+  OnCore_Biomarker_Report <- OnCore_Biomarker_Report[rowkeep, ]
+} else {
+  print("Biomarker Gene alterations from Biomarker Report are defined using the following term(s):")
+  print(alterations_okay)
+}
+remove(rowkeep)
+
+## Extract Biomarker.Description comments
+#----------------------------------------------
+for (x in 1:nrow(OnCore_Biomarker_Report)) {
+  if (isTRUE(grepl("-", OnCore_Biomarker_Report$Biomarker_Detail[x]))) {
+    OnCore_Biomarker_Report$Biomarker_Comment[x] <- 
+      sapply(strsplit(OnCore_Biomarker_Report$Biomarker_Detail[x], "-"), "[", 2)
+    OnCore_Biomarker_Report$Biomarker_Detail[x] <- 
+      sapply(strsplit(OnCore_Biomarker_Report$Biomarker_Detail[x], "-"), "[", 1)
   }
-   
-  row_start = (which(DF[[2]] == "Exclusion Variants")) +2
-  row_end = (which(DF[[2]] == "Inclusion Variants")) -1
-  DF_Exclusion_Variants_pre <- DF[c(row_start:row_end),1:16]
-  colnames(DF_Exclusion_Variants_pre) <- colnames(DF_Exclusion_Variants) 
-  DF_Exclusion_Variants_pre$Arm_Name <- Arm_Name
-  DF_Exclusion_Variants <- rbind(DF_Exclusion_Variants, DF_Exclusion_Variants_pre)
-  
-  row_start = (which(DF[[2]] == "Inclusion Variants")) +2
-  row_end = (which(DF[[2]] == "COMMENTS:")) -1
-  
-  if (isTRUE(which(DF[[2]] == "IHC Results") > 0)) {
-    row_int_end = (which(DF[[2]] == "IHC Results")) -1
-    row_int_start = row_int_end +3
-    
-    DF_Inclusion_Variants_pre <- DF[c(row_start:row_int_end),1:16]
-    colnames(DF_Inclusion_Variants_pre) <- colnames(DF_Inclusion_Variants) 
-    DF_Inclusion_Variants_pre$Arm_Name <- Arm_Name
-    DF_Inclusion_Variants <- rbind(DF_Inclusion_Variants, DF_Inclusion_Variants_pre)
+}
 
-    DF_IHC_Results_pre <- DF[c(row_int_start:row_end),1:7]
-    colnames(DF_IHC_Results_pre) <- colnames(DF_IHC_Results) 
-    DF_IHC_Results_pre$Arm_Name <- Arm_Name
-    DF_IHC_Results <- rbind(DF_IHC_Results, DF_IHC_Results_pre)
-    
-  } else {
-    DF_Inclusion_Variants_pre <- DF[c(row_start:row_end),1:16]
-    colnames(DF_Inclusion_Variants_pre) <- colnames(DF_Inclusion_Variants) 
-    DF_Inclusion_Variants_pre$Arm_Name <- Arm_Name
-    DF_Inclusion_Variants <- rbind(DF_Inclusion_Variants, DF_Inclusion_Variants_pre)
-  }
-
-  row_start = (which(DF[[2]] == "COMMENTS:")) +1
-  row_end = nrow(DF)
-  if (row_start < row_end) {
-    DF_Comments_pre <- DF[c(row_start:row_end),1:16]
-    colnames(DF_Comments_pre) <- colnames(DF_Comments) 
-    DF_Comments_pre$Arm_Name <- Arm_Name
-    DF_Comments<- rbind(DF_Comments, DF_Comments_pre)
-  }
-
-  if (exists("DF_Inclusion_NonHotspot_Rules_pre")) {remove(DF_Inclusion_NonHotspot_Rules_pre)}
-  if (exists("DF_Exclusion_NonHotspot_Rules_pre")) {remove(DF_Exclusion_NonHotspot_Rules_pre)}
-  if (exists("DF_Exclusion_Variants_pre")) {remove(DF_Exclusion_Variants_pre)}
-  if (exists("DF_Inclusion_Variants_pre")) {remove(DF_Inclusion_Variants_pre)}
-  if (exists("DF_IHC_Results_pre")) {remove(DF_IHC_Results_pre)}
-  if (exists("DF_Comments_pre")) {remove(DF_Comments_pre)}
-  remove(Arm_Name,row_start,row_end)
-  }
-
-## Remove rows that are all empty or where column 2 == c("none", "None")
-DF_Inclusion_NonHotspot_Rules <- 
-  DF_Inclusion_NonHotspot_Rules[rowSums(is.na(DF_Inclusion_NonHotspot_Rules)) != ncol(DF_Inclusion_NonHotspot_Rules),]
-
-DF_Exclusion_NonHotspot_Rules <- 
-  DF_Exclusion_NonHotspot_Rules[rowSums(is.na(DF_Exclusion_NonHotspot_Rules)) != 
-                                  ncol(DF_Exclusion_NonHotspot_Rules),]
-
-DF_Exclusion_Variants <- 
-  DF_Exclusion_Variants[rowSums(is.na(DF_Exclusion_Variants)) != ncol(DF_Exclusion_Variants),]
-DF_Exclusion_Variants <- DF_Exclusion_Variants[DF_Exclusion_Variants$Gene_Name != "None", ] 
-
-DF_Inclusion_Variants <- 
-  DF_Inclusion_Variants[rowSums(is.na(DF_Inclusion_Variants)) != 
-                                  ncol(DF_Inclusion_Variants),]  
-
-DF_IHC_Results <- DF_IHC_Results[rowSums(is.na(DF_IHC_Results)) != ncol(DF_IHC_Results),]
-DF_IHC_Results <- DF_IHC_Results[DF_IHC_Results$Gene != "none", ]  
-
-DF_Comments <- DF_Comments[rowSums(is.na(DF_Comments)) != ncol(DF_Comments),]
-
-remove(PATIENT_VARIANT_REPORT, DF)
+OnCore_Biomarker_Report$Biomarker_Detail <- 
+  gsub("^\\*[[:blank:]]*$", "All mutations accepted", OnCore_Biomarker_Report$Biomarker_Detail)
 
 ################################
-## Manual edit of DF_Comments
+## Manual correction: Amino acid change
 ################################
-DF_Comments$Note[max(which(DF_Comments$Arm_Name == "ARM-T"))] <- 
-  paste(DF_Comments$Gene[1], DF_Comments$Gene[2], DF_Comments$Gene[3], sep=" ")
-DF_Comments <- DF_Comments[DF_Comments$Arm_Name == "ARM-T" & 
-                      !is.na(DF_Comments$Note),]
-DF_Comments <- DF_Comments[,c(1:11,ncol(DF_Comments))]
-colnames(DF_Comments)[1:11] <- colnames(DF_Exclusion_Variants)[1:11]
+OnCore_Biomarker_Report$Biomarker_Detail[OnCore_Biomarker_Report$Biomarker_Detail == "V600*"] <- "Val600*"
 
-# ## Review of data
+# Disease.Group grouped according to medical specialties  
+# Most general Disease.Site is assigned priority 
+################################
+# Manual assignment
+################################
+OnCore_Biomarker_Report$Disease.Group.category <- NA
+for (row_No in 1:nrow(OnCore_Biomarker_Report)) {
+  if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Cutaneous Oncology") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Dermatology"
+  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Developmental Therapeutics" |
+             OnCore_Biomarker_Report$Disease.Group[row_No] == "Non-CRG Specific") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Any Site"
+  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Gastrointestinal Oncology") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Gastroenterology"
+  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Genitourinary Oncology") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Genitourinary"
+  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Head & Neck Oncology") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Otolaryngology"
+  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Thoracic Oncology") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Pulmonology"
+  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Hematology") {
+    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Hematology"
+  }
+}
+
+OnCore_Biomarker_Report$Disease.Site.category <- OnCore_Biomarker_Report$Disease.Sites
+OnCore_Biomarker_Report$Disease.Site.category[grep("Any Site", OnCore_Biomarker_Report$Disease.Sites)] <- "Any Site"
+
+################################
+# Manual correction for consistency
+################################
+OnCore_Biomarker_Report$Disease.Site.category [OnCore_Biomarker_Report$Disease.Site.category == 
+                                                 "Leukemia, other; Other Hematopoietic"] <- "Other Leukemia; Other Hematopoietic"
+  
+# Convert Disease.Site.category to long format
+#----------------------------------------------
+colname_keep <- append(colname_keep, "Disease.Group.category")
+## Strip Disease.Site.category into components
+OnCore_Biomarker_Report <- cSplit(OnCore_Biomarker_Report, "Disease.Site.category", ";", 
+                                  stripWhite = TRUE, type.convert="as.character",
+                                  drop = FALSE)
+
+## Convert to long format 
+OnCore_Biomarker_Report <- melt(OnCore_Biomarker_Report, 
+                                id.vars=append(colname_keep, "Disease.Site.category"))
+OnCore_Biomarker_Report <- OnCore_Biomarker_Report[which(!is.na(OnCore_Biomarker_Report$value)), ]
+
+colnames(OnCore_Biomarker_Report)[as.numeric(ncol(OnCore_Biomarker_Report))] <- c("Disease.Site")
+colname_keep <- append(colname_keep, "Disease.Site")
+OnCore_Biomarker_Report <- subset(OnCore_Biomarker_Report, select = colname_keep)
+
+# ## Data Review
 # #----------------------------------------------
-# table(sort(DF_Inclusion_Variants$Gene_Name))
-# table(sort(DF_Exclusion_Variants$Gene_Name))
-# table(sort(DF_Inclusion_NonHotspot_Rules$Gene_Name))
-# table(sort(DF_Exclusion_NonHotspot_Rules$Gene_Name))
-# table(sort(DF_IHC_Results$Gene))
-# table(sort(DF_Comments$Gene_Name))
+# print(paste("Total number of unique OnCore.No ", length(unique(OnCore_Biomarker_Report$OnCore.No)), sep=""))
+# print(paste("Total number of unique disease groups: ", length(sort(unique(OnCore_Biomarker_Report$Disease.Group))), sep=""))
+# sort(unique(OnCore_Biomarker_Report$Disease.Group))
+# print(paste("Total number of unique disease group categories: ", length(sort(unique(OnCore_Biomarker_Report$Disease.Group.category))), sep=""))
+# sort(unique(OnCore_Biomarker_Report$Disease.Group.category))
+# print(paste("Total number of unique disease sites: ", length(sort(unique(OnCore_Biomarker_Report$Disease.Site))), sep=""))
+# sort(unique(OnCore_Biomarker_Report$Disease.Site))
+# print(paste("Total number of unique biomarker genes: ", length(sort(unique(OnCore_Biomarker_Report$Biomarker_GeneName))), sep=""))
+# sort(unique(OnCore_Biomarker_Report$Biomarker_GeneName))
+# print(paste("Total number of unique biomarker conditions: ", length(sort(unique(OnCore_Biomarker_Report$Biomarker_Condition))), sep=""))
+# sort(unique(OnCore_Biomarker_Report$Biomarker_Condition))
+# print(paste("Total number of unique Biomarker details: ", length(sort(unique(OnCore_Biomarker_Report$Biomarker_Detail))), sep=""))
+# sort(unique(OnCore_Biomarker_Report$Biomarker_Detail))
 
-################################
-## Manual correction of fields = DF_Inclusion_Variants
-################################
-# table(sort(DF_Inclusion_Variants$Variant_Type))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "SNV"]))
+# Confirm all entries have a Disease.Group.category and Disease.Site
+# which(is.na(OnCore_Biomarker_Report$Disease.Group.category))
+# sort(table(OnCore_Biomarker_Report$Disease.Group.category))
+# which(is.na(OnCore_Biomarker_Report$Disease.Site))
+# sort(table(OnCore_Biomarker_Report$Disease.Site))
 
-if (Patient_Variant_Report_timestamp  == "2018-09-06") {
-  
-  # Remove blank space after "p."
-  for (row_No in 1:nrow(DF_Inclusion_Variants)) {
-    if (DF_Inclusion_Variants$Variant_Type[row_No] == "SNV") {
-      DF_Inclusion_Variants$Protein[row_No] <- gsub("(^p.[[:blank:]]*)(.*)", "\\2", DF_Inclusion_Variants$Protein[row_No])
-      DF_Inclusion_Variants$Protein[row_No] <- paste("p.", DF_Inclusion_Variants$Protein[row_No], sep="")
-    }
-  }
-  
-  # Spelling correction
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "p.Gly719Cys"
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "SNV"
-  
-  # Editing of "MET Exon 14 skipping"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082G>C")] <- "p.Asp1028His"
-  # Input coding info for intronic mutations
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.2:c.3082+1G>T")] <- "c.3082+1G>T"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Variant_ID == "MVAR27")] <- "c.3082_3082+26del"
-  
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Protein == "p.G983_G1054del")] <- "p.Gly983_Gly1054del"
-  
-  # NM_000368.4(TSC1):c.1907_1908del (p.Glu636Glyfs)
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Protein == "p.Glu636fs51")] <- "p.Glu636Glyfs"
-  
-  # NM_000142.4(FGFR3):c.1949A>C (p.Lys650Thr)
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Protein == "p.Lys650Thr")] <- "SNV"
-  
-} else if (Patient_Variant_Report_timestamp  == "2018-12-11") {
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "Del")] <- "Indel"
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "SNV"
-  
-  # Editing of "MET Exon 14 skipping"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082G>C")] <- "p.Asp1028His"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.2:c.3082+1G>T")] <- "c.3082+1G>T"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082+1G>A")] <- "c.3082+1G>A"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_000245.2:c.2888-18_2888-2del")] <- "c.2888-18_2888-2del"
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Variant_ID == "MVAR27")] <- "c.3082_3082+26del"
-  
-  # NM_000142.4(FGFR3):c.1949A>C (p.Lys650Thr)
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Protein == "p.Lys650Thr")] <- "SNV"
-  
-  # NM_000368.4(TSC1):c.1907_1908del (p.Glu636Glyfs)
-  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Protein == "p.Glu636fs51")] <- "p.Glu636Glyfs"
-  
-  DF_Exclusion_Variants$Variant_Type[which(DF_Exclusion_Variants$Variant_Type == "MNV")] <- "SNV"
-}
-
-# Annotate for consistency  
-for (row_No in 1:nrow(DF_Inclusion_Variants)) {
-  if (isTRUE(DF_Inclusion_Variants$Variant_Type[row_No] == "Indel")) {
-    if (grepl("del.*ins", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
-      DF_Inclusion_Variants$Variant_Type[row_No] <- "Delins"
-    } else if (grepl("ins", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
-      DF_Inclusion_Variants$Variant_Type[row_No] <- "Insertion"
-    } else if (grepl("del", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
-      DF_Inclusion_Variants$Variant_Type[row_No] <- "Deletion"
-    } else if (grepl("fs", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
-      DF_Inclusion_Variants$Variant_Type[row_No] <- "Frameshift"
-    }
-  }
-}
-
-# ## Review of data
-# #----------------------------------------------
-# sort(table(DF_Inclusion_Variants$Variant_Type))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Indel"]))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Frameshift"]))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Insertion"]))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Deletion"]))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Delins"]))
-
-################################
-## Manual correction of fields = DF_Exclusion_Variants
-################################
-# table(sort(DF_Exclusion_Variants$Variant_Type))
-# sort(unique(DF_Exclusion_Variants$Protein[DF_Exclusion_Variants$Variant_Type == "SNV"]))
-
-# Remove blank space after "p." and/or include "p."
-for (row_No in 1:nrow(DF_Exclusion_Variants)) {
-  if (DF_Exclusion_Variants$Variant_Type[row_No] == "SNV") {
-    DF_Exclusion_Variants$Protein[row_No] <- gsub("(^p.[[:blank:]]*)(.*)", "\\2", DF_Exclusion_Variants$Protein[row_No])
-    DF_Exclusion_Variants$Protein[row_No] <- paste("p.", DF_Exclusion_Variants$Protein[row_No], sep="")
-  }
-}
-
-remove(arm_end,arm_start,Arm_No,row_int_end,row_int_start,row_No)
+remove(alterations_okay,colname_keep,x,row_No)
+cat("\n")
 
 ## Write to local computer
 #----------------------------------------------
-list_of_datasets <- list("DF_Inclusion_Variants" = DF_Inclusion_Variants, 
-                         "DF_Exclusion_Variants" = DF_Exclusion_Variants,
-                         "DF_Inclusion_NonHotspot_Rules" = DF_Inclusion_NonHotspot_Rules,
-                         "DF_Exclusion_NonHotspot_Rules" = DF_Exclusion_NonHotspot_Rules,
-                         "DF_IHC_Results" = DF_IHC_Results,
-                         "DF_Comments" = DF_Comments,
-                         "DF_Disease_Exclusion_Codes" = DF_Histologic_Disease_Exclusion_Codes)
-write.xlsx(list_of_datasets, file = paste("Patient_Variant_Report_", Patient_Variant_Report_timestamp, "_QC_.xlsx", sep=""))
-
-remove(DF_Inclusion_Variants, DF_Exclusion_Variants, DF_Inclusion_NonHotspot_Rules,
-       DF_Exclusion_NonHotspot_Rules, DF_IHC_Results, DF_Comments,DF_Histologic_Disease_Exclusion_Codes)
+write.csv(OnCore_Biomarker_Report,
+          file = paste("Biomarker_Report_LongFormat_", OnCore_Biomarker_Report_timestamp, ".csv", sep=""),
+          na = "NA", row.names = FALSE)
