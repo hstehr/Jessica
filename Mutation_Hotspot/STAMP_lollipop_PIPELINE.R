@@ -7,7 +7,8 @@ setwd("~/Documents/ClinicalDataScience_Fellowship/")
 Syapse_Export_timestamp <- format(as.Date("2018-10-18"), format= "%Y-%m-%d")
 STAMP_annotation_timestamp <- format(as.Date("2016-08-23"), format= "%Y-%m-%d")
 deleteIntermediateFile = TRUE
-saveStaticPlots = TRUE
+saveStaticPlots = FALSE
+saveDynamicPlots = TRUE
 
 # Classify pathogenicity statuses
 pathogenic = c("Pathogenic", "Likely Pathogenic")
@@ -41,19 +42,16 @@ remove(DF_STAMP_VariantAnno, Age_Calculation_timestamp)
 Sys.setenv("plotly_username"="jwrchen")
 Sys.setenv("plotly_api_key"="R71FseH6JGAfY8qq6zsa")
 options(browser = 'false')
+setwd("~/Documents/ClinicalDataScience_Fellowship/")
 source("Mutation_Hotspot/mutation_hotspot.R")
 
 ## Remove Syapse-related files
 #----------------------------------------------
 setwd("~/Documents/ClinicalDataScience_Fellowship/")
-int_file_01 = paste(getwd(), "/ClinicalTrialMatching/", Syapse_Export_timestamp,
-                    "_syapse_export_DF_STAMP_VariantAnno.csv", sep="")
-int_file_02 = paste(getwd(), "/STAMP/", Syapse_Export_timestamp,
-                    "_syapse_export_all_variants_QC.csv", sep="")
-int_file_03 = paste(getwd(), "/Mutation_Hotspot/", Syapse_Export_timestamp,
-                    "_syapse_export_DF_NAprotein.csv", sep="")
-int_file_04 = paste(getwd(), "/Mutation_Hotspot/", Syapse_Export_timestamp,
-                    "_syapse_export_DF_STAMP_4Map.csv", sep="")
+int_file_01 = paste(getwd(), "/ClinicalTrialMatching/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_VariantAnno.csv", sep="")
+int_file_02 = paste(getwd(), "/STAMP/", Syapse_Export_timestamp, "_syapse_export_all_variants_QC.csv", sep="")
+int_file_03 = paste(getwd(), "/Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_NAprotein.csv", sep="")
+int_file_04 = paste(getwd(), "/Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_4Map.csv", sep="")
 
 if (isTRUE(deleteIntermediateFile)) {
   if (file.exists(int_file_01)){file.remove(int_file_01)}
