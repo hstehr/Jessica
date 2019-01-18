@@ -101,6 +101,7 @@ colnames(DF_Output_Biomarker_Matched) <- colnames(DF_Output_OnCore_Biomarker)
 
 # Extract corresponding row based on OnCore.No
 for (match_num in 1:nrow(DF_Output_OnCore_Biomarker)) {
+
   match_id <- DF_Output_OnCore_Biomarker$value[match_num]
   gene_id <- DF_Output_OnCore_Biomarker$base.gene[match_num]
   site_id <- DF_Output_OnCore_Biomarker$Disease.Group.category[match_num]
@@ -132,7 +133,7 @@ for (match_num in 1:nrow(DF_Output_OnCore_Biomarker)) {
     DF_Output_Pre <- cbind(DF_Output_OnCore_Biomarker[match_num,1:ncol_original],match_info[1,])
 
   } else {
-    DF_Output_Pre <- cbind(DF_Output_OnCore_Biomarker[match_num,1:ncol_original],match_info)
+    DF_Output_Pre <- cbind(DF_Output_OnCore_Biomarker[match_num,1:ncol_original], match_info)
   }
   
   DF_Output_Biomarker_Matched <- rbind.fill(DF_Output_Biomarker_Matched, DF_Output_Pre)
@@ -281,6 +282,7 @@ for (patient_num in 1:length(patient.list)) {
           site_id_component <- unlist(site_id_component)
           
           for (elem_No in 1:length(site_id_component)) {
+            # Whole word matching
             if (isTRUE(grepl(site_id_component[elem_No], primaryTumorSite.patient, ignore.case = TRUE))) {
               disease_site_match <- append(disease_site_match, "TRUE")
             } else {
