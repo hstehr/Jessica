@@ -4,7 +4,6 @@ setwd("~/Documents/ClinicalDataScience_Fellowship/")
 #################################
 ## Customize variables 
 #################################
-Age_Calculation_timestamp <- format(as.Date("2018-12-31"), format= "%Y-%m-%d") # Default = Sys.Date() 
 Syapse_Export_timestamp <- format(as.Date("2018-10-18"), format= "%Y-%m-%d")
 OnCore_Biomarker_Report_timestamp <- format(as.Date("2018-10-01"), format= "%Y-%m")
 Patient_Variant_Report_timestamp <- format(as.Date("2018-09-06"), format= "%Y-%m-%d")
@@ -19,33 +18,6 @@ disease.group_FILTER = TRUE
 disease.site_FILTER = TRUE # Dependent on disease.group_FILTER == TRUE
 pathogenic_FILTER = TRUE
 
-# # Run every combination of filters
-# # Export script from "## PIPELINE" onward as file = "~/Desktop/Untitled.R"
-# disease.group_FILTER_all = c("TRUE","FALSE")
-# disease.site_FILTER_all = c("TRUE","FALSE")
-# pathogenic_FILTER_all = c("TRUE","FALSE")
-# 
-# for (group_type in 1:length(disease.group_FILTER_all)) {
-#   disease.group_FILTER <- as.logical(disease.group_FILTER_all[group_type])
-# 
-#   if (isTRUE(disease.group_FILTER)) {
-#     for (site_type in 1:length(disease.site_FILTER_all)) {
-#       disease.site_FILTER <- as.logical(disease.site_FILTER_all[site_type])
-#       for (patho_type in 1:length(pathogenic_FILTER_all)) {
-#         pathogenic_FILTER <- as.logical(pathogenic_FILTER_all[patho_type])
-#         source("~/Desktop/Untitled.R")
-#       }
-#     }
-#   } else {
-#     for (patho_type in 1:length(pathogenic_FILTER_all)) {
-#       pathogenic_FILTER <- as.logical(pathogenic_FILTER_all[patho_type])
-#       source("~/Desktop/Untitled.R")
-#     }
-#   }
-# }
-# 
-# remove(disease.group_FILTER_all,disease.site_FILTER_all,pathogenic_FILTER_all,group_type,site_type,patho_type)
-
 #################################
 ## PIPELINE
 #################################
@@ -55,6 +27,39 @@ suppressMessages(library("easypackages"))
 suppressMessages(libraries("plyr", "tidyverse", "dplyr", "ggplot2", "eeptools", "splitstackshape", 
                            "reshape", "tidyr", "Biobase", "stringr", "rio", "openxlsx"))
 # tidyverse_conflicts()     # Conflicts with dplyr
+
+# Load DiseaseGroupCategories 
+#----------------------------------------------
+source("ClinicalTrialMatching/DiseaseGroupCategories.R")
+
+# Run every combination of filters
+#----------------------------------------------
+# Export script from "## Filter indication" onward as file = "~/Desktop/Untitled.R"
+disease.group_FILTER_all = c("TRUE","FALSE")
+disease.site_FILTER_all = c("TRUE","FALSE")
+pathogenic_FILTER_all = c("TRUE","FALSE")
+
+for (group_type in 1:length(disease.group_FILTER_all)) {
+  disease.group_FILTER <- as.logical(disease.group_FILTER_all[group_type])
+  
+  if (isTRUE(disease.group_FILTER)) {
+    for (site_type in 1:length(disease.site_FILTER_all)) {
+      disease.site_FILTER <- as.logical(disease.site_FILTER_all[site_type])
+      for (patho_type in 1:length(pathogenic_FILTER_all)) {
+        pathogenic_FILTER <- as.logical(pathogenic_FILTER_all[patho_type])
+        source("~/Desktop/Untitled.R")
+      }
+    }
+  } else {
+    for (patho_type in 1:length(pathogenic_FILTER_all)) {
+      pathogenic_FILTER <- as.logical(pathogenic_FILTER_all[patho_type])
+      source("~/Desktop/Untitled.R")
+    }
+  }
+}
+
+remove(disease.group_FILTER_all,disease.site_FILTER_all,pathogenic_FILTER_all,
+       group_type,site_type,patho_type)
 
 ## Filter indication
 #----------------------------------------------
@@ -123,18 +128,18 @@ remove(DF_Output_Patient_Variant_Matched,DF_Output_Patient_NonHotspot_Matched)
 
 # FINAL_Matching
 #----------------------------------------------
-## Generate summary text file of candidate clinical trial(s) per patient
-outdir = paste(getwd(), "/ClinicalTrialMatching/Retrospective_Analysis/Internal_", OnCore_Biomarker_Report_timestamp, 
-               "_NCI-MATCH_", Patient_Variant_Report_timestamp, "_", filterName, "/", sep="")
-if (!dir.exists(outdir)){dir.create(outdir)} 
+## Generate summary separate text file of candidate clinical trial(s) per patient per trial cohort
+outdir = paste(getwd(), "/ClinicalTrialMatching/Retrospective_Analysis/", sep="")
 source("ClinicalTrialMatching/ClinicalTrial_Final_Match.R")     ## Output: Match_ClinicalTrial_patient_id.txt
 
 # Remove Syapse-related files
 #----------------------------------------------
-int_file_01 = paste(getwd(), "/ClinicalTrialMatching/",Syapse_Export_timestamp, "_syapse_export_DF_STAMP_VariantAnno.csv", sep="")
-int_file_02 = paste(getwd(), "/STAMP/",Syapse_Export_timestamp, "_syapse_export_all_variants_QC.csv", sep="")
-
-if (file.exists(int_file_01)){file.remove(int_file_01)}
-if (file.exists(int_file_02)){file.remove(int_file_02)}
-
-remove(int_file_01,int_file_02)
+if (isTRUE(deleteIntermediateFile)) {
+  int_file_01 = paste(getwd(), "/ClinicalTrialMatching/",Syapse_Export_timestamp, "_syapse_export_DF_STAMP_VariantAnno.csv", sep="")
+  int_file_02 = paste(getwd(), "/STAMP/",Syapse_Export_timestamp, "_syapse_export_all_variants_QC.csv", sep="")
+  
+  if (file.exists(int_file_01)){file.remove(int_file_01)}
+  if (file.exists(int_file_02)){file.remove(int_file_02)}
+  
+  remove(int_file_01,int_file_02)
+}
