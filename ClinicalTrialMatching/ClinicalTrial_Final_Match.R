@@ -102,7 +102,7 @@ DF_NCI_Matched_Dup <- rbind(unique(data.frame(id = Patient_Variant_Matched$sys.u
 DF_NCI_Matched_Dup <- DF_NCI_Matched_Dup$id[which(duplicated(DF_NCI_Matched_Dup[,1:2]))]
 
 # Confirmation check of correct adjustment to "No.NCI.NonHotspot"
-print(paste("Patient_id is duplicated at most ONCE: ", 
+print(paste("Patient_id is duplicated at most ONCE for NCI-MATCH trials: ", 
       (length(DF_NCI_Matched_Dup) == length(unique(DF_NCI_Matched_Dup))),
       sep=""))
 cat("\n","\n")
@@ -119,6 +119,7 @@ for (row_No in 1:nrow(Trial_Count)) {
   Trial_Count$No.Internal.Trials[row_No] <- 
     as.numeric(length(unique(OnCore_Biomarker_Matched$OnCore.No[OnCore_Biomarker_Matched$sys.uniqueId == 
                                                                   Trial_Count$patient_id[row_No]])))
+  
   Trial_Count$No.NCI.Trials[row_No] <- 
     as.numeric(length(unique(Patient_Variant_Matched$Arm_Name[Patient_Variant_Matched$sys.uniqueId == 
                                                                 Trial_Count$patient_id[row_No]])))
@@ -133,26 +134,28 @@ for (row_No in 1:nrow(Trial_Count)) {
 }
 Trial_Count$No.Total.Trials <- rowSums(Trial_Count[,3:5])
 
-plot_Trial_Count(DF = Trial_Count, y_max = 900,
+plot_Trial_Count(DF = Trial_Count, y_max = 1010,
                  trialColumn = "No.Total.Trials", 
                  fileName_pre = paste("Total_MatchDistribution_Internal", OnCore_Biomarker_Report_timestamp, 
                                       "_NCI-MATCH_", Patient_Variant_Report_timestamp, "_", filterName, sep=""), 
                  plotTitle = "NCI-MATCH & Stanford Internal Clinical Trial Matching") 
 
-plot_Trial_Count(DF = Trial_Count, y_max = 900,
+plot_Trial_Count(DF = Trial_Count, y_max = 1010,
                  trialColumn = "No.Internal.Trials", 
                  fileName_pre = paste("OnCore_Biomarker_MatchDistribution_", OnCore_Biomarker_Report_timestamp, "_", 
                                       filterName_initial, filterName_int, sep=""), 
                  plotTitle = "Stanford Internal Clinical Trial Matching") 
 
-plot_Trial_Count(DF = Trial_Count, y_max = 900,
-                 trialColumn = "No.NCI.Trials", fileName_pre = paste("Patient_Variant_MatchDistribution_",
-                                                                     Patient_Variant_Report_timestamp, "_", pathogenic_pre, sep=""), 
+plot_Trial_Count(DF = Trial_Count, y_max = 1010,
+                 trialColumn = "No.NCI.Trials", 
+                 fileName_pre = paste("Patient_Variant_MatchDistribution_",
+                                      Patient_Variant_Report_timestamp, "_", pathogenic_pre, sep=""), 
                  plotTitle = "NCI-MATCH Trial Matching (Variants)") 
 
-plot_Trial_Count(DF = Trial_Count, y_max = 900,
-                 trialColumn = "No.NCI.NonHotspot", fileName_pre = paste("Patient_NonHotspot_MatchDistribution_",
-                                                                         Patient_Variant_Report_timestamp, "_", pathogenic_pre, sep=""), 
+plot_Trial_Count(DF = Trial_Count, y_max = 1010,
+                 trialColumn = "No.NCI.NonHotspot", 
+                 fileName_pre = paste("Patient_NonHotspot_MatchDistribution_",
+                                      Patient_Variant_Report_timestamp, "_", pathogenic_pre, sep=""), 
                  plotTitle = "NCI-MATCH Trial Matching (NonHotspot)") 
 
 remove(Trial_Count,row_No,DF_NCI_Matched_Dup,plot_Trial_Count)
@@ -160,6 +163,21 @@ remove(Trial_Count,row_No,DF_NCI_Matched_Dup,plot_Trial_Count)
 ## Generate email notification
 #---------------------------------------------- 
 ## FUNCTION
+# Print STAMP entry to screen for Exclusion_NonHotspot_Rules
+Arm_Exclusion <- function(patient_DF, matched_DF, exclusion_DF) {
+  patient_id <- sort(unique(matched_DF$sys.uniqueId))
+  
+  ## Extract all STAMP entries for each patient
+  patient_DF <- patient_DF[patient_DF$sys.uniqueId == patient_id,]
+  patient_gene <- unique(patient_DF$base.gene)
+  
+  exclusion_gene <- unique(exclusion_DF$Gene_Name)
+  DF_exclusion_output <- patient_DF[patient_DF$base.gene %in% exclusion_gene,]
+  DF_exclusion_output <- DF_exclusion_output[!(DF_exclusion_output$smpl.hgvsProtein %in% matched_DF$smpl.hgvsProtein),]
+  
+  assign("DF_exclusion_output", DF_exclusion_output, envir = .GlobalEnv)
+}
+
 # Print additional ARM criteria for NCI-MATCH trials
 Arm_INFO <- function(trial_id) {
   
@@ -168,24 +186,42 @@ Arm_INFO <- function(trial_id) {
     DF_Exclusion_NonHotspot_Rules[DF_Exclusion_NonHotspot_Rules$Arm_Name == trial_id,]
   DF_IHC_Patient <- DF_IHC_Results[DF_IHC_Results$Arm_Name == trial_id,]
   DF_Comments_Patient <- DF_Comments[DF_Comments$Arm_Name == trial_id,]
+  DF_Disease_Exclusion_Codes_Patient <- DF_Disease_Exclusion_Codes[DF_Disease_Exclusion_Codes$Arm_Name == trial_id,]
   
   # Determine if any rows of interested extracted 
   if (nrow(DF_Exclusion_NonHotspot_Patient) + nrow(DF_IHC_Patient) +
-      nrow(DF_Comments_Patient) > 0) {
+      nrow(DF_Comments_Patient) + nrow(DF_Disease_Exclusion_Codes_Patient) > 0) {
     cat("\n")
-    cat("Trial criteria that need to be manually assessed: ", "\n")  
+    cat("Trial criteria to be manually assessed: ", "\n")  
     
-    # Print rows from DF_Exclusion_NonHotspot_Rules
+    # Print rows from DF_Exclusion_NonHotspot_Rules if match by Gene_Name
     if (nrow(DF_Exclusion_NonHotspot_Patient) > 0) {
-      cat("Exclusion NonHotspot criteria: ", "\n")
-      for (entry_num in 1:nrow(DF_Exclusion_NonHotspot_Patient)) {
-        cat("\t", paste(DF_Exclusion_NonHotspot_Patient$Gene_Name[entry_num], 
-                        ":Exon ", DF_Exclusion_NonHotspot_Patient$Exon[entry_num], 
-                        " (Function: ", DF_Exclusion_NonHotspot_Patient$Function[entry_num], 
-                        "; Variant Class: ", DF_Exclusion_NonHotspot_Patient$oncominevariantclass[entry_num], 
-                        ")", sep=""),"\t")
+      if (trial_num == 0) {
+        Arm_Exclusion(patient_DF = STAMP_all_variants_QC, 
+                      matched_DF = DF_patient_NCI, 
+                      exclusion_DF = DF_Exclusion_NonHotspot_Patient)
+      } else {
+        Arm_Exclusion(patient_DF = STAMP_all_variants_QC, 
+                      matched_DF = DF_patient_NCI.NonHotspot, 
+                      exclusion_DF = DF_Exclusion_NonHotspot_Patient)
       }
-      cat("\n")
+      
+      if (nrow(DF_exclusion_output) > 0) {
+        cat("Exclusion NonHotspot criteria: ", "\n")
+        for (entry_num in 1:nrow(DF_Exclusion_NonHotspot_Patient)) {
+          cat("\t", paste(DF_Exclusion_NonHotspot_Patient$Gene_Name[entry_num], 
+                          ":Exon ", DF_Exclusion_NonHotspot_Patient$Exon[entry_num], 
+                          " (Function: ", DF_Exclusion_NonHotspot_Patient$Function[entry_num], 
+                          "; Variant Class: ", DF_Exclusion_NonHotspot_Patient$oncominevariantclass[entry_num], 
+                          ")", sep=""),"\t")
+        }
+        cat("\n", paste("Additional relevant mutated transcript(s) identified in patient ", patient_id, ":", sep=""),"\n")
+        for (entry_num in 1:nrow(DF_exclusion_output)) {
+          cat("\t", paste(DF_exclusion_output$base.gene[entry_num], ":", DF_exclusion_output$smpl.hgvsProtein[entry_num], 
+                          " (", DF_exclusion_output$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
+        }
+        cat("\n")
+      }
     }
     
     # Print rows from DF_IHC_Results
@@ -206,6 +242,24 @@ Arm_INFO <- function(trial_id) {
       print(DF_Comments_Patient, row.names = FALSE)
       cat("\n")
     }
+    
+    # Print rows from DF_Disease_Exclusion_Codes
+    if (nrow(DF_Disease_Exclusion_Codes_Patient) > 0) {
+      cat("\n")
+      cat("Disease_Exclusion_Codes:", "\n")
+      cat("CTEP.CATEGORY:", "\n")
+      print(unique(DF_Disease_Exclusion_Codes_Patient$CTEP.CATEGORY))
+      
+      cat("CTEP.SUBCATEGORY:", "\n")
+      print(unique(DF_Disease_Exclusion_Codes_Patient$CTEP.SUBCATEGORY))
+      
+      cat("CTEP.TERM:", "\n")
+      print(unique(DF_Disease_Exclusion_Codes_Patient$SHORT.NAME))
+      
+      cat("MedDRA.CODE:", "\n")
+      print(unique(DF_Disease_Exclusion_Codes_Patient$MedDRA.CODE))
+      cat("\n")
+    }
   }
 }
 
@@ -218,38 +272,40 @@ for (id_num  in 1:length(patient.list)) {
   patient_id <- patient.list[id_num]
   
   # Extract rows of matched trials per patient
-  DF_patient_Internal <- OnCore_Biomarker_Matched[which(OnCore_Biomarker_Matched$sys.uniqueId == patient_id),]
-  DF_patient_NCI <- Patient_Variant_Matched[which(Patient_Variant_Matched$sys.uniqueId == patient_id),]
-  DF_patient_NCI.NonHotspot <- Patient_NonHotspot_Matched[which(Patient_NonHotspot_Matched$sys.uniqueId == patient_id),]
-  
-  ## Write output to file
-  txt_filename <- paste(outdir, patient_id, ".txt", sep="")
-  sink(file = txt_filename, 
-       append = FALSE, 
-       split = FALSE)
-  
-  options(max.print=999999)
-  
-  # Extract patient INFO
-  DF_patient_INFO <- rbind(DF_patient_Internal[,c(1:33,39,42,69:71)], 
-                           DF_patient_NCI[,c(1:33,39,42,69:71)],
-                           DF_patient_NCI.NonHotspot[,c(1:33,39,42,69:71)])
-  DF_patient_INFO <- unique(DF_patient_INFO)
-  
-  # Output patient bio
-  cat(paste("Ordering Physician: ",DF_patient_INFO$smpl.hasOrderingPhysician, sep=""), "\n","\n")
-  cat(paste("Patient ", patient_id, " may qualify for the following clinical trial(s) based on ", 
-            DF_patient_INFO$smpl.csmAssay, " of the specimen biopsied on ", DF_patient_INFO$smpl.dateCollected, 
-            ". Mutations were identified in ", DF_patient_INFO$smpl.assayName, 
-            " assay (reviewed ", DF_patient_INFO$smpl.reportDateReviewed, ").", sep=""), 
-      "\n", "\t", paste("Demographic: ", DF_patient_INFO$current.age, "yo ", DF_patient_INFO$smpl.gender, sep=""), 
-      "\n", "\t", paste("Primary tumor site: ", DF_patient_INFO$smpl.primaryTumorSite, sep=""), 
-      "\n", "\t", paste("Specimen site: ", DF_patient_INFO$smpl.specimenSite, sep=""), 
-      "\n", "\t", paste("Dx: ", DF_patient_INFO$smpl.ppDiagnosticSummary, sep=""), "\n","\n","\n")
-  remove(DF_patient_INFO)
+  DF_patient_Internal <- unique(OnCore_Biomarker_Matched[which(OnCore_Biomarker_Matched$sys.uniqueId == patient_id),])
+  DF_patient_NCI <- unique(Patient_Variant_Matched[which(Patient_Variant_Matched$sys.uniqueId == patient_id),])
+  DF_patient_NCI.NonHotspot <- unique(Patient_NonHotspot_Matched[which(Patient_NonHotspot_Matched$sys.uniqueId == patient_id),])
   
   # Output trials from OnCore_Biomarker_Matched
   if (nrow(DF_patient_Internal) > 0 ) {
+    
+    ## Write output to file (Internal Stanford Trial)
+    outdir_sub_internal = paste(outdir, "Internal_", OnCore_Biomarker_Report_timestamp, "_", 
+                                gsub("_pathogenicFILTER[_][[:alpha:]]{,3}$", "", filterName), "/", sep="")
+    if (!dir.exists(outdir_sub_internal)){dir.create(outdir_sub_internal)} 
+    
+    txt_filename <- paste(outdir_sub_internal, patient_id, ".txt", sep="")
+    sink(file = txt_filename, 
+         append = FALSE, 
+         split = FALSE)
+    
+    options(max.print=999999)
+    
+    # Extract patient INFO
+    DF_patient_INFO <- DF_patient_Internal[,c(1:33,39,42,69:71)]
+    DF_patient_INFO <- unique(DF_patient_INFO)
+    
+    # Output patient bio
+    cat(paste("Ordering Physician: ",DF_patient_INFO$smpl.hasOrderingPhysician, sep=""), "\n","\n")
+    cat(paste("Patient ", patient_id, " may qualify for the following clinical trial(s) based on ", 
+              DF_patient_INFO$smpl.csmAssay, " of the specimen biopsied on ", DF_patient_INFO$smpl.dateCollected, 
+              ". Mutations were identified in ", DF_patient_INFO$smpl.assayName, 
+              " assay (reviewed ", DF_patient_INFO$smpl.reportDateReviewed, ").", sep=""), 
+        "\n", "\t", paste("Demographic: ", DF_patient_INFO$current.age, "yo ", DF_patient_INFO$smpl.gender, sep=""), 
+        "\n", "\t", paste("Primary tumor site: ", DF_patient_INFO$smpl.primaryTumorSite, sep=""), 
+        "\n", "\t", paste("Specimen site: ", DF_patient_INFO$smpl.specimenSite, sep=""), 
+        "\n", "\t", paste("Dx: ", DF_patient_INFO$smpl.ppDiagnosticSummary, sep=""), "\n","\n","\n")
+    remove(DF_patient_INFO)
     
     # Extract list of matched OnCore.No
     trial.list.internal <- sort(unique(DF_patient_Internal$OnCore.No))
@@ -278,125 +334,167 @@ for (id_num  in 1:length(patient.list)) {
           "\n","\n")
       
       DF_patient_trial <- DF_patient_Internal[DF_patient_Internal$OnCore.No == trial_id,]
+      DF_patient_trial_ouput <- unique(DF_patient_trial[, c("base.gene","smpl.hgvsProtein","smpl.pathogenicityStatus",
+                                                            "Biomarker_GeneName","Biomarker_Condition","Biomarker_Detail","Biomarker_Comment")])
+      
       cat(paste("Relevant mutation(s) identified in patient ", patient_id, ":", sep=""),"\n")
-      for (entry_num in 1:nrow(DF_patient_trial)) {
-        cat("\t", paste(DF_patient_trial$base.gene[entry_num], ":", DF_patient_trial$smpl.hgvsProtein[entry_num], 
-                  " (", DF_patient_trial$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
+      for (entry_num in 1:nrow(DF_patient_trial_ouput)) {
+        cat("\t", paste(DF_patient_trial_ouput$base.gene[entry_num], ":", DF_patient_trial_ouput$smpl.hgvsProtein[entry_num], 
+                        " (", DF_patient_trial_ouput$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
       }
       cat("\n","\n")
-      remove(trial_INFO,trial_id,entry_num,DF_patient_trial)
+      remove(trial_INFO,trial_id,entry_num,DF_patient_trial,DF_patient_trial_ouput)
     }
-  } else {
-    trial_num_internal = 0
+  
+    remove(trial_num_internal)
+    
+    cat(paste("NOTE: Trial criteria indicated by 'Disease group', 'Disease site' and 'Comments' need to be manually assessed. OnCore Biomarker Report last updated on ", 
+              OnCore_Biomarker_Report_timestamp, ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
+    sink()     
   }
   
-  # Output trials from Patient_Variant_Matched
-  if (nrow(DF_patient_NCI) > 0) {
+  if (isTRUE(nrow(DF_patient_NCI) > 0  | nrow(DF_patient_NCI.NonHotspot) > 0)) {
     
-    # Extract list of matched Arm_Name (Inclusion Variants)
-    trial.list.NCI <- sort(unique(DF_patient_NCI$Arm_Name))
+    trial_num = 0
+    assign("trial_num", trial_num, envir = .GlobalEnv)
     
-    # Output matched INFO per trial 
-    for (trial_num_NCI in 1:length(trial.list.NCI)) {
+    ## Write output to file (NCI-MATCH Trial)
+    outdir_sub_NCI = paste(outdir, "NCI-MATCH_", Patient_Variant_Report_timestamp, "_", 
+                                gsub("(^.*)(_pathogenicFILTER[_][[:alpha:]]{,3}$)", "\\1", filterName), "/", sep="")
+    if (!dir.exists(outdir_sub_NCI)){dir.create(outdir_sub_NCI)} 
+    
+    txt_filename <- paste(outdir_sub_NCI, patient_id, ".txt", sep="")
+    sink(file = txt_filename, 
+         append = FALSE, 
+         split = FALSE)
+    
+    options(max.print=999999)
+    
+    # Extract patient INFO
+    DF_patient_INFO <- rbind(DF_patient_NCI[,c(1:33,39,42,69:71)],
+                             DF_patient_NCI.NonHotspot[,c(1:33,39,42,69:71)])
+    DF_patient_INFO <- unique(DF_patient_INFO)
+    
+    # Output patient bio
+    cat(paste("Ordering Physician: ",DF_patient_INFO$smpl.hasOrderingPhysician, sep=""), "\n","\n")
+    cat(paste("Patient ", patient_id, " may qualify for the following clinical trial(s) based on ", 
+              DF_patient_INFO$smpl.csmAssay, " of the specimen biopsied on ", DF_patient_INFO$smpl.dateCollected, 
+              ". Mutations were identified in ", DF_patient_INFO$smpl.assayName, 
+              " assay (reviewed ", DF_patient_INFO$smpl.reportDateReviewed, ").", sep=""), 
+        "\n", "\t", paste("Demographic: ", DF_patient_INFO$current.age, "yo ", DF_patient_INFO$smpl.gender, sep=""), 
+        "\n", "\t", paste("Primary tumor site: ", DF_patient_INFO$smpl.primaryTumorSite, sep=""), 
+        "\n", "\t", paste("Specimen site: ", DF_patient_INFO$smpl.specimenSite, sep=""), 
+        "\n", "\t", paste("Dx: ", DF_patient_INFO$smpl.ppDiagnosticSummary, sep=""), "\n","\n","\n")
+    remove(DF_patient_INFO)
+     
+    # Output trials from Patient_Variant_Matched
+    if (nrow(DF_patient_NCI) > 0) {
       
-      # Extract and output trial INFO (Inclusion Variants)
-      trial_id <- trial.list.NCI[trial_num_NCI]
-      DF_patient_trial <- DF_patient_NCI[DF_patient_NCI$Arm_Name == trial_id,]
+      # Extract list of matched Arm_Name (Inclusion Variants)
+      trial.list.NCI <- sort(unique(DF_patient_NCI$Arm_Name))
       
-      cat(paste("No.", (trial_num_NCI + trial_num_internal), ": NCI-MATCH Trial Treatment ", 
-                unique(DF_patient_trial$Arm_Name), sep=""),"\n", 
-          "----------------------------------------------------------------------", "\n")
-      cat("Inclusion criteria: ", "\n")
-      for (entry_num in 1:nrow(DF_patient_NCI)) {
-        cat("\t", paste(DF_patient_NCI$Gene_Name[entry_num], ":", 
-                        DF_patient_NCI$Protein[entry_num], sep=""),"\n")
-      }
-      
-      # Extract trial INFO (Inclusion NonHotspot)
-      DF_Inclusion_NonHotspot_Patient <- 
-        DF_patient_NCI.NonHotspot[DF_patient_NCI.NonHotspot$Arm_Name == trial_id,]
-      
-      # Output trial INFO (Inclusion NonHotspot)
-      if (nrow(DF_Inclusion_NonHotspot_Patient) > 0) {
-        cat("Inclusion NonHotspot criteria: ", "\n")
-        for (entry_num in 1:nrow(DF_Inclusion_NonHotspot_Patient)) {
-          cat("\t", paste(DF_Inclusion_NonHotspot_Patient$Gene_Name[entry_num], ":Exon ", 
-                    DF_Inclusion_NonHotspot_Patient$Exon[entry_num], " (Function: ",
-                    DF_Inclusion_NonHotspot_Patient$Function[entry_num], "; Variant Class: ",
-                    DF_Inclusion_NonHotspot_Patient$oncominevariantclass[entry_num], ")", sep=""),"\n")
+      # Output matched INFO per trial 
+      for (trial_num_NCI in 1:length(trial.list.NCI)) {
+        
+        # Extract and output trial INFO (Inclusion Variants)
+        trial_id <- trial.list.NCI[trial_num_NCI]
+        DF_patient_trial <- DF_patient_NCI[DF_patient_NCI$Arm_Name == trial_id,]
+        DF_patient_trial_ouput <- unique(DF_patient_trial[, c("base.gene","smpl.hgvsProtein","smpl.pathogenicityStatus",
+                                                              "Gene_Name","Protein")])
+        
+        cat(paste("No.", trial_num_NCI, ": NCI-MATCH Trial Treatment ", trial_id, sep=""),"\n", 
+            "----------------------------------------------------------------------", "\n")
+        cat("Inclusion criteria: ", "\n")
+        for (entry_num in 1:nrow(DF_patient_trial_ouput)) {
+          cat("\t", paste(DF_patient_trial_ouput$Gene_Name[entry_num], ":", 
+                          DF_patient_trial_ouput$Protein[entry_num], sep=""),"\n")
         }
         
-        # Adjust patient-specific Inclusion NonHotspot dataframe
-        DF_patient_NCI.NonHotspot <- 
-          DF_patient_NCI.NonHotspot[!(DF_patient_NCI.NonHotspot$sys.uniqueId == patient_id & 
-                                        DF_patient_NCI.NonHotspot$Arm_Name == trial_id),]
+        # Extract trial INFO (Inclusion NonHotspot)
+        DF_Inclusion_NonHotspot_Patient <- 
+          DF_patient_NCI.NonHotspot[DF_patient_NCI.NonHotspot$Arm_Name == trial_id,]
+        
+        # Output trial INFO (Inclusion NonHotspot)
+        if (nrow(DF_Inclusion_NonHotspot_Patient) > 0) {
+          cat("Inclusion NonHotspot criteria: ", "\n")
+          for (entry_num in 1:nrow(DF_Inclusion_NonHotspot_Patient)) {
+            cat("\t", paste(DF_Inclusion_NonHotspot_Patient$Gene_Name[entry_num], ":Exon ", 
+                            DF_Inclusion_NonHotspot_Patient$Exon[entry_num], " (Function: ",
+                            DF_Inclusion_NonHotspot_Patient$Function[entry_num], "; Variant Class: ",
+                            DF_Inclusion_NonHotspot_Patient$oncominevariantclass[entry_num], ")", sep=""),"\n")
+          }
+          
+          # Adjust patient-specific Inclusion NonHotspot dataframe
+          DF_patient_NCI.NonHotspot <- 
+            DF_patient_NCI.NonHotspot[!(DF_patient_NCI.NonHotspot$sys.uniqueId == patient_id & 
+                                          DF_patient_NCI.NonHotspot$Arm_Name == trial_id),]
+        }
+        
+        cat("\n")
+        cat(paste("Relevant mutation(s) identified in patient ", patient_id, ":", sep=""),"\n")
+        for (entry_num in 1:nrow(DF_patient_trial_ouput)) {
+          cat("\t", paste(DF_patient_trial_ouput$base.gene[entry_num], ":", 
+                          DF_patient_trial_ouput$smpl.hgvsProtein[entry_num], 
+                          " (", DF_patient_trial_ouput$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
+        }
+        
+        Arm_INFO(trial_id = trial_id)
+        cat("\n","\n")
+        remove(trial_id,entry_num,DF_patient_trial,DF_Inclusion_NonHotspot_Patient,DF_patient_trial_ouput)
       }
-      
-      cat("\n")
-      cat(paste("Relevant mutation(s) identified in patient ", patient_id, ":", sep=""),"\n")
-      for (entry_num in 1:nrow(DF_patient_NCI)) {
-        cat("\t", paste(DF_patient_NCI$base.gene[entry_num], ":", DF_patient_NCI$smpl.hgvsProtein[entry_num], 
-                  " (", DF_patient_NCI$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
-      }
-
-      Arm_INFO(trial_id = trial_id)
-      cat("\n","\n")
-      remove(trial_id,entry_num,DF_patient_trial,DF_Inclusion_NonHotspot_Patient)
+    } else {
+      trial_num_NCI = 0
     }
-  } else {
-    trial_num_NCI = 0
-  }
-  
-  # Output trials from Patient_NonHotspot_Matched
-  if (nrow(DF_patient_NCI.NonHotspot) > 0 ) {
     
-    # Extract list of matched Arm_Name (Inclusion NonHotspot)
-    trial.list.NonHotspot <- sort(unique(DF_patient_NCI.NonHotspot$Arm_Name))
+    # Output trials from Patient_NonHotspot_Matched
+    if (nrow(DF_patient_NCI.NonHotspot) > 0 ) {
+      
+      # Extract list of matched Arm_Name (Inclusion NonHotspot)
+      trial.list.NonHotspot <- sort(unique(DF_patient_NCI.NonHotspot$Arm_Name))
+      
+      # Output matched INFO per trial 
+      for (trial_num in 1:length(trial.list.NonHotspot)) {
+        assign("trial_num", trial_num, envir = .GlobalEnv)
+        
+        # Extract and output trial INFO (Inclusion NonHotspot)
+        trial_id <- trial.list.NonHotspot[trial_num]
+        DF_patient_trial <- DF_patient_NCI.NonHotspot[DF_patient_NCI.NonHotspot$Arm_Name == trial_id,]
+        
+        cat(paste("No.", (trial_num_NCI + trial_num), ": NCI-MATCH Trial Treatment ", 
+                  unique(DF_patient_trial$Arm_Name), sep=""),"\n",
+            "----------------------------------------------------------------------", "\n")
+        cat("Inclusion NonHotspot criteria: ", "\n")
+        for (entry_num in 1:nrow(DF_patient_NCI.NonHotspot)) {
+          cat("\t", paste(DF_patient_NCI.NonHotspot$Gene_Name[entry_num], 
+                          ":Exon ", DF_patient_NCI.NonHotspot$Exon[entry_num], 
+                          " (Function: ", DF_patient_NCI.NonHotspot$Function[entry_num], 
+                          "; Variant Class: ", DF_patient_NCI.NonHotspot$oncominevariantclass[entry_num], 
+                          ")", sep=""),"\n")
+        }
+        
+        cat("\n", paste("Relevant mutated transcript(s) identified in patient ", patient_id, ":", sep=""),"\n")
+        for (entry_num in 1:nrow(DF_patient_NCI.NonHotspot)) {
+          cat("\t", paste(DF_patient_NCI.NonHotspot$base.gene[entry_num], ":", DF_patient_NCI.NonHotspot$smpl.hgvsProtein[entry_num], 
+                          " (", DF_patient_NCI.NonHotspot$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
+        }
+        
+        Arm_INFO(trial_id = trial_id)
+        cat("\n","\n")
+        remove(trial_id,entry_num,DF_patient_trial)
+      } 
+    }
     
-    # Output matched INFO per trial 
-    for (trial_num in 1:length(trial.list.NonHotspot)) {
-      
-      # Extract and output trial INFO (Inclusion NonHotspot)
-      trial_id <- trial.list.NonHotspot[trial_num]
-      DF_patient_trial <- DF_patient_NCI.NonHotspot[DF_patient_NCI.NonHotspot$Arm_Name == trial_id,]
-      
-      cat(paste("No.", (trial_num_NCI + trial_num_internal + trial_num), ": NCI-MATCH Trial Treatment ", 
-                unique(DF_patient_trial$Arm_Name), sep=""),"\n",
-          "----------------------------------------------------------------------", "\n")
-      cat("Inclusion NonHotspot criteria: ", "\n")
-      for (entry_num in 1:nrow(DF_patient_NCI.NonHotspot)) {
-        cat("\t", paste(DF_patient_NCI.NonHotspot$Gene_Name[entry_num], 
-                        ":Exon ", DF_patient_NCI.NonHotspot$Exon[entry_num], 
-                        " (Function: ", DF_patient_NCI.NonHotspot$Function[entry_num], 
-                        "; Variant Class: ", DF_patient_NCI.NonHotspot$oncominevariantclass[entry_num], 
-                        ")", sep=""),"\n")
-      }
-      
-      cat("\n", paste("Relevant mutation(s) identified in patient ", patient_id, ":", sep=""),"\n")
-      for (entry_num in 1:nrow(DF_patient_NCI.NonHotspot)) {
-        cat("\t", paste(DF_patient_NCI.NonHotspot$base.gene[entry_num], ":", DF_patient_NCI.NonHotspot$smpl.hgvsProtein[entry_num], 
-                  " (", DF_patient_NCI.NonHotspot$smpl.pathogenicityStatus[entry_num], ")", sep=""),"\n")
-      }
-       
-      Arm_INFO(trial_id = trial_id)
-      cat("\n","\n")
-      remove(trial_id,entry_num,DF_patient_trial)
-    } 
+    cat(paste("NOTE: NCI-MATCH trial criteria i.e. NonHotspot Rules, IHC Results, Comments, and Disease Exclusion Codes need to be manually assessed.",
+      " Patient Variant Report last updated on ", Patient_Variant_Report_timestamp, ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
+    sink() 
   }
-  
-  cat(paste("NOTE: Comments and exclusion criteria for clinical trial(s) above need to be manually assessed. ",
-            "Age of patient calculated relative to ", Age_Calculation_timestamp, 
-            "; OnCore Biomarker Report last updated on ", OnCore_Biomarker_Report_timestamp, 
-            "; Patient Variant Report last updated on ", Patient_Variant_Report_timestamp,
-            ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
-  sink() 
 }
 
 remove(patient_id,patient.list,trial_num,trial.list.internal,trial.list.NCI,txt_filename,
        DF_patient_Internal,DF_patient_NCI,DF_patient_NCI.NonHotspot,Arm_INFO,STAMP_all_variants_QC,
-       id_num,trial_num_internal,trial_num_NCI,trial.list.NonHotspot,Patient_NonHotspot_Matched,
-       Patient_Variant_Matched,DF_Comments,DF_Exclusion_NonHotspot_Rules,DF_IHC_Results,
-       OnCore_Biomarker_Matched)
+       id_num,trial_num_NCI,trial.list.NonHotspot,Patient_NonHotspot_Matched,Patient_Variant_Matched,
+       DF_Comments,DF_Exclusion_NonHotspot_Rules,DF_IHC_Results,OnCore_Biomarker_Matched,
+       Arm_Exclusion,DF_Disease_Exclusion_Codes,DF_exclusion_output,outdir_sub_internal,outdir_sub_NCI)
 
 # Delete intermediate file
 #----------------------------------------------
