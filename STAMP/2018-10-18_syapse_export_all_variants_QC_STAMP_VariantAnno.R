@@ -326,6 +326,7 @@ remove(DF_SNV,DF_Frameshift,DF_delins,DF_ins,DF_del,DF_dup,DF_Map,DF_Map_All,DF)
 ## Data Review
 #----------------------------------------------
 cat("\n")
+print("General overview for DF_STAMP_4Map entries")
 print(paste("Total number of unique patient_id: ", length(unique(DF_STAMP_4Map$sys.uniqueId)), sep=""))
 print(paste("Total number of unique specimen sites: ", length(sort(unique(DF_STAMP_4Map$smpl.specimenSite))), sep=""))
 sort(unique(DF_STAMP_4Map$smpl.specimenSite))
@@ -379,14 +380,12 @@ DF_STAMP_VariantAnno <- DF_STAMP_VariantAnno[!is.na(DF_STAMP_VariantAnno$base.do
 ncol_STAMP <- as.numeric(ncol(DF_STAMP_VariantAnno))
 
 print(paste("STAMP entries with valid DOB: n=",(nrow(DF_STAMP_VariantAnno)), sep=""))
+print(paste("Unique patient ID with valid DOB: n=",(length(unique(DF_STAMP_VariantAnno$sys.uniqueId))), sep=""))
 
 ## Structure patient DOB and input current age
 #----------------------------------------------
-if (!exists("Age_Calculation_timestamp")) {
-  Age_Calculation_timestamp <- format(as.Date(Sys.Date(), format= "%Y-%m-%d"))
-}
 curr_year <- as.numeric(gsub("^([[:digit:]]{2})([[:digit:]]{2})", "\\2", 
-                             format(as.Date(Age_Calculation_timestamp, format="%Y-%m-%d"),"%Y")))
+                             format(as.Date(Sys.Date(), format="%Y-%m-%d"),"%Y")))
 
 DF_STAMP_VariantAnno$month = gsub("(^[[:digit:]]{,2})(.*)", "\\1", DF_STAMP_VariantAnno$base.dob)
 DF_STAMP_VariantAnno$day=gsub("(^[[:digit:]]{,2})([/])([[:digit:]]{,2})(.*)", "\\3", DF_STAMP_VariantAnno$base.dob)
@@ -394,6 +393,7 @@ DF_STAMP_VariantAnno$year=gsub("(^[[:digit:]]{,2})([/])([[:digit:]]{,2})([/])([[
                                DF_STAMP_VariantAnno$base.dob)
 
 # Assume no individual is >= 100yo
+# sort(as.numeric(unique(DF_STAMP_VariantAnno$year)))
 for (row_No in 1:nrow(DF_STAMP_VariantAnno)) {
   if (DF_STAMP_VariantAnno$year[row_No] > curr_year) {
     DF_STAMP_VariantAnno$year[row_No] <- paste("19", DF_STAMP_VariantAnno$year[row_No], sep="")
@@ -401,6 +401,7 @@ for (row_No in 1:nrow(DF_STAMP_VariantAnno)) {
     DF_STAMP_VariantAnno$year[row_No] <- paste("20", DF_STAMP_VariantAnno$year[row_No], sep="")
   }
 }
+# sort(as.numeric(unique(DF_STAMP_VariantAnno$year)))
 
 DF_STAMP_VariantAnno$patient.dob <- NA
 for (row_No in 1:nrow(DF_STAMP_VariantAnno)) {
@@ -412,24 +413,38 @@ for (row_No in 1:nrow(DF_STAMP_VariantAnno)) {
 DF_STAMP_VariantAnno$patient.dob <- as.Date(DF_STAMP_VariantAnno$patient.dob, "%m/%d/%Y")
 DF_STAMP_VariantAnno <- DF_STAMP_VariantAnno[,c(1:ncol_STAMP,ncol(DF_STAMP_VariantAnno))]
 
-# Age rounded down to nearest integer
+# Age rounded down to nearest integer -- relative to smpl.dateReceived
+DF_STAMP_VariantAnno$dateReceived <- gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*)", "\\1", 
+                                          DF_STAMP_VariantAnno$smpl.dateReceived)
+
+# Use sys.date_created as alternative for missing smpl.dateReceived
+row_NA <- which(is.na(DF_STAMP_VariantAnno$dateReceived))
+if (length(row_NA) > 0) {
+  DF_STAMP_VariantAnno$dateReceived[row_NA] <- gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*)", "\\1", 
+                                                    DF_STAMP_VariantAnno$sys.date_created[row_NA])
+}
+
+DF_STAMP_VariantAnno$dateReceived <- as.Date(DF_STAMP_VariantAnno$dateReceived, format = "%Y-%m-%d")
+
 DF_STAMP_VariantAnno$current.age <- as.numeric(floor(age_calc(dob = DF_STAMP_VariantAnno$patient.dob, 
-                                                              enddate = as.Date(Age_Calculation_timestamp, format="%Y-%m-%d"),
+                                                              enddate = DF_STAMP_VariantAnno$dateReceived,
                                                               units = "years")))
+
+# Remove dateReceived column
+DF_STAMP_VariantAnno <- DF_STAMP_VariantAnno[, !(colnames(DF_STAMP_VariantAnno) %in% c("dateReceived"))]
 
 ## Data Review
 #----------------------------------------------
-print(paste("Age calculation date is: ", Age_Calculation_timestamp, sep=""))
 Temp_Age <- unique(DF_STAMP_VariantAnno$sys.uniqueId[DF_STAMP_VariantAnno$current.age < 18])
 print(paste("No. child patients (birth-17yo): n=",(length(Temp_Age)), sep=""))
 Temp_Age <- unique(DF_STAMP_VariantAnno$sys.uniqueId[DF_STAMP_VariantAnno$current.age > 65])
 print(paste("No. Older Adult patients (65yo+): n=",(length(Temp_Age)), sep=""))
-cat("\n")
 Temp_Age <- DF_STAMP_VariantAnno[DF_STAMP_VariantAnno$current.age >= 18 &
                                    DF_STAMP_VariantAnno$current.age < 65,]
 print(paste("No. Adult patients (18-64yo): n=",(length(unique(Temp_Age$sys.uniqueId))), sep=""))
 cat("\n")
-print(paste("Total number of unique patient_id: ", length(unique(Temp_Age$sys.uniqueId)), sep=""))
+print("General overview for adult patient entries")
+print(paste("Total number of STAMP entries: ", nrow(Temp_Age), sep=""))
 print(paste("Total number of unique specimen sites: ", length(sort(unique(Temp_Age$smpl.specimenSite))), sep=""))
 print(paste("Total number of unique Dx: ", length(sort(unique(Temp_Age$smpl.ppDiagnosticSummary))), sep=""))
 print(paste("Total number of unique genes: ", length(sort(unique(Temp_Age$base.gene))), sep=""))
@@ -451,8 +466,7 @@ for (id_num in 1:length(patient.list)) {
 }
 DF <- DF_new
 
-tiff(filename = paste("ClinicalTrialMatching/Retrospective_Analysis/Syapse_", Syapse_Export_timestamp, 
-                      "_AgeDistribution_", Age_Calculation_timestamp,".tiff", sep=""),
+tiff(filename = paste("STAMP/Syapse_", Syapse_Export_timestamp, "_AgeDistribution.tiff", sep=""),
      width = 15, height = 7, units = "in", res = 200)
 
 plot <- ggplot(DF, aes(DF$age, fill=DF$assayName)) +
@@ -479,7 +493,6 @@ remove(DF_new,DF,curr_year, row_No,ncol_STAMP,id_num,patient.list)
 ## Data Review
 #----------------------------------------------
 # print(paste("Total number of variant categories: ", length(sort(unique(DF_STAMP_VariantAnno$var.type))), sep=""))
-# table(sort(DF_STAMP_VariantAnno$var.type))
 # print(paste("Total number of variant annotations for clinical trials: ", length(sort(unique(DF_STAMP_VariantAnno$var.anno))), sep=""))
 # table(sort(DF_STAMP_VariantAnno$var.anno))
 # print("Variants with an annotation == MUTATION have the following categories")
@@ -525,68 +538,44 @@ DF_STAMP_VariantAnno <- left_join(DF_STAMP_VariantAnno, DF_TumorSite,
 
 # primaryTumorSite grouped according to medical specializations 
 #----------------------------------------------
-Dermatology <- c("Skin")
-Endocrinology <- c("Pancreas","Adrenal")
-Gastroenterology <- c("Colon","Colon and Rectum","Anus","Appendix","Small Intestine",
-                      "Perihilar Bile Ducts","Peritoneum","Stomach","Ampulla of Vater",
-                      "Mesenteric Mass","Intrahepatic Bile Ducts","Gallbladder","Liver","Hepatocellular (Liver)")
-Genitourinary <- c("Urinary Bladder","Urethra","Kidney","Prostate Gland","Testes","Testis","Penis","Foreskin")
-Gynecology <- c("Cervix","Breast","Uterus","Vulva","Ovary")
-Hematology <- c("Hematologic and Lymphatic Neoplasm","Bone Marrow","Lymph node","Peripheral blood")
-Neurology <- c("Central Nervous System (Brain/Spinal Cord)","Scalp")
-Ophthalmology <- c("Uvea","Ocular Tumors")
-Orthopaedics <- c("Foot","Bone","Back")
-Otolaryngology <- c("Thymus","Larynx","Thyroid","Esophagus","Lip and Oral Cavity","Pharynx",
-                    "Nasopharynx","Nasal Cavity and Paranasal Sinuses","Salivary Glands","Neck")
-Pulmonology <- c("Lung","Pleura","Trachea")
-SoftTissue <- c("Soft Tissue")
-Unknown <- c("Other Primary Site","Unknown")
+DF_STAMP_VariantAnno$smpl.primaryTumorSite <- tolower(DF_STAMP_VariantAnno$smpl.primaryTumorSite)
+
+# Confirm smpl.primaryTumorSite is classified 
+primaryTumorSite.STAMP <- sort(unique(DF_STAMP_VariantAnno$smpl.primaryTumorSite))
+primaryTumorSite.key <- sort(unique(DiseaseGroupCategory_LongFormat$primaryTumorSite))
+
+for (elem_No in 1:length(primaryTumorSite.STAMP)) {
+  if (isTRUE(is.element(primaryTumorSite.STAMP[elem_No], primaryTumorSite.key) == FALSE)) {
+    cat("\n")
+    print(paste(primaryTumorSite.STAMP[elem_No], 
+                ": primaryTumorSite has not been classified into DiseaseGroupCategory", sep=""))
+    cat("\n")
+  }
+}
+remove(primaryTumorSite.STAMP,primaryTumorSite.key)
 
 DF_STAMP_VariantAnno$primaryTumorSite.category <- NA
 for (row_No in 1:nrow(DF_STAMP_VariantAnno)) {
-  if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Dermatology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Dermatology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Endocrinology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Endocrinology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Gastroenterology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Gastroenterology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Genitourinary) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Genitourinary"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Gynecology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Gynecology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Hematology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Hematology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Neurology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Neurology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Ophthalmology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Ophthalmology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Orthopaedics) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Orthopaedics"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Otolaryngology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Otolaryngology"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Pulmonology) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Pulmonology"
-  }  else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% SoftTissue) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- "Soft Tissue"
-  } else if (DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No] %in% Unknown) {
-    DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- NA
-  }
+  DiseaseGroupCategory.name <- 
+    DiseaseGroupCategory_LongFormat$Disease.Group.category[which(DiseaseGroupCategory_LongFormat$primaryTumorSite == 
+                                                                   DF_STAMP_VariantAnno$smpl.primaryTumorSite[row_No])] 
+  
+  DF_STAMP_VariantAnno$primaryTumorSite.category[row_No] <- paste(as.character(DiseaseGroupCategory.name), collapse=", ")
 }
 
-DF_STAMP_VariantAnno$primaryTumorSite.category[is.na(DF_STAMP_VariantAnno$primaryTumorSite.category)] <- "Unknown"
+# If missing smpl.primaryTumorSite, primaryTumorSite.category = "Unknown"
+DF_STAMP_VariantAnno$primaryTumorSite.category[which(DF_STAMP_VariantAnno$primaryTumorSite.category == "")] <- "unknown"
 
-table(DF_STAMP_VariantAnno$primaryTumorSite.category)
-# Dermatology    Endocrinology Gastroenterology    Genitourinary       Gynecology       Hematology 
-# 585              221              886              148              283              112 
-# Neurology    Ophthalmology     Orthopaedics   Otolaryngology      Pulmonology      Soft Tissue 
-# 235               23               29              220             3283               75 
-# Unknown 
-# 3814 
+print(paste("Total number of unique primaryTumorSite.category: ", length(sort(unique(DF_STAMP_VariantAnno$primaryTumorSite.category))), sep=""))
+print(table(DF_STAMP_VariantAnno$primaryTumorSite.category))
+# breast          dermatology dermatology, sarcoma        endocrinology     gastroenterology 
+# 189                  593                   11                    7                 1100 
+# genitourinary           gynecology       hematolymphoid            neurology        ophthalmology 
+# 148                   94                  112                  227                   23 
+# otolaryngology          pulmonology              sarcoma              unknown 
 
-remove(Dermatology,Endocrinology,Gastroenterology,Genitourinary,Gynecology,
-       Hematology,Neurology,Ophthalmology,Orthopaedics,Otolaryngology,Pulmonology,
-       SoftTissue, Unknown)
-remove(DF,DF_TumorSite,patient.list,row_No,rep_No,Extract_VarPosition,gene.no,plot)
+remove(DF,DF_TumorSite,patient.list,row_No,rep_No,Extract_VarPosition,gene.no,plot,
+       elem_No,row_NA,DiseaseGroupCategory.name)
 
 ## Data Review
 #----------------------------------------------
@@ -604,65 +593,6 @@ remove(Temp_Age,Temp_col)
 
 ## Write to local computer
 #----------------------------------------------
-write.csv(DF_STAMP_VariantAnno, file = paste("ClinicalTrialMatching/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_VariantAnno.csv", sep=""),
+write.csv(DF_STAMP_VariantAnno, 
+          file = paste("ClinicalTrialMatching/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_VariantAnno.csv", sep=""),
           na = "NA", row.names = FALSE)
-
-# # smpl.specimenSite is not an appropriate proxy because it can be the site of a metastasis
-# # if smpl.primaryTumorSite is in Unknown grouping, classify based on smpl.specimenSite
-# #----------------------------------------------
-# DF_int <- DF_STAMP_VariantAnno[is.na(DF_STAMP_VariantAnno$primaryTumorSite.category),]
-# 
-# Dermatology.grep = "skin"
-# Endocrinology.grep = "pancrea|adrenal|Parotid"
-# Gastroenterology.grep = "quadrant mass|Serosa|Umbilical|Perineal|Peritoneal|Oment|abdom|colon|liver|Duod|ileum|Jejunum|Diaphragm|rectum|Rectosigmoid|Cecum|stomach|gastric|peritoneum|bowel|Rectouterine|flank|rectal|Ampulla|Appendix|Mesenteric"
-# Genitourinary.grep = "kidney|Prostate|testi|penis|bladder"
-# Gynecology.grep = "Uterus|Vagina|pelvi|ovary|breast|metrium|Axillary"
-# Hematology.grep = "lymph|node"
-# Neurology.grep = "brain|Scalp|Retrosigmoid|skull"
-# Orthopaedics.grep = "vertebra|spine|back|bone|Sacrum|Hip|Humerus|Femur|Fibula|Iliac|Ilium|epidural|ligament|muscle|ankle|thigh"
-# Otolaryngology.grep = "neck|thyroid|Larynx|Esophag|ear|naso|nasal|tongue|maxilla|Pharynx|mandibular"
-# Pulmonology.grep = "lung|trachea|pulmonary|pleura|rib|card|chest|ventricle|bronchus|shoulder|septum|Mediastinum"
-# SoftTissue.grep = "Soft tissue|spin|axilla|Brachial"
-#   
-# # sort(unique(DF_int$smpl.specimenSite[grep(Dermatology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Endocrinology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Gastroenterology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Genitourinary.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Gynecology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Hematology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Neurology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Orthopaedics.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Otolaryngology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(Pulmonology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# # sort(unique(DF_int$smpl.specimenSite[grep(SoftTissue.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)]))
-# 
-# DF_int$primaryTumorSite.category[grep(Dermatology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Dermatology"
-# DF_int$primaryTumorSite.category[grep(Endocrinology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Endocrinology"
-# DF_int$primaryTumorSite.category[grep(Gastroenterology.grep,DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Gastroenterology"
-# DF_int$primaryTumorSite.category[grep(Genitourinary.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Genitourinary"
-# DF_int$primaryTumorSite.category[grep(Gynecology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Gynecology"
-# DF_int$primaryTumorSite.category[grep(Hematology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Hematology"
-# DF_int$primaryTumorSite.category[grep(Neurology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Neurology"
-# DF_int$primaryTumorSite.category[grep(Orthopaedics.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Orthopaedics"
-# DF_int$primaryTumorSite.category[grep(Otolaryngology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Otolaryngology"
-# DF_int$primaryTumorSite.category[grep(Pulmonology.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Pulmonology"
-# DF_int$primaryTumorSite.category[grep(SoftTissue.grep, DF_int$smpl.specimenSite, ignore.case = TRUE)] <- "Soft Tissue"
-# 
-# # 5 entries (n=2 patients) missing smpl.specimenSite,smpl.primaryTumorSite, smpl.histologicalDiagnosis 
-# DF_int$primaryTumorSite.category[is.na(DF_int$primaryTumorSite.category)] <- "Any Site"
-# 
-# # Merge dataframes 
-# DF_STAMP_VariantAnno <- rbind(DF_int, DF_STAMP_VariantAnno[!is.na(DF_STAMP_VariantAnno$primaryTumorSite.category),])
-#
-# sort(table(DF_STAMP_VariantAnno$primaryTumorSite.category))
-# # Any Site    Ophthalmology     Orthopaedics      Soft Tissue    Genitourinary    Endocrinology   Otolaryngology       Gynecology
-# # 5               23              140              201              235              320              364              379
-# # Neurology       Hematology      Dermatology Gastroenterology      Pulmonology
-# # 467              606              679             1633             4862
-# 
-# remove(Dermatology.grep,Endocrinology.grep,Gastroenterology.grep,Genitourinary.grep,Gynecology.grep,
-#        Hematology.grep,Neurology.grep,Orthopaedics.grep,Otolaryngology.grep,Pulmonology.grep,SoftTissue.grep,
-#        DF_int)
-# 
-# # Confirm all entries have a primaryTumorSite.category
-# which(is.na(DF_STAMP_VariantAnno$primaryTumorSite.category))
