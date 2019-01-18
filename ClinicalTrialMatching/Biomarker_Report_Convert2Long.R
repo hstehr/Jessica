@@ -42,7 +42,6 @@ if (length(OnCore_Biomarker_Report$Protocol.Type[!grepl("Treatment", OnCore_Biom
   print("Protocol.Type of all clinical trials from Biomarker Report are TREATMENT")
 }
 
-
 ## Match Age.Group column with patient DOB
 #----------------------------------------------
 for (x in 1:nrow(OnCore_Biomarker_Report)) {
@@ -123,30 +122,38 @@ OnCore_Biomarker_Report$Biomarker_Detail <-
 OnCore_Biomarker_Report$Biomarker_Detail[OnCore_Biomarker_Report$Biomarker_Detail == "V600*"] <- "Val600*"
 
 # Disease.Group grouped according to medical specialties  
-# Most general Disease.Site is assigned priority 
-################################
-# Manual assignment
-################################
-OnCore_Biomarker_Report$Disease.Group.category <- NA
-for (row_No in 1:nrow(OnCore_Biomarker_Report)) {
-  if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Cutaneous Oncology") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Dermatology"
-  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Developmental Therapeutics" |
-             OnCore_Biomarker_Report$Disease.Group[row_No] == "Non-CRG Specific") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Any Site"
-  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Gastrointestinal Oncology") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Gastroenterology"
-  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Genitourinary Oncology") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Genitourinary"
-  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Head & Neck Oncology") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Otolaryngology"
-  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Thoracic Oncology") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Pulmonology"
-  } else if (OnCore_Biomarker_Report$Disease.Group[row_No] == "Hematology") {
-    OnCore_Biomarker_Report$Disease.Group.category[row_No] <- "Hematology"
+#----------------------------------------------
+OnCore_Biomarker_Report$Disease.Group <- tolower(OnCore_Biomarker_Report$Disease.Group)
+
+# Confirm Disease.Group is classified 
+Disease.Group.Report <- sort(unique(OnCore_Biomarker_Report$Disease.Group))
+Disease.Group.key <- sort(unique(DiseaseGroupCategory_LongFormat$Disease.Group))
+
+for (elem_No in 1:length(Disease.Group.Report)) {
+  if (isTRUE(is.element(Disease.Group.Report[elem_No], Disease.Group.key) == FALSE)) {
+    cat("\n")
+    print(paste(Disease.Group.Report[elem_No], 
+                ": Disease.Group has not been classified into DiseaseGroupCategory", sep=""))
+    cat("\n")
   }
 }
+remove(Disease.Group.Report,Disease.Group.key)
 
+OnCore_Biomarker_Report$Disease.Group.category <- NA
+for (row_No in 1:nrow(OnCore_Biomarker_Report)) {
+  DiseaseGroupCategory.name <- 
+    unique(DiseaseGroupCategory_LongFormat$Disease.Group.category[which(DiseaseGroupCategory_LongFormat$Disease.Group == 
+                                                                   OnCore_Biomarker_Report$Disease.Group[row_No])]) 
+  
+  OnCore_Biomarker_Report$Disease.Group.category[row_No] <- paste(as.character(DiseaseGroupCategory.name), collapse=", ")
+}
+
+print(paste("Total number of unique Disease.Group.category: ", 
+            length(sort(unique(OnCore_Biomarker_Report$Disease.Group.category))), sep=""))
+print(table(OnCore_Biomarker_Report$Disease.Group.category))
+
+# Most general Disease.Site is assigned priority 
+#----------------------------------------------
 OnCore_Biomarker_Report$Disease.Site.category <- OnCore_Biomarker_Report$Disease.Sites
 OnCore_Biomarker_Report$Disease.Site.category[grep("Any Site", OnCore_Biomarker_Report$Disease.Sites)] <- "Any Site"
 
@@ -173,6 +180,23 @@ colnames(OnCore_Biomarker_Report)[as.numeric(ncol(OnCore_Biomarker_Report))] <- 
 colname_keep <- append(colname_keep, "Disease.Site")
 OnCore_Biomarker_Report <- subset(OnCore_Biomarker_Report, select = colname_keep)
 
+# Convert Disease.Group.category to long format
+#----------------------------------------------
+colname_keep <- colname_keep[colname_keep != "Disease.Group.category"]
+## Strip Disease.Group.category into components
+OnCore_Biomarker_Report <- cSplit(OnCore_Biomarker_Report, "Disease.Group.category", ",", 
+                                  stripWhite = TRUE, type.convert="as.character",
+                                  drop = FALSE)
+
+## Convert to long format 
+OnCore_Biomarker_Report <- melt(OnCore_Biomarker_Report, 
+                                id.vars=append(colname_keep, "Disease.Group.category"))
+OnCore_Biomarker_Report <- OnCore_Biomarker_Report[which(!is.na(OnCore_Biomarker_Report$value)), ]
+OnCore_Biomarker_Report <- OnCore_Biomarker_Report[,c(colname_keep, "value")]
+
+colnames(OnCore_Biomarker_Report)[as.numeric(ncol(OnCore_Biomarker_Report))] <- c("Disease.Group.category")
+colname_keep <- append(colname_keep, "Disease.Group.category")
+
 # ## Data Review
 # #----------------------------------------------
 # print(paste("Total number of unique OnCore.No ", length(unique(OnCore_Biomarker_Report$OnCore.No)), sep=""))
@@ -188,8 +212,8 @@ OnCore_Biomarker_Report <- subset(OnCore_Biomarker_Report, select = colname_keep
 # sort(unique(OnCore_Biomarker_Report$Biomarker_Condition))
 # print(paste("Total number of unique Biomarker details: ", length(sort(unique(OnCore_Biomarker_Report$Biomarker_Detail))), sep=""))
 # sort(unique(OnCore_Biomarker_Report$Biomarker_Detail))
-
-# Confirm all entries have a Disease.Group.category and Disease.Site
+# 
+# # Confirm all entries have a Disease.Group.category and Disease.Site
 # which(is.na(OnCore_Biomarker_Report$Disease.Group.category))
 # sort(table(OnCore_Biomarker_Report$Disease.Group.category))
 # which(is.na(OnCore_Biomarker_Report$Disease.Site))
