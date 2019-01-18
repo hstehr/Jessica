@@ -11,9 +11,10 @@ Match_initial <- function(DF, var.type) {
   ################################
   # Manual exclusion
   ################################
-  if (var.type == "SNV") {
-    # sort(unique(DF$NCI.aa.end))
-    coding.change <- which(DF$NCI.aa.end %in% c("c.3082+1G>T","c.3082+1G>A","c.634+1G>C","c.635-1G>T"))
+  # sort(unique(DF$NCI.aa.end))
+  coding.change <- which(DF$NCI.aa.end %in% c("c.3082+1G>T","c.3082+1G>A","c.634+1G>C","c.635-1G>T",
+                                              "c.3082_3082+26del","c.2888-18_2888-2del"))
+  if (length(coding.change) > 0) {
     DF$NCI.aa.start[coding.change] <- NA
     DF$NCI.aa.end[coding.change] <- NA
     DF$NCI.var.position[coding.change] <- NA
@@ -147,16 +148,13 @@ summary_check(DF = DF_Output_SNV, var.type = "SNV")
 ################################
 unique(NA.DF[,74:80])
 
-# A <- unique(NA.DF[,c(50,56,57,64:68)])
-# # Subset by each unique gene 
+# A <- unique(NA.DF[,c(50,56,57,64:67)])
+# # Subset by each unique gene
 # B <- data.frame()
 # sort(unique(NA.DF$Gene_Name))
 # for (row_No in 1:nrow(A)) {
-#   if (isTRUE(grepl("PTEN", A$sys.label[row_No]))) {
-#     B <- rbind(B, A[row_No,])
-#   }
-# }
-# print(A)
+#   if (isTRUE(grepl("MET", A$sys.label[row_No]))) {
+#     B <- rbind(B, A[row_No,])}}
 # View(B)
 # remove(A,B)
 
@@ -177,10 +175,7 @@ unique(NA.DF[,74:80])
 # sort(unique(NA.DF$Gene_Name))
 # for (row_No in 1:nrow(A)) {
 #   if (isTRUE(grepl("KIT", A$sys.label[row_No]))) {
-#     B <- rbind(B, A[row_No,])
-#   }
-# }
-# print(A)
+#     B <- rbind(B, A[row_No,])}}
 # View(B)
 # remove(A,B)
 
