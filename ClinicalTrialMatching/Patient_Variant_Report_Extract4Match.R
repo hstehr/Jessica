@@ -127,13 +127,14 @@ DF_Output_Patient_NonHotspot <-
 ## Match STAMP entries based on Protein grouped by trial Variant_Type 
 #----------------------------------------------
 DF_Output_SNV <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$Variant_Type == "SNV",]
+DF_Output_Delins <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$Variant_Type == "Delins",]
 DF_Output_Ins <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$Variant_Type == "Insertion",]
 DF_Output_Del <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$Variant_Type == "Deletion",]
-DF_Output_Delins <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$Variant_Type == "Delins",]
+DF_Output_Dup <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$Variant_Type == "Duplication",]
 
 print(paste("All cases have been re-distributed based on variant type:",
-            nrow(DF_Output_Patient_Variant) == (nrow(DF_Output_SNV) + nrow(DF_Output_Ins) + nrow(DF_Output_Del) + 
-                                                  nrow(DF_Output_Delins))),sep="")
+            nrow(DF_Output_Patient_Variant) == (nrow(DF_Output_SNV) + nrow(DF_Output_Delins) + nrow(DF_Output_Ins) + 
+                                                  nrow(DF_Output_Del) + nrow(DF_Output_Dup)), sep=""))
 cat("\n")
 remove(DF_Output_Patient_Variant)
 
@@ -157,6 +158,15 @@ unique(NA.DF[,74:80])
 #     B <- rbind(B, A[row_No,])}}
 # View(B)
 # remove(A,B)
+
+## Parse through Indel matches 
+#----------------------------------------------
+Match_initial(DF = DF_Output_Delins, var.type = "Delins")
+DF_Output_Delins <- DF
+DF_Output_Delins <- DF_Output_Delins[DF_Output_Delins$smpl.hgvsProtein == DF_Output_Delins$Protein,]
+summary_check(DF = DF_Output_Delins, var.type = "Delins")
+
+unique(NA.DF[,74:80])
 
 ## Parse through Deletion matches
 #----------------------------------------------
@@ -186,21 +196,21 @@ Match_initial(DF = DF_Output_Ins, var.type = "Ins")
 print("Summary details for variant type == Ins: NO MATCHES")
 cat("\n")
 DF_Output_Ins <- DF
-remove(DF_Output_Ins)
 
-## Parse through Indel matches 
+## Parse through Dup matches 
 #----------------------------------------------
-Match_initial(DF = DF_Output_Delins, var.type = "Delins")
-DF_Output_Delins <- DF
-DF_Output_Delins <- DF_Output_Delins[DF_Output_Delins$smpl.hgvsProtein == DF_Output_Delins$Protein,]
-summary_check(DF = DF_Output_Delins, var.type = "Delins")
+Match_initial(DF = DF_Output_Dup, var.type = "Dup")
+DF_Output_Dup <- DF
+summary_check(DF = DF_Output_Dup, var.type = "Dup")
 
 unique(NA.DF[,74:80])
 
 ## Merge matches 
 #----------------------------------------------
-DF_Output_Patient_Variant_Matched <- rbind(DF_Output_SNV[,1:86], DF_Output_Del[,1:86], DF_Output_Delins[,1:86])
-remove(DF_Output_SNV,DF_Output_Del,DF_Output_Delins,DF,NA.DF)
+DF_Output_Patient_Variant_Matched <- rbind(DF_Output_SNV[,1:86], DF_Output_Delins[,1:86], 
+                                           DF_Output_Ins[,1:86], DF_Output_Del[,1:86], DF_Output_Dup[,1:86])
+DF_Output_Patient_Variant_Matched <- DF_Output_Patient_Variant_Matched[complete.cases(DF_Output_Patient_Variant_Matched$sys.uniqueId), ] 
+remove(DF_Output_SNV,DF_Output_Del,DF_Output_Delins,DF,NA.DF,DF_Output_Dup,DF_Output_Ins)
 
 ## Parse through exclusion criteria per patient
 #----------------------------------------------
