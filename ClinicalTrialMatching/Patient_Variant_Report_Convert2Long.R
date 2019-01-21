@@ -298,17 +298,19 @@ if (Patient_Variant_Report_timestamp  == "2018-09-06") {
   DF_Exclusion_Variants$Variant_Type[which(DF_Exclusion_Variants$Variant_Type == "MNV")] <- "SNV"
 }
 
-# Annotate for consistency  
+# Annotate Variant_Type for consistency  
 for (row_No in 1:nrow(DF_Inclusion_Variants)) {
   if (isTRUE(DF_Inclusion_Variants$Variant_Type[row_No] == "Indel")) {
-    if (grepl("del.*ins", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
+    if (grepl("fs", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
+      DF_Inclusion_Variants$Variant_Type[row_No] <- "Frameshift"
+    } else if (grepl("del.*ins", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
       DF_Inclusion_Variants$Variant_Type[row_No] <- "Delins"
     } else if (grepl("ins", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
       DF_Inclusion_Variants$Variant_Type[row_No] <- "Insertion"
     } else if (grepl("del", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
       DF_Inclusion_Variants$Variant_Type[row_No] <- "Deletion"
-    } else if (grepl("fs", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
-      DF_Inclusion_Variants$Variant_Type[row_No] <- "Frameshift"
+    } else if (grepl("dup", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
+      DF_Inclusion_Variants$Variant_Type[row_No] <- "Duplication"
     }
   }
 }
@@ -318,9 +320,10 @@ for (row_No in 1:nrow(DF_Inclusion_Variants)) {
 # sort(table(DF_Inclusion_Variants$Variant_Type))
 # sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Indel"]))
 # sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Frameshift"]))
+# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Delins"]))
 # sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Insertion"]))
 # sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Deletion"]))
-# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Delins"]))
+# sort(unique(DF_Inclusion_Variants$Protein[DF_Inclusion_Variants$Variant_Type == "Duplication"]))
 
 ################################
 ## Manual correction of fields = DF_Exclusion_Variants
