@@ -261,7 +261,7 @@ for (patient_num in 1:length(patient.list)) {
     if (isTRUE(disease.site_FILTER & disease.group_FILTER)) {
       
       # Remove corresponding trial INFO from "DF_patient" if no match
-      if (!("Any Site" %in% Disease.Site.trial)) {
+      if (!("any site" %in% Disease.Site.trial)) {
         
         for (site_num in 1:length(Disease.Site.trial)) {
           site_id <- Disease.Site.trial[site_num]
