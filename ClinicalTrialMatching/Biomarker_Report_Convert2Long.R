@@ -152,17 +152,28 @@ print(paste("Total number of unique Disease.Group.category: ",
             length(sort(unique(OnCore_Biomarker_Report$Disease.Group.category))), sep=""))
 print(table(OnCore_Biomarker_Report$Disease.Group.category))
 
-# Most general Disease.Site is assigned priority 
+# Classification of Disease.Site
 #----------------------------------------------
-OnCore_Biomarker_Report$Disease.Site.category <- OnCore_Biomarker_Report$Disease.Sites
-OnCore_Biomarker_Report$Disease.Site.category[grep("Any Site", OnCore_Biomarker_Report$Disease.Sites)] <- "Any Site"
-
 ################################
 # Manual correction for consistency
 ################################
-OnCore_Biomarker_Report$Disease.Site.category [OnCore_Biomarker_Report$Disease.Site.category == 
-                                                 "Leukemia, other; Other Hematopoietic"] <- "Other Leukemia; Other Hematopoietic"
-  
+OnCore_Biomarker_Report$Disease.Sites[OnCore_Biomarker_Report$Disease.Sites == 
+                                        "Leukemia, other; Other Hematopoietic"] <- "Other Leukemia; Other Hematopoietic"
+
+################################
+# Manual edit of Disease.Site to match ontology
+################################
+OnCore_Biomarker_Report$Disease.Sites <- 
+  gsub("Other Leukemia; Other Hematopoietic","Blood",OnCore_Biomarker_Report$Disease.Sites)
+OnCore_Biomarker_Report$Disease.Sites <- 
+  gsub("Other Digestive Organ",
+       DiseaseGroupCategory$primaryTumorSite[DiseaseGroupCategory$Disease.Group.category == "gastroenterology"],
+       OnCore_Biomarker_Report$Disease.Sites)
+
+# Most general Disease.Site is assigned priority 
+OnCore_Biomarker_Report$Disease.Site.category <- OnCore_Biomarker_Report$Disease.Sites
+OnCore_Biomarker_Report$Disease.Site.category[grep("Any Site", OnCore_Biomarker_Report$Disease.Sites)] <- "Any Site"
+
 # Convert Disease.Site.category to long format
 #----------------------------------------------
 colname_keep <- append(colname_keep, "Disease.Group.category")
