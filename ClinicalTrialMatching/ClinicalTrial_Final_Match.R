@@ -31,12 +31,13 @@ remove(PATIENT_VARIANT_REPORT_QC,DF_Exclusion_Variants,DF_Inclusion_NonHotspot_R
 #---------------------------------------------- 
 if (isTRUE(pathogenic_FILTER)) {
   print("pathogenic Filter: ON")
+  print("Patient_Variant_Matched")
   print(paste("Pre-FILTER: n= ", nrow(Patient_Variant_Matched), " entries (n= ",
               length(unique(Patient_Variant_Matched$sys.uniqueId)), " patients)", sep=""))
   TempDF <- Patient_Variant_Matched[!Patient_Variant_Matched$smpl.pathogenicityStatus %in% pathogenic_accepted,]
   print(paste("REMOVED: n= ", nrow(TempDF), " entries (n= ", length(unique(TempDF$sys.uniqueId)), " patients)", sep=""))
-  remove(TempDF)
-        
+  cat("\n")
+
   Patient_Variant_Matched <- 
     Patient_Variant_Matched[Patient_Variant_Matched$smpl.pathogenicityStatus %in% pathogenic_accepted,]
   print(paste("POST-FILTER: n= ", nrow(Patient_Variant_Matched), " entries (n= ", 
@@ -44,10 +45,29 @@ if (isTRUE(pathogenic_FILTER)) {
   
   Patient_NonHotspot_Matched <- 
     Patient_NonHotspot_Matched[Patient_NonHotspot_Matched$smpl.pathogenicityStatus %in% pathogenic_accepted,]
+  
+  print("OnCore_Biomarker_Matched")
+  print(paste("Pre-FILTER: n= ", nrow(OnCore_Biomarker_Matched), " entries (n= ",
+              length(unique(OnCore_Biomarker_Matched$sys.uniqueId)), " patients)", sep=""))
+  TempDF <- OnCore_Biomarker_Matched[!OnCore_Biomarker_Matched$smpl.pathogenicityStatus %in% pathogenic_accepted,]
+  print(paste("REMOVED: n= ", nrow(TempDF), " entries (n= ", length(unique(TempDF$sys.uniqueId)), " patients)", sep=""))
+  cat("\n")
+  
+  OnCore_Biomarker_Matched <- 
+    OnCore_Biomarker_Matched[OnCore_Biomarker_Matched$smpl.pathogenicityStatus %in% pathogenic_accepted,]
+  print(paste("POST-FILTER: n= ", nrow(OnCore_Biomarker_Matched), " entries (n= ", 
+              length(unique(OnCore_Biomarker_Matched$sys.uniqueId)), " patients)", sep=""))
+  
+  remove(TempDF)
 } else {
   print("pathogenic Filter: OFF")
+  print("Patient_Variant_Matched")
   print(paste("Current: n= ", nrow(Patient_Variant_Matched), " entries (n= ",
               length(unique(Patient_Variant_Matched$sys.uniqueId)), " patients)", sep=""))
+  cat("\n")
+  print("OnCore_Biomarker_Matched")
+  print(paste("Current: n= ", nrow(OnCore_Biomarker_Matched), " entries (n= ",
+              length(unique(OnCore_Biomarker_Matched$sys.uniqueId)), " patients)", sep=""))
   
 }
 
@@ -78,7 +98,7 @@ plot_Trial_Count <- function(DF, trialColumn, fileName_pre, plotTitle, y_max) {
          subtitle = paste("N = ", total_matched, " / ", nrow(DF), " adult patients matched", sep="")) +
     
     scale_x_continuous(name="No. Clinical Trials", breaks = seq(0, x_max, 1)) +
-    scale_y_continuous(name="No. Individuals", limits = c(0,y_max), breaks = seq(0,y_max, by = 50)) + 
+    scale_y_continuous(name="No. Individuals", limits = c(0,y_max), breaks = seq(0,y_max, by = 100)) + 
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=12),
@@ -109,50 +129,63 @@ cat("\n","\n")
 
 # Tally No. trial matches from each source
 Trial_Count <- data.frame(patient_id = STAMP_all_variants_QC$sys.uniqueId,
-                          patient_age = STAMP_all_variants_QC$current.age)
+                          patient_age = STAMP_all_variants_QC$current.age,
+                          stringsAsFactors = FALSE)
+Trial_Count$patient_age <- as.numeric(Trial_Count$patient_age)
 Trial_Count <- unique(Trial_Count)
 
-# Subset only ADULT patients (18-64yo)
-Trial_Count <- Trial_Count[Trial_Count$patient_age >= 18 & Trial_Count$patient_age < 65,]
+# Subset only ADULT patients (18+yo)
+if (isTRUE(pathogenic_FILTER)) {
+  Trial_Count <- Trial_Count[Trial_Count$patient_age >= 18,]
+}
+
+Trial_Count$No.Internal.Trials <- NA
+Trial_Count$No.NCI.Trials <- NA
+Trial_Count$No.NCI.NonHotspot <- NA
 
 for (row_No in 1:nrow(Trial_Count)) {
+  pt_id <- Trial_Count$patient_id[row_No]
+  
   Trial_Count$No.Internal.Trials[row_No] <- 
-    as.numeric(length(unique(OnCore_Biomarker_Matched$OnCore.No[OnCore_Biomarker_Matched$sys.uniqueId == 
-                                                                  Trial_Count$patient_id[row_No]])))
+    as.numeric(length(unique(OnCore_Biomarker_Matched$OnCore.No
+                             [which(OnCore_Biomarker_Matched$sys.uniqueId == pt_id)])))
   
   Trial_Count$No.NCI.Trials[row_No] <- 
-    as.numeric(length(unique(Patient_Variant_Matched$Arm_Name[Patient_Variant_Matched$sys.uniqueId == 
-                                                                Trial_Count$patient_id[row_No]])))
+    as.numeric(length(unique(Patient_Variant_Matched$Arm_Name
+                             [which(Patient_Variant_Matched$sys.uniqueId == pt_id)])))
+  
   Trial_Count$No.NCI.NonHotspot[row_No] <- 
-    as.numeric(length(unique(Patient_NonHotspot_Matched$Arm_Name[Patient_NonHotspot_Matched$sys.uniqueId == 
-                                                                   Trial_Count$patient_id[row_No]])))
+    as.numeric(length(unique(Patient_NonHotspot_Matched$Arm_Name
+                             [which(Patient_NonHotspot_Matched$sys.uniqueId == pt_id)])))
   
   # Remove duplicated patient_id-Arm_Name combo for NCI-MATCH trials (Variant and NonHotspot matches)
   if (Trial_Count$patient_id[row_No] %in% DF_NCI_Matched_Dup) {
     Trial_Count$No.NCI.NonHotspot[row_No] <- Trial_Count$No.NCI.NonHotspot[row_No] -1
   }
+  
+  remove(pt_id)
 }
 Trial_Count$No.Total.Trials <- rowSums(Trial_Count[,3:5])
 
-plot_Trial_Count(DF = Trial_Count, y_max = 1010,
+plot_Trial_Count(DF = Trial_Count, y_max = 2180,
                  trialColumn = "No.Total.Trials", 
                  fileName_pre = paste("Total_MatchDistribution_Internal", OnCore_Biomarker_Report_timestamp, 
                                       "_NCI-MATCH_", Patient_Variant_Report_timestamp, "_", filterName, sep=""), 
                  plotTitle = "NCI-MATCH & Stanford Internal Clinical Trial Matching") 
 
-plot_Trial_Count(DF = Trial_Count, y_max = 1010,
+plot_Trial_Count(DF = Trial_Count, y_max = 2180,
                  trialColumn = "No.Internal.Trials", 
                  fileName_pre = paste("OnCore_Biomarker_MatchDistribution_", OnCore_Biomarker_Report_timestamp, "_", 
                                       filterName_initial, filterName_int, sep=""), 
                  plotTitle = "Stanford Internal Clinical Trial Matching") 
 
-plot_Trial_Count(DF = Trial_Count, y_max = 1010,
+plot_Trial_Count(DF = Trial_Count, y_max = 2180,
                  trialColumn = "No.NCI.Trials", 
                  fileName_pre = paste("Patient_Variant_MatchDistribution_",
                                       Patient_Variant_Report_timestamp, "_", pathogenic_pre, sep=""), 
                  plotTitle = "NCI-MATCH Trial Matching (Variants)") 
 
-plot_Trial_Count(DF = Trial_Count, y_max = 1010,
+plot_Trial_Count(DF = Trial_Count, y_max = 2180,
                  trialColumn = "No.NCI.NonHotspot", 
                  fileName_pre = paste("Patient_NonHotspot_MatchDistribution_",
                                       Patient_Variant_Report_timestamp, "_", pathogenic_pre, sep=""), 
@@ -359,8 +392,7 @@ for (id_num  in 1:length(patient.list)) {
     assign("trial_num", trial_num, envir = .GlobalEnv)
     
     ## Write output to file (NCI-MATCH Trial)
-    outdir_sub_NCI = paste(outdir, "NCI-MATCH_", Patient_Variant_Report_timestamp, "_", 
-                                gsub("(^.*)(_pathogenicFILTER[_][[:alpha:]]{,3}$)", "\\1", filterName), "/", sep="")
+    outdir_sub_NCI = paste(outdir, "NCI-MATCH_", Patient_Variant_Report_timestamp,"/", sep="")
     if (!dir.exists(outdir_sub_NCI)){dir.create(outdir_sub_NCI)} 
     
     txt_filename <- paste(outdir_sub_NCI, patient_id, ".txt", sep="")
