@@ -10,13 +10,14 @@ Patient_Variant_Report_timestamp <- format(as.Date("2018-09-06"), format= "%Y-%m
 # Patient_Variant_Report_timestamp <- format(as.Date("2018-12-11"), format= "%Y-%m-%d")
 
 deleteIntermediateFile = TRUE
+# Adult = age >= 18+yo i.e. adult & older adult cohorts 
 adult.group_FILTER = TRUE # APPLY TO ALL
+pathogenic_FILTER = TRUE # APPLY TO ALL
 pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
 
 # Specify individual filters
 disease.group_FILTER = TRUE
 disease.site_FILTER = TRUE # Dependent on disease.group_FILTER == TRUE
-pathogenic_FILTER = TRUE
 
 #################################
 ## PIPELINE
@@ -32,34 +33,25 @@ suppressMessages(libraries("plyr", "tidyverse", "dplyr", "ggplot2", "eeptools", 
 #----------------------------------------------
 source("ClinicalTrialMatching/DiseaseGroupCategories.R")
 
-# Run every combination of filters
-#----------------------------------------------
-# Export script from "## Filter indication" onward as file = "~/Desktop/Untitled.R"
-disease.group_FILTER_all = c("TRUE","FALSE")
-disease.site_FILTER_all = c("TRUE","FALSE")
-pathogenic_FILTER_all = c("TRUE","FALSE")
-
-for (group_type in 1:length(disease.group_FILTER_all)) {
-  disease.group_FILTER <- as.logical(disease.group_FILTER_all[group_type])
-  
-  if (isTRUE(disease.group_FILTER)) {
-    for (site_type in 1:length(disease.site_FILTER_all)) {
-      disease.site_FILTER <- as.logical(disease.site_FILTER_all[site_type])
-      for (patho_type in 1:length(pathogenic_FILTER_all)) {
-        pathogenic_FILTER <- as.logical(pathogenic_FILTER_all[patho_type])
-        source("~/Desktop/Untitled.R")
-      }
-    }
-  } else {
-    for (patho_type in 1:length(pathogenic_FILTER_all)) {
-      pathogenic_FILTER <- as.logical(pathogenic_FILTER_all[patho_type])
-      source("~/Desktop/Untitled.R")
-    }
-  }
-}
-
-remove(disease.group_FILTER_all,disease.site_FILTER_all,pathogenic_FILTER_all,
-       group_type,site_type,patho_type)
+# # Run every combination of filters
+# #----------------------------------------------
+# # Export script from "## Filter indication" onward as file = "~/Desktop/Untitled.R"
+# disease.group_FILTER_all = c("TRUE","FALSE")
+# disease.site_FILTER_all = c("TRUE","FALSE")
+# 
+# for (group_type in 1:length(disease.group_FILTER_all)) {
+#   disease.group_FILTER <- as.logical(disease.group_FILTER_all[group_type])
+# 
+#   if (isTRUE(disease.group_FILTER)) {
+#     for (site_type in 1:length(disease.site_FILTER_all)) {
+#       disease.site_FILTER <- as.logical(disease.site_FILTER_all[site_type])
+#       source("~/Desktop/Untitled.R")
+#     }
+#   } else {
+#     source("~/Desktop/Untitled.R")
+#   }
+# }
+# remove(disease.group_FILTER_all,disease.site_FILTER_all,group_type,site_type)
 
 ## Filter indication
 #----------------------------------------------
