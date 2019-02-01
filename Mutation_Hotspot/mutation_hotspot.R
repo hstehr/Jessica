@@ -1,8 +1,4 @@
-setwd("~/Documents/ClinicalDataScience_Fellowship/")
-
-## FUNCTIONS
-#----------------------------------------------
-# Generate Lollipop Plot
+## FUNCTION: Generate Lollipop Plot
 Lollipop_Plot <- function(variant_type, assay,
                           static_plot = TRUE, dynamic_plot = FALSE,
                           loc.freq.max = max(as.numeric(data_var_FULL$var.freq))) {
@@ -209,12 +205,12 @@ Mutation_Pipeline <- function (gene.list, DF, assay) {
     
     # Extract STAMP entries for gene of interest 
     #----------------------------------------------
-    DF_patient_INFO <- DF[DF$base.gene == gene_id,]
+    DF_patient_INFO <- DF[DF$VariantGene == gene_id,]
     
     # Remove STAMP entries with UTR variants i.e. position > AA length of transcript 
     DF_remove <- DF_patient_INFO[which(DF_patient_INFO$var.position > unique(DF_gene_INFO$gene.end)),]
     if (nrow(DF_remove) != 0){
-      DF_patient_INFO <- DF_patient_INFO[!DF_patient_INFO$sys.label %in% DF_remove$sys.label,]
+      DF_patient_INFO <- DF_patient_INFO[!DF_patient_INFO$VariantLabel %in% DF_remove$VariantLabel,]
     }
     remove(DF_remove,row_id)
     
@@ -223,7 +219,7 @@ Mutation_Pipeline <- function (gene.list, DF, assay) {
     # Extract variant position from smpl.hgvsProtein
     variant.loc.list <- DF_patient_INFO$var.position
     # Extract pathogenicity status from smpl.pathogenicityStatus
-    variant.pathogenicity.list = DF_patient_INFO$smpl.pathogenicityStatus
+    variant.pathogenicity.list = DF_patient_INFO$VariantPathogenicityStatus
     
     # Unique pathogenicity statuses to map
     index.sig = unique(variant.pathogenicity.list)
@@ -275,7 +271,7 @@ Mutation_Pipeline <- function (gene.list, DF, assay) {
     
     # Generate plots for each pathogenicity status
     #----------------------------------------------
-    if (as.numeric(table(DF$base.gene == gene_id)["TRUE"]) > 0) {
+    if (as.numeric(table(DF$VariantGene == gene_id)["TRUE"]) > 0) {
       Lollipop_Plot(variant_type = "All Variants", assay = assay,
                     dynamic_plot = TRUE)
       pNum = 1
@@ -319,7 +315,7 @@ Mutation_Pipeline <- function (gene.list, DF, assay) {
                                    top = text_grob(paste(gene_id, " variants from ", assay, 
                                                          " (", unique(DF_gene_INFO$gene.end), " aa)", sep=""), 
                                                    face = "bold", size = 18))
-        file_id = paste("Mutation_Hotspot/LollipopPlots/", gene_id, "_", assayName, ".jpg", sep="")
+        file_id = paste("LollipopPlots/", gene_id, "_", assayName, ".jpg", sep="")
         
         ggexport(gpanels, filename = file_id, width = 4000, height = 4000, res=350)
         remove(gpanels)
@@ -350,7 +346,8 @@ Mutation_Pipeline <- function (gene.list, DF, assay) {
 #----------------------------------------------
 # Import excel file as single list
 STAMPv2_Annotation <- 
-  import_list(paste("STAMP/", STAMP_annotation_timestamp, "_STAMPv2_Annotation.xlsx", sep=""), setclass = "tbl")
+  import_list(paste("/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/STAMP/", 
+                    STAMP_annotation_timestamp, "_STAMPv2_Annotation.xlsx", sep=""), setclass = "tbl")
 
 # Generate individual DF per worksheet in excel file
 invisible(capture.output(lapply(names(STAMPv2_Annotation), 
@@ -364,17 +361,17 @@ Domains <- data.frame(Domains[c(3:nrow(Domains)),c(2:ncol(Domains))])
 colnames(Genes) <- unlist(Genes[2,])
 Genes <- data.frame(Genes[c(3:nrow(Genes)),c(2:ncol(Genes))])
 
-DF <- read.csv(file = paste("Mutation_Hotspot/", Syapse_Export_timestamp, "_syapse_export_DF_STAMP_4Map.csv", sep=""),
-               header = TRUE, na.strings = "NA", stringsAsFactors = FALSE,sep = ",")
-col.change <- c("smpl.hasOrderingPhysician", "sys.uniqueId", "smpl.gender", 
-                "smpl.assayName", "base.chromosome", "smpl.specimenType", "smpl.specimenSite")
+DF <- read.csv(file = paste(Syapse_Export_timestamp, "_syapse_export_DF_STAMP_4Map.tsv", sep=""),
+               header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+col.change <- c("AssayOrderingPhysician", "PatientID", "PatientGender", 
+                "AssayName", "VariantCHR", "SpecimenSite")
 DF[ ,col.change] <- lapply(DF[ ,col.change], factor)
 
 ## Check missing gene INFO
 #----------------------------------------------
 gene.DF = data.frame(gene=sort(unique(Genes$Name)), stringsAsFactors=FALSE)
 domain.DF = data.frame(gene=sort(unique(Domains$Name)), stringsAsFactors=FALSE)
-gene.list <- data.frame(gene=unique(DF$base.gene), stringsAsFactors=FALSE)
+gene.list <- data.frame(gene=unique(DF$VariantGene), stringsAsFactors=FALSE)
 
 Temp_DF <- anti_join(gene.list, gene.DF, by = "gene")
 if (nrow(Temp_DF) > 0) {
@@ -393,37 +390,60 @@ if (nrow(Temp_DF) > 0) {
 
 # Categorize by assay data i.e. STAMP v1 and v2
 #----------------------------------------------
-DF_STAMP_v1 <- DF[DF$smpl.assayName == "STAMP - Solid Tumor Actionable Mutation Panel (198 genes)" |
-                    DF$smpl.assayName == "STAMP - Solid Tumor Actionable Mutation Panel (200 genes)", ]
+DF_STAMP_v1 <- DF[DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (198 genes)" |
+                    DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (200 genes)", ]
 
-DF_STAMP_v2 <- DF[DF$smpl.assayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)", ]
+DF_STAMP_v2 <- DF[DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)", ]
 
 DF_STAMP_all <- DF
 
-remove(Changes,Tiles,STAMPv2_Annotation, col.change, gene.DF, domain.DF,Temp_DF,gene.list,DF)
-
 # Data Review 
 #----------------------------------------------
-cat(paste("DF_STAMP_v1: ", nrow(DF_STAMP_v1), " entries; ", length(unique(DF_STAMP_v1$base.gene)), 
-          " genes; ", length(unique(DF_STAMP_v1$sys.uniqueId)), " patients.", sep=""), "\n")
-cat(paste("DF_STAMP_v2: ", nrow(DF_STAMP_v2), " entries; ", length(unique(DF_STAMP_v2$base.gene)), 
-          " genes; ", length(unique(DF_STAMP_v2$sys.uniqueId)), " patients.", sep=""), "\n")
-cat(paste("DF_STAMP_all: ", nrow(DF_STAMP_all), " entries; ", length(unique(DF_STAMP_all$base.gene)), 
-          " genes; ", length(unique(DF_STAMP_all$sys.uniqueId)), " patients.", sep=""), "\n")
+cat(paste("DF_STAMP_v1: ", nrow(DF_STAMP_v1), " entries; ", length(unique(DF_STAMP_v1$VariantGene)), 
+          " genes; ", length(unique(DF_STAMP_v1$PatientID)), " patients.", sep=""), "\n")
+cat(paste("DF_STAMP_v2: ", nrow(DF_STAMP_v2), " entries; ", length(unique(DF_STAMP_v2$VariantGene)), 
+          " genes; ", length(unique(DF_STAMP_v2$PatientID)), " patients.", sep=""), "\n")
+cat(paste("DF_STAMP_all: ", nrow(DF_STAMP_all), " entries; ", length(unique(DF_STAMP_all$VariantGene)), 
+          " genes; ", length(unique(DF_STAMP_all$PatientID)), " patients.", sep=""), "\n")
+
+# Generate table of iframe codes
+DF_iframe.code_v1 <- 
+  data.frame(Folder = "STAMP_v1_Lollipop", Gene = sort(unique(DF_STAMP_v1$VariantGene)),
+             iframe = NA,stringsAsFactors = FALSE)
+for (row_No in 1:nrow(DF_iframe.code_v1)) { DF_iframe.code_v1$iframe[row_No] <- seq(1448,1794,2)[row_No] }
+
+DF_iframe.code_v2 <- 
+  data.frame(Folder = "STAMP_v2_Lollipop", Gene = sort(unique(DF_STAMP_v2$VariantGene)),
+             iframe = NA,stringsAsFactors = FALSE)
+for (row_No in 1:nrow(DF_iframe.code_v2)) { DF_iframe.code_v2$iframe[row_No] <- seq(1796,2052,2)[row_No] }
+
+DF_iframe.code_all <- 
+  data.frame(Folder = "STAMP_all_Lollipop", Gene = sort(unique(DF_STAMP_all$VariantGene)),
+             iframe = NA,stringsAsFactors = FALSE)
+for (row_No in 1:nrow(DF_iframe.code_all)) { DF_iframe.code_all$iframe[row_No] <- seq(2054,2546,2)[row_No] }
+
+DF_iframe.code <- rbind(DF_iframe.code_v1, DF_iframe.code_v2, DF_iframe.code_all)
+
+## Write to local computer
+#----------------------------------------------
+write.table(DF_iframe.code, "STAMP_plotly_iframe.tsv",
+            append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 # Generate Lollipop Plot
 #----------------------------------------------
-Mutation_Pipeline(gene.list = sort(unique(DF_STAMP_v1$base.gene)), 
+Mutation_Pipeline(gene.list = sort(unique(DF_STAMP_v1$VariantGene)),
                   DF = DF_STAMP_v1,
                   assay = "STAMP v1")
 
-Mutation_Pipeline(gene.list = sort(unique(DF_STAMP_v2$base.gene)),
+Mutation_Pipeline(gene.list = sort(unique(DF_STAMP_v2$VariantGene)),
                   DF = DF_STAMP_v2,
                   assay = "STAMP v2")
 
-Mutation_Pipeline(gene.list = sort(unique(DF_STAMP_all$base.gene)),
+Mutation_Pipeline(gene.list = sort(unique(DF_STAMP_all$VariantGene)),
                   DF = DF_STAMP_all,
                   assay = "STAMP v1 and v2")
 
-remove(plot_dynamic_int,plot_static,data_var_FULL,DF_gene_INFO)
-remove(DF_STAMP_v1,DF_STAMP_v2,DF_STAMP_all,Lollipop_Plot,Mutation_Pipeline)
+remove(Changes,Tiles,STAMPv2_Annotation, col.change, gene.DF, domain.DF,Temp_DF,gene.list,DF,
+       DF_STAMP_v1,DF_STAMP_v2,DF_STAMP_all,Lollipop_Plot,Mutation_Pipeline,
+       plot_dynamic_int,plot_static,data_var_FULL,DF_gene_INFO,
+       DF_iframe.code_v1,DF_iframe.code_v2,DF_iframe.code_all)
