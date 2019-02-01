@@ -1,137 +1,115 @@
-rm(list=ls())
-setwd("~/Documents/ClinicalDataScience_Fellowship/")
+#!/usr/bin/env Rscript
 
-#################################
-## Customize variables 
-#################################
-Syapse_Export_timestamp <- format(as.Date("2018-10-18"), format= "%Y-%m-%d")
-OnCore_Biomarker_Report_timestamp <- format(as.Date("2018-10-01"), format= "%Y-%m")
-Patient_Variant_Report_timestamp <- format(as.Date("2018-09-06"), format= "%Y-%m-%d")
-# Patient_Variant_Report_timestamp <- format(as.Date("2018-12-11"), format= "%Y-%m-%d")
+library(plyr)
+library(dplyr)
+library(Biobase)
+library(eeptools)
+library(splitstackshape)
+library(reshape)
+library(rio)
+library(stringr)
+library(openxlsx)
 
-deleteIntermediateFile = TRUE
-# Adult = age >= 18+yo i.e. adult & older adult cohorts 
-adult.group_FILTER = TRUE # APPLY TO ALL
-pathogenic_FILTER = TRUE # APPLY TO ALL
+args = commandArgs(trailingOnly=TRUE)
+# 1. Directory to save output to.
+outdir = args[1]
+# 2. Annotation of Output folder.
+outdir_anno = args[2]
+# 3. Location of STAMP entries (syapse export).
+STAMP.file = args[3]
+# 4. Location of OnCore Report (Stanford Internal Clinical Trials).
+OnCore.file = args[4]
+# 5. Location of Patient Variant Report (NCI-MATCH Clinical Trials).
+NCI.file = args[5]
+
+## Load files 
+#----------------------------------------------
+STAMP_DF <- 
+  read.csv(file = STAMP.file, header = TRUE, na.strings = c(""," ","NA"), stringsAsFactors = FALSE, sep = ",")
+
+OnCore_Biomarker_Report <- 
+  read.csv(file = OnCore.file, header = TRUE, na.strings = c("NA", ""), stringsAsFactors = FALSE, sep = ",")
+
+PATIENT_VARIANT_REPORT <- import_list(NCI.file, setclass = "tbl")
+
+## Specify Parameters 
+#----------------------------------------------
+setwd(outdir)
+
+## Disease Ontology 
+source("DiseaseGroupCategories.R")
+
+## Timestamp
+Syapse_Export_timestamp <- 
+  format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",
+                      sub(".*/", "", STAMP.file))), format= "%Y-%m-%d")
+
+OnCore_Biomarker_Report_timestamp <- 
+  format(as.Date(paste(gsub("([[:digit:]]{4}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*_", "", OnCore.file)), 
+                       "-01",sep="")), format= "%Y-%m")
+
+Patient_Variant_Report_timestamp <- 
+  format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",
+                      sub(".*_", "", NCI.file))), format= "%Y-%m-%d")
+
+## Default filters 
+adult.group_FILTER = TRUE # Adult = age >= 18+yo)
+pathogenic_FILTER = TRUE
 pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
 
-# Specify individual filters
+## Customizeable filters
 disease.group_FILTER = TRUE
 disease.site_FILTER = TRUE # Dependent on disease.group_FILTER == TRUE
 
-#################################
+## Filters APPLIED
+if (isTRUE(disease.group_FILTER)) { groupName <- "diseaseFILTER_groupON" } else { groupName <- "diseaseFILTER_groupOFF" }
+if (isTRUE(disease.group_FILTER & disease.site_FILTER)) { siteName <- "siteON" } else { siteName <- "siteOFF" }
+if (isTRUE(pathogenic_FILTER)) { pathoName <- "pathogenicON" } else { pathoName <- "pathogenicOFF" }
+if (isTRUE(adult.group_FILTER)) { ageName <- "AdultGroupON" } else { ageName <- "AdultGroupOFF" }
+filterName <- paste(groupName,siteName, "_", pathoName, "_",  ageName, sep="")
+
+## Directories
+outdir_int = paste(getwd(), "/Temporary/", sep="")
+
+outdir_patient = paste(getwd(), "/Results/", Sys.Date(), "_", outdir_anno, sep="")
+if (!dir.exists(outdir_patient)){dir.create(outdir_patient)} 
+
+## Write output to file
+#----------------------------------------------
+sink(file = paste(getwd(), "/Results/", Sys.Date(), "_",outdir_anno,"_Output.txt", sep=""), 
+     append = FALSE, split = FALSE)
+options(max.print=999999)
+
+## Print parameters to output
+#----------------------------------------------
+cat("Syapse Timestamp: ", Syapse_Export_timestamp, "\n", "\n",
+    "Stanford Internal Trial Timestamp: ", OnCore_Biomarker_Report_timestamp, "\n",
+    "\t", "FILTERs: disease group matched: ", disease.group_FILTER, "; disease site matched: ", disease.site_FILTER, "\n",
+    "NCI-MATCH Trial Timestamp: ", Patient_Variant_Report_timestamp, "\n",
+    "FILTERs: adult patients (age >= 18yo): ",adult.group_FILTER, "; pathogenic variants: ", pathogenic_FILTER, "\n", "\n",
+    "Outdirectory: ", getwd(), "\n",
+    "Temporary Files within outdir: ", gsub(paste(getwd(),"/",sep=""), "", outdir_int), "\n",
+    "Patient Match Results within outdir: ", gsub(paste(getwd(),"/",sep=""), "", outdir_patient), "\n","\n")
+
 ## PIPELINE
-#################################
-# Load Libraries 
 #----------------------------------------------
-suppressMessages(library("easypackages"))
-suppressMessages(libraries("plyr", "tidyverse", "dplyr", "ggplot2", "eeptools", "splitstackshape", 
-                           "reshape", "tidyr", "Biobase", "stringr", "rio", "openxlsx"))
-# tidyverse_conflicts()     # Conflicts with dplyr
+# Clean up patient data from Syapse
+source("Syapse_Export_QC.R")
+source("Syapse_VariantAnnotate.R")
 
-# Load DiseaseGroupCategories 
-#----------------------------------------------
-source("ClinicalTrialMatching/DiseaseGroupCategories.R")
+# Extract patient_id
+patient.list <- sort(unique(STAMP_DF$PatientID))
 
-# # Run every combination of filters
-# #----------------------------------------------
-# # Export script from "## Filter indication" onward as file = "~/Desktop/Untitled.R"
-# disease.group_FILTER_all = c("TRUE","FALSE")
-# disease.site_FILTER_all = c("TRUE","FALSE")
-# 
-# for (group_type in 1:length(disease.group_FILTER_all)) {
-#   disease.group_FILTER <- as.logical(disease.group_FILTER_all[group_type])
-# 
-#   if (isTRUE(disease.group_FILTER)) {
-#     for (site_type in 1:length(disease.site_FILTER_all)) {
-#       disease.site_FILTER <- as.logical(disease.site_FILTER_all[site_type])
-#       source("~/Desktop/Untitled.R")
-#     }
-#   } else {
-#     source("~/Desktop/Untitled.R")
-#   }
-# }
-# remove(disease.group_FILTER_all,disease.site_FILTER_all,group_type,site_type)
+# Clean up Clinical Trial data
+source("Biomarker_Report_QC.R")
+source("Patient_Variant_Report_QC.R")
 
-## Filter indication
-#----------------------------------------------
-filterName_initial <- "diseaseFILTER_"
-if (isTRUE(disease.group_FILTER)) {
-  filterName_initial <- paste(filterName_initial, "groupON", sep="")
-} else {
-  filterName_initial <- paste(filterName_initial, "groupOFF", sep="")
-}
-if (isTRUE(disease.group_FILTER & disease.site_FILTER)) {
-  filterName_int <- "siteON"
-} else {
-  filterName_int <- "siteOFF"
-}
-if (isTRUE(pathogenic_FILTER)) {
-  pathogenic_pre = "pathogenicFILTER_ON"
-} else {
-  pathogenic_pre = "pathogenicFILTER_OFF"
-}
-filterName <- paste(filterName_initial,filterName_int, "_", pathogenic_pre, sep="")
+# Clinical trial Match
+source("Biomarker_Report_Match.R")
+source("Patient_Variant_Report_InclusionMatch.R")
+source("Patient_Variant_Report_NonHotspotMatch.R")
 
-# Clean up Patient data from Syapse
-#----------------------------------------------
-## QC-parameters: smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding
-source(paste("STAMP/", Syapse_Export_timestamp, "_syapse_export_all_variants_QC.R", sep=""))
-remove(DF_Full)     ## Output: "syapse_export_all_variants_QC.csv"
+## Generate OUTPUT file
+source("ClinicalTrial_MatchOutput.R")
 
-## Subset STAMP entries > classify mutations > assign current age > classify primaryTumorSite
-## Classification #1: Synonymous, Upstream, Intronic, SNV, Frameshift/In-frame (i.e. Delins, Insertions, Deletions, Duplications)
-## Classification #2: "MUTATION","OTHER"
-source(paste(Syapse_Export_timestamp, "_syapse_export_all_variants_QC_STAMP_VariantAnno.R", sep=""))
-## Output: "Mutation_Hotspot/syapse_export_DF_[STAMP_4Map | NAprotein].csv"
-remove(DF_STAMP_VariantAnno)     ## Output: "syapse_export_DF_STAMP_VariantAnno.csv""
-
-# Clean up Clinical trial data
-#----------------------------------------------
-## QC-parameters: Biomarker.Description, Disease.Sites (most general), Disease.Group
-source("ClinicalTrialMatching/Biomarker_Report_Convert2Long.R")
-remove(OnCore_Biomarker_Report)     ## Output: "Biomarker_Report_LongFormat.csv"
-
-## Partition criteria into separate files and general QC
-source("Patient_Variant_Report_Convert2Long.R")
-remove(list_of_datasets)     ## Output: "Patient_Variant_Report_QC.xlsx"
-
-# PRE_Matching
-#----------------------------------------------
-## Function (Internal): age.group (ADULT), biomarker.gene, biomarker.condition ("MUTATION"), disease_group (diseaseFILTER)
-## Function (NCI-MATCH): age.group (ADULT), Gene_Name, Variant_Type (Inclusion ONLY)
-outdir = paste(getwd(), "/Retrospective_Analysis/Internal_", OnCore_Biomarker_Report_timestamp, 
-               "_NCI-MATCH_", Patient_Variant_Report_timestamp, "_", filterName_initial, "/", sep="")
-if (!dir.exists(outdir)){dir.create(outdir)} 
-source("ClinicalTrial_Initial_Match.R")
-remove(DF_Output_OnCore_Biomarker,DF_Output_Patient_Variant,DF_Output_Patient_NonHotspot)
-## OUTPUT: OnCore_Biomarker_Matched.csv, Patient_Variant_Matched.csv, Patient_NonHotspot_Matched.csv
-
-# Merge patient entries with candidate clinical trials 
-#----------------------------------------------
-## Extract candidate clinical trials based on disease_site (FILTER) and Biomarker_Detail
-source("ClinicalTrialMatching/Biomarker_Report_Extract4Match.R")
-remove(DF_Output_Biomarker_Matched_FINAL)     ## Output: OnCore_Biomarker_Matched_FINAL.csv
-
-## Match NCI-MATCH "Protein" with STAMP "hgvs.Protein"
-source("ClinicalTrialMatching/Patient_Variant_Report_Extract4Match.R")
-remove(DF_Output_Patient_Variant_Matched,DF_Output_Patient_NonHotspot_Matched)
-## Output: Patient_Variant_Report_QC_Matched_FINAL.xlsx
-
-# FINAL_Matching
-#----------------------------------------------
-## Generate summary separate text file of candidate clinical trial(s) per patient per trial cohort
-outdir = paste(getwd(), "/ClinicalTrialMatching/Retrospective_Analysis/", sep="")
-source("ClinicalTrialMatching/ClinicalTrial_Final_Match.R")     ## Output: Match_ClinicalTrial_patient_id.txt
-
-# Remove Syapse-related files
-#----------------------------------------------
-if (isTRUE(deleteIntermediateFile)) {
-  int_file_01 = paste(getwd(), "/ClinicalTrialMatching/",Syapse_Export_timestamp, "_syapse_export_DF_STAMP_VariantAnno.csv", sep="")
-  int_file_02 = paste(getwd(), "/STAMP/",Syapse_Export_timestamp, "_syapse_export_all_variants_QC.csv", sep="")
-  
-  if (file.exists(int_file_01)){file.remove(int_file_01)}
-  if (file.exists(int_file_02)){file.remove(int_file_02)}
-  
-  remove(int_file_01,int_file_02)
-}
+sink()
