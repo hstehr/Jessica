@@ -1,4 +1,4 @@
-print("Melanoma and Blook have NOT been classified into a primaryTumorSite")
+cat("Melanoma and Blood have NOT been classified into a primaryTumorSite","\n","\n")
 
 #################################
 ## Customize disease group categories 
