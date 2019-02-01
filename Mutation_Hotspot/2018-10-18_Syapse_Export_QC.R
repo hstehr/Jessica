@@ -2,7 +2,7 @@
 
 ## QC-parameters: smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding
 ## Calculate patient age > merge with primary tumor site data > filter for STAMP entries 
-## Output: "Syapse_Export_QC.csv"
+## Output: "Syapse_Export_QC.tsv"
 
 cat(paste("Timestamp of Syapse_Report: ", Syapse_Export_timestamp, sep=""),"\n")
 
