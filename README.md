@@ -1,6 +1,6 @@
 ## Clinical Trial Matching (NCI-MATCH and Stanford Internal)
 ```
-source("ClinicalTrialMatching/ClinicalTrial_Matching_PIPELINE.R")
+bash ClinicalTrialMatching/ClinicalTrial_Matching.sh
 ```
 
 ## Mutation plots (STAMP entries)
