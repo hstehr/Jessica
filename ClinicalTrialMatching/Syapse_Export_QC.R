@@ -1,11 +1,10 @@
 ## Confirmed for timestamp = c("2018-10-18")
 
-
-## QC-parameters: smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding
+## QC-parameters: smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding, smpl.hgvsGenomic
 ## Calculate patient age > merge with primary tumor site data > filter for STAMP entries 
 ## Output: "syapse_export_all_variants_QC.csv"
 
-cat(paste("Timestamp of Syapse_Report: ", Syapse_Export_timestamp, sep=""),"\n")
+cat(paste("Timestamp of Syapse_Report: ", Syapse_Export_timestamp, sep=""),"\n","\n")
 
 # Load relevant file from global environment 
 #----------------------------------------------
@@ -184,7 +183,34 @@ if (Syapse_Export_timestamp  == "2018-10-18") {
   DF_Full[8129,"base.gene"] <- "TERT"
   DF_Full[8129,"smpl.hgvsCoding"] <- "c.-154C>T"
   DF_Full[8129,"smpl.transcript"] <- "NM_198253.2"
+  
+  # VariantHGVSGenomic correction
+  #----------------------------------------------
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "PTCH1 c.3947A>G (p.Tyr1316Cys)")] <-"g.98209591T>C"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "PIK3CA c.1348_1374del (p.His450_Pro458del)")] <- "g.1505_1531del"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "KIT c.1721_1762dup (p. Thr574_Asn587dup)")] <- "g.55593655_55593696dup"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "TERT c.-138_139delinsTT ()")] <- "g.1295242_1295243delinsAA"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "EGFR c.89-7736_889+41del (p.Leu30_Arg297delinsGly)")] <- "g.55202243_55221886del"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "MET c.2942-18_2953del (p.?)")] <- "g.116411885_116411914del"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "DNMT3A c.2645G>C (p.Arg882Pro)")] <- "g.25457242C>G"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "TET2 c.1072A>G (p.Ser358Gly)")] <- "g.106156171A>G"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "IDH2 c.419G>T (p.Arg140Leu)")] <- "g.90631934C>A"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "TET2 c.2645_2646delinsAA (p.Cys882Ter)")] <- "g.106157744_106157745delinsAA"
+
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr3:g.37067129C>A")] <- "g.37067129C>A"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr4:g.153249384 _153249385delinsGAC")] <- "g.153249384_153249385delinsGAC"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.140453136_140453137delinsTT")] <- "g.140453136_140453137delinsTT"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.116411885_116411899del")] <- "g.116411885_116411899del"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.2562_2563insGGACACCCC")] <- "g.2562_2563insGGACACCCC"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr12:g.25398280_25398286delinsACGACCC")] <- "g.25398280_25398286delinsACGACCC"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr15:g.90631934C>T")] <- "g.90631934C>T"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.7579406delGinsAC")] <- "g.7579406delGinsAC"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.7579371_7579372dupTG")] <- "g.7579371_7579372dupTG"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.29527590C>T")] <- "g.29527590C>T"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == ":g.10602467 _10602472dup")] <- "g.10602467_10602472dup"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "g.10191479")] <- "g.10191479C>G"
 }
+
 ###################################
 ## Manual edit END
 ###################################
@@ -278,16 +304,16 @@ DF_Full$smpl.dateReceived <- as.Date(gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-][
 DF_Full$Age <- as.numeric(floor(age_calc(dob = DF_Full$patient.dob, 
                                          enddate = DF_Full$smpl.dateReceived, units = "years")))
 
-## Merge with primary tumor site data
+## Merge with primary tumor site & histological Dx data 
 #----------------------------------------------
 if (Syapse_Export_timestamp  == "2018-10-18") {
   
-  DF_TumorSite <- read.csv(file = "~/Documents/ClinicalDataScience_Fellowship/STAMP/2018-12-17_syapse_primary_tumor_site.csv",
+  DF_TumorSite <- read.csv(file = "~/Documents/ClinicalDataScience_Fellowship/STAMP/2019-01-31_syapse_export_all.csv",
                            header = TRUE, na.strings = c("NA","None"), stringsAsFactors = FALSE,sep = ",")
   # Remove extraneous columns
-  DF_TumorSite <- DF_TumorSite[,c(1,2,7)]
-  # Shorten column names of DF
-  colnames(DF_TumorSite) <- gsub("smpl.[a-zA-Z]+[.]{3}", "", colnames(DF_TumorSite))
+  DF_TumorSite <- DF_TumorSite[,c("UNIQUE_ID","PRIMARY_TUMOR_SITE","HISTOLOGICAL_DIAGNOSIS")]
+  # Rename columns of DF
+  colnames(DF_TumorSite) <- c("sys.uniqueId","primaryTumorSite","histologicalDiagnosis")
   
   # Remove duplicate rows   
   DF_TumorSite <- DF_TumorSite %>% dplyr::distinct(sys.uniqueId, .keep_all = TRUE)
@@ -301,7 +327,7 @@ if (Syapse_Export_timestamp  == "2018-10-18") {
                                                    "STAMP - Solid Tumor Actionable Mutation Panel (198 genes)",
                                                    "STAMP - Solid Tumor Actionable Mutation Panel (200 genes)"), ]
   cat(paste("Total Count: n=",(nrow(DF_Full)), 
-              " STAMP entries (n=", length(unique(DF_Full$sys.uniqueId)), " patients)",sep=""),"\n")
+            " STAMP entries (n=", length(unique(DF_Full$sys.uniqueId)), " patients)",sep=""),"\n")
 }
 
 ## Format dataframe 
@@ -309,16 +335,15 @@ if (Syapse_Export_timestamp  == "2018-10-18") {
 # Select columns of interest
 colnames_keep <- c("sys.uniqueId","smpl.gender","patient.dob","Age","smpl.dateReceived",
                    "smpl.hasOrderingPhysician","smpl.csmAssay","smpl.dateCollected","smpl.reportDateReviewed",
-                   "smpl.specimenSite","smpl.ppDiagnosticSummary",
                    "smpl.assayName","smpl.transcript","base.chromosome","smpl.hgvsGenomic",
                    "sys.label","base.gene","smpl.hgvsCoding","smpl.hgvsProtein","smpl.pathogenicityStatus",
-                   "smpl.primaryTumorSite","smpl.histologicalDiagnosis")
+                   "primaryTumorSite","histologicalDiagnosis")
 DF_Full <- DF_Full[,colnames_keep]
 
 # Rename columns
 colnames_generic <- c("PatientID","PatientGender","PatientDOB","PatientAge",
                       "AssayDateReceived","AssayOrderingPhysician","AssayType",
-                      "SpecimenDateCollected","AssayReportDateReviewed","SpecimenSite","DxSummary","AssayName",
+                      "SpecimenDateCollected","AssayReportDateReviewed","AssayName",
                       "VariantNMAccession","VariantCHR","VariantHGVSGenomic","VariantLabel","VariantGene",
                       "VariantHGVSCoding","VariantHGVSProtein","VariantPathogenicityStatus",
                       "PrimaryTumorSite","HistologicalDx")
@@ -326,7 +351,7 @@ colnames(DF_Full) <- colnames_generic
 
 colnames_order <- c("PatientID","PatientGender","PatientDOB","PatientAge",
                     "AssayOrderingPhysician","AssayDateReceived","AssayType","AssayName","AssayReportDateReviewed",
-                    "SpecimenDateCollected","SpecimenSite","DxSummary","HistologicalDx","PrimaryTumorSite",
+                    "SpecimenDateCollected","HistologicalDx","PrimaryTumorSite",
                     "VariantNMAccession","VariantCHR","VariantHGVSGenomic","VariantLabel","VariantGene",
                     "VariantHGVSCoding","VariantHGVSProtein","VariantPathogenicityStatus")
 DF_Full <- DF_Full[,colnames_order]
@@ -334,6 +359,7 @@ DF_Full <- DF_Full[,colnames_order]
 # General structurization
 #----------------------------------------------
 # Convert to lowercase 
+DF_Full$HistologicalDx <- tolower(DF_Full$HistologicalDx)
 DF_Full$PrimaryTumorSite <- tolower(DF_Full$PrimaryTumorSite)
 
 ## Overwrite variable in global environment
@@ -342,7 +368,7 @@ assign("STAMP_DF", DF_Full, envir = .GlobalEnv)
 
 ## Write to local computer
 #----------------------------------------------
-write.table(DF_Full, file = paste(outdir_int, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
+write.table(DF_Full, file = paste(tempdir, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 remove(phgvs.noeffect, phgvs.sys.label, row.change, x,DF_Full_AMENDED, 
