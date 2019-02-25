@@ -14,6 +14,9 @@ OnCore_Biomarker_QC <- OnCore_Biomarker_Report
 
 ## CONFIRMATION: Current.Status are OPEN TO ACCRUAL
 if (length(OnCore_Biomarker_QC$Current.Status[!grepl("OPEN TO ACCRUAL", OnCore_Biomarker_QC$Current.Status)]) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
   cat("Current status of clinical trials from Biomarker Report that are not OPEN TO ACCRUAL:","\n")
   cat(paste("NOTE: corresponding rows (n=", length(which(OnCore_Biomarker_QC$Current.Status != "OPEN TO ACCRUAL")),
   ") have been removed from downstream processing", sep=""),"\n")
@@ -23,12 +26,18 @@ if (length(OnCore_Biomarker_QC$Current.Status[!grepl("OPEN TO ACCRUAL", OnCore_B
   ## Remove clinical trials not OPEN TO ACCRUAL from spreadsheet
   rowkeep <- which(OnCore_Biomarker_QC$Current.Status == "OPEN TO ACCRUAL")
   OnCore_Biomarker_QC <- OnCore_Biomarker_QC[rowkeep, ]
+  
+  sink()
+  
 } else {
   cat("Current.Status of all clinical trials from Biomarker Report are OPEN TO ACCRUAL","\n")
 }
 
 ## CONFIRMATION: Protocol.Type are Treatment
 if (length(OnCore_Biomarker_QC$Protocol.Type[!grepl("Treatment", OnCore_Biomarker_QC$Protocol.Type)]) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
   cat("Protocol type of clinical trials from Biomarker Report that are not TREATMENT:","\n")
   cat(paste("NOTE: corresponding rows (n=", length(which(OnCore_Biomarker_QC$Protocol.Type != "Treatment")),
               ") have been removed from downstream processing", sep=""),"\n")
@@ -38,6 +47,9 @@ if (length(OnCore_Biomarker_QC$Protocol.Type[!grepl("Treatment", OnCore_Biomarke
   ## Remove clinical trials not OPEN TO ACCRUAL from spreadsheet
   rowkeep <- which(OnCore_Biomarker_QC$Protocol.Type == "Treatment")
   OnCore_Biomarker_QC <- OnCore_Biomarker_QC[rowkeep, ]
+  
+  sink()
+  
 } else {
   cat("Protocol.Type of all clinical trials from Biomarker Report are TREATMENT","\n")
 }
@@ -101,6 +113,9 @@ alterations_okay <- c("AMPLIFICATION", "DELETION","FUSION","MUTATION","All alter
 rowkeep <- which(OnCore_Biomarker_QC$Biomarker_Condition %in% alterations_okay)
 
 if (nrow(OnCore_Biomarker_QC) != length(rowkeep)) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
   rowNA <- which(!OnCore_Biomarker_QC$Biomarker_Condition %in% alterations_okay)
   
   cat("Biomarker Gene alterations from Biomarker Report that are not defined using the following terms:","\n")
@@ -111,6 +126,9 @@ if (nrow(OnCore_Biomarker_QC) != length(rowkeep)) {
   
   ## Remove respective rows from spreadsheet
   OnCore_Biomarker_QC <- OnCore_Biomarker_QC[rowkeep, ]
+  
+  sink()
+  
 } else {
   cat("Biomarker Gene alterations from Biomarker Report are defined using the following term(s):","\n")
   print(alterations_okay)
@@ -128,8 +146,13 @@ Disease.Group.key <- sort(unique(DiseaseGroupCategory_LongFormat$Disease.Group))
 
 for (elem_No in 1:length(Disease.Group.Report)) {
   if (isTRUE(is.element(Disease.Group.Report[elem_No], Disease.Group.key) == FALSE)) {
+    sink(file = err.output, append = TRUE, split = FALSE)
+    options(max.print=999999)
+    
     cat(paste(Disease.Group.Report[elem_No], 
               ": Disease.Group has not been classified into Disease.Group.category", sep=""),"\n")
+    
+    sink()
   }}
 
 # Assign Disease.Group.category based on Disease.Group
@@ -214,8 +237,9 @@ assign("OnCore_Biomarker_QC", OnCore_Biomarker_QC, envir = .GlobalEnv)
 
 ## Write to local computer
 #----------------------------------------------
-write.table(OnCore_Biomarker_QC, paste(outdir_int,OnCore_Biomarker_Report_timestamp, "_Biomarker_Report_QC.tsv", sep=""),
+write.table(OnCore_Biomarker_QC, paste(tempdir,OnCore_Biomarker_Report_timestamp, "_Biomarker_Report_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 remove(alterations_okay,col_No,colname_keep,Disease.Group.key,Disease.Group.Report,
        DiseaseGroupCategory.name,elem_No,row_No,rowkeep,x)
+cat("\n")
