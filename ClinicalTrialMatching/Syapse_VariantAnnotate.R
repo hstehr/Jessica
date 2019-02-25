@@ -1,6 +1,7 @@
 ## Classification #1 (var.type): Synonymous, Upstream, Intronic, SNV, Frameshift/In-frame (i.e. Delins, Insertions, Deletions, Duplications)
 ## Classification #2 (var.anno): "MUTATION","OTHER"
 ## Classification #3 (PrimaryTumorSite.Category)
+## Classification #4 (Exon_Number)
 ## Output: "syapse_export_all_variants_QC.csv" [overwrite]
 
 # Categorize protein sequence variants (var.type)
@@ -203,7 +204,6 @@ Extract_VarPosition <- function(DF) {
 } 
 
 # Extract variant positions for entries with VariantHGVSProtein field (aa.start, var.position, aa.end)
-# 
 #----------------------------------------------
 DF_Map <- DF_Map[!is.na(DF_Map$VariantHGVSProtein),]
 Extract_VarPosition(DF = DF_Map)
@@ -234,10 +234,14 @@ primaryTumorSite.key <- sort(unique(DiseaseGroupCategory_LongFormat$primaryTumor
 
 for (elem_No in 1:length(primaryTumorSite.STAMP)) {
   if (isTRUE(is.element(primaryTumorSite.STAMP[elem_No], primaryTumorSite.key) == FALSE)) {
+    sink(file = err.output, append = TRUE, split = FALSE)
+    options(max.print=999999)
+    
     cat("\n")
     cat(paste(primaryTumorSite.STAMP[elem_No], 
-                ": primaryTumorSite has not been classified into DiseaseGroupCategory", sep=""),"\n")
-    cat("\n")
+                ": primaryTumorSite has not been classified into DiseaseGroupCategory", sep=""),"\n","\n")
+    
+    sink()
   }}
 
 DF_Full$PrimaryTumorSite.Category <- NA
@@ -252,13 +256,68 @@ for (row_No in 1:nrow(DF_Full)) {
 # If missing smpl.primaryTumorSite, primaryTumorSite.category = "unknown"
 DF_Full$PrimaryTumorSite.Category[which(DF_Full$PrimaryTumorSite.Category == "")] <- "unknown"
 
+# Histological Dx grouped according to CTEP categories
+#----------------------------------------------
+# Confirm HistologicalDx is classified 
+HistologicalDx.STAMP <- sort(unique(DF_Full$HistologicalDx))
+HistologicalDx.key <- sort(unique(HistologicalDxCategory$histologicalDiagnosis))
+
+for (elem_No in 1:length(HistologicalDx.STAMP)) {
+  if (isTRUE(is.element(HistologicalDx.STAMP[elem_No], HistologicalDx.key) == FALSE)) {
+    sink(file = err.output, append = TRUE, split = FALSE)
+    options(max.print=999999)
+    
+    cat("\n")
+    cat(paste(HistologicalDx.STAMP[elem_No], 
+              ": Histological Dx has not been classified into HistologicalDxCategory", sep=""),"\n","\n")
+    
+    sink()
+  }}
+
+# Input Exon INFO
+#----------------------------------------------
+# Confirm correct structure of HistologicalDx is classified 
+for (row_No in 1:nrow(DF_Full)) {
+  if (isTRUE(grep("^g.",DF_Full$VariantHGVSGenomic[row_No]) == FALSE |
+             grep("[[:alpha:]]+$",DF_Full$VariantHGVSGenomic[row_No]) == FALSE)) {
+    sink(file = err.output, append = TRUE, split = FALSE)
+    options(max.print=999999)
+    
+    cat("\n")
+    cat(paste(DF_Full$PatientID[row_No], " has incorrect HGVS genomic nomenclature: ", sep=""),"\n")
+    print(DF_Full[row_No, 
+                  c("VariantNMAccession","VariantCHR","VariantHGVSGenomic","VariantLabel",
+                    "VariantGene","VariantHGVSCoding","VariantHGVSProtein","VariantPathogenicityStatus")],
+          row.names = FALSE)
+
+    sink()
+  }
+}
+
+# Input Exon Number
+for (row_No in 1:nrow(DF_Full)) {
+  gene_id <- DF_Full$VariantGene[row_No]
+  genomic_pos <- gsub("(^g.)([[:digit:]]+)([_]*[[:digit:]]*[[:alpha:]]+.*)", "\\2", DF_Full$VariantHGVSGenomic[row_No])
+  
+  Gene.ExonTable <- stamp_reference_full[stamp_reference_full$Gene == gene_id,]
+  
+  for (exon_row_No in 1:nrow(Gene.ExonTable)) {
+    exon_start <- Gene.ExonTable$start[exon_row_No]
+    exon_end <- Gene.ExonTable$end[exon_row_No]
+    
+    if (isTRUE(genomic_pos >= exon_start & genomic_pos <= exon_end)) {
+      DF_Full$Exon_Number[row_No] <- Gene.ExonTable$exon_number[exon_row_No]
+    }
+  }
+}
+
 ## Overwrite variable in global environment
 #----------------------------------------------
 assign("STAMP_DF", DF_Full, envir = .GlobalEnv)
 
 ## Write to local computer
 #----------------------------------------------
-write.table(DF_Full, file = paste(outdir_int, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
+write.table(DF_Full, file = paste(tempdir, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 ## Export entries per patient into .tsv file
@@ -275,13 +334,155 @@ for (patient_num in 1:length(patient.list)) {
   DF_patient <- DF_patient[order(DF_patient$VariantGene, decreasing = FALSE),]
   
   ## Write to local computer
-  write.table(DF_patient, file = paste(outdir_patient, patient_id, ".tsv", sep=""),
+  write.table(DF_patient, file = paste(tempdir, patient_id, ".tsv", sep=""),
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+}
+
+## Output potential matching errors due to structurization
+#----------------------------------------------
+# Missing information
+out.DF <- STAMP_DF[is.na(STAMP_DF$VariantGene),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with missing gene information:", "\n")
+  print(unique(out.DF$PatientID))
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(is.na(STAMP_DF$VariantHGVSProtein)),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with missing HGVS protein information:", "\n")
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantGene, sep=" : ")
+  print(sort(unique(out.DF$print)))
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(is.na(STAMP_DF$VariantHGVSCoding)),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with missing HGVS coding information:", "\n")
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantGene, sep=" : ")
+  print(sort(unique(out.DF$print)))
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(is.na(STAMP_DF$VariantHGVSGenomic)),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with missing HGVS genomic information:", "\n")
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantGene, sep=" : ")
+  print(sort(unique(out.DF$print)))
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(is.na(STAMP_DF$var.anno)),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with missing variant annotation:", "\n")
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantLabel, sep=" : ")
+  print(sort(unique(out.DF$print)))
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(is.na(STAMP_DF$PrimaryTumorSite.Category)),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with missing primary tumor site category:", "\n")
+  out.DF$print <- paste(out.DF$PatientID, " - primary tumor site: ", out.DF$PrimaryTumorSite, sep="")
+  print(sort(unique(out.DF$print)))
+  cat("\n")
+  
+  sink()
+}
+
+# Incorrect structure
+stamp_reference_gene.list <- sort(unique(stamp_reference_full$Gene))
+out.DF <- STAMP_DF[!(STAMP_DF$VariantGene %in% stamp_reference_gene.list),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with gene not listed in stamp reference table:", "\n")
+  out.DF <- out.DF[, c("PatientID","VariantGene")]
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantGene, sep=" : ")
+  print(out.DF$print , quote = TRUE)
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSProtein) &
+                           grepl("^p.[[:alpha:]]{3}[[:digit:]]+.*", STAMP_DF$VariantHGVSProtein) == FALSE),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with HGVS protein nomenclature formatted incorrectly:", "\n")
+  out.DF <- out.DF[, c("PatientID","VariantHGVSProtein")]
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantHGVSProtein, sep=" : ")
+  print(out.DF$print , quote = TRUE)
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSCoding) &
+                           grepl("^c.[-]*[[:digit:]]+.*", STAMP_DF$VariantHGVSCoding) == FALSE),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with HGVS coding nomenclature formatted incorrectly:", "\n")
+  out.DF <- out.DF[, c("PatientID","VariantHGVSCoding")]
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantHGVSCoding, sep=" : ")
+  print(out.DF$print , quote = TRUE)
+  cat("\n")
+  
+  sink()
+}
+
+out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSGenomic) &
+                           grepl("^g.[[:digit:]]+.*", STAMP_DF$VariantHGVSGenomic) == FALSE),]
+if (nrow(out.DF) > 0) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("Patient IDs with HGVS genomic nomenclature formatted incorrectly:", "\n")
+  out.DF <- out.DF[, c("PatientID","VariantHGVSGenomic")]
+  out.DF$print <- paste(out.DF$PatientID, out.DF$VariantHGVSGenomic, sep=" : ")
+  print(out.DF$print , quote = TRUE)
+  cat("\n")
+  
+  sink()
 }
 
 remove(DF,DF_del,DF_delins,DF_dup,DF_Frameshift,DF_Full,DF_ins,DF_intron,DF_Map,DF_NAprotein,
        DF_remain,DF_SNV,DF_synonymous,DF_upstream,DF_var,colname_subset,DiseaseGroupCategory.name,
        elem_No,i,primaryTumorSite.key,primaryTumorSite.STAMP,row_No,Extract_VarPosition,
-       patient_id,patient_num,patient.list,DF_patient)
+       patient_id,patient_num,patient.list,DF_patient,HistologicalDx.key,HistologicalDx.STAMP,
+       exon_end,exon_row_No,exon_start,gene_id,genomic_pos,Gene.ExonTable,out.DF)
 
 cat("\n")
