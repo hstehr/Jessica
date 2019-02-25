@@ -1,4 +1,4 @@
-## Confirmed for timestamp = c("2018-09-06","2018-12-11")
+## Confirmed for timestamp = c("2019-02-01","2018-12-11","2018-09-06","2018-01-01")
 
 ## Parse info across ARMs into separate dataframes
 ## Classification #1 (Variant_Type): SNV, Frameshift/In-frame (i.e. Delins, Insertions, Deletions, Duplications)
@@ -10,12 +10,17 @@ cat(paste("Timestamp of Patient_Variant_Report: ", Patient_Variant_Report_timest
 ## Manual edit
 ################################
 # Removal of ARMs based on information in "ARM-GENE-LOOK-UP-TABLE"
-if (isTRUE(Patient_Variant_Report_timestamp == "2018-12-11")) {
-  cat("ARM-Z1C and ARM-Z1F have been removed based on comments in ARM-GENE-LOOK-UP-TABLE", "\n")
+if (isTRUE(Patient_Variant_Report_timestamp %in% c("2019-02-01","2018-12-11"))) {
+  sink(file = err.output, append = TRUE, split = FALSE)
+  options(max.print=999999)
+  
+  cat("ARM-Z1C and ARM-Z1F have been removed based on comments in ARM-GENE-LOOK-UP-TABLE", "\n","\n")
+  
+  sink()
   
   # names(PATIENT_VARIANT_REPORT)
-  PATIENT_VARIANT_REPORT <- PATIENT_VARIANT_REPORT[-21]
-  PATIENT_VARIANT_REPORT <- PATIENT_VARIANT_REPORT[-22]
+  PATIENT_VARIANT_REPORT <- PATIENT_VARIANT_REPORT[-21] # `ARM-Z1C`
+  PATIENT_VARIANT_REPORT <- PATIENT_VARIANT_REPORT[-22] # `ARM-Z1F`
 }
 
 ## Specify parameters of output files 
@@ -57,13 +62,13 @@ for (tab_No in which(names(PATIENT_VARIANT_REPORT) == "Disease Exclusion LOOK-UP
   ## Remove rows that are all empty
   Disease_Exclusion_file <- 
     Disease_Exclusion_file[rowSums(is.na(Disease_Exclusion_file)) != 
-                                           ncol(Disease_Exclusion_file),]  
+                             ncol(Disease_Exclusion_file),]  
   
   row_start_list = (which(Disease_Exclusion_file[[1]] == "Histologic Disease Exclusion Codes"))
   
   for (Histo_No in 1:length(row_start_list)) {
     row_start = row_start_list[Histo_No] +2
-      
+    
     # Extract ARM_Name
     if (isTRUE(row_start_list[Histo_No] == 1)) { Arm_Name <- colnames(Disease_Exclusion_file)[2]
     } else { Arm_Name <- as.character(Disease_Exclusion_file[row_start_list[Histo_No] -1,2])
@@ -80,7 +85,7 @@ for (tab_No in which(names(PATIENT_VARIANT_REPORT) == "Disease Exclusion LOOK-UP
     
     # Reorder columns for consistency
     DF_Histologic_Disease_Exclusion_pre <- data.frame(DF_Histologic_Disease_Exclusion_pre[,c(6,1:5)])
-
+    
     if (isTRUE(row_start_list[Histo_No] == 1)) { DF_Histologic_Disease_Exclusion_Codes <- DF_Histologic_Disease_Exclusion_pre
     } else { DF_Histologic_Disease_Exclusion_Codes <- rbind(DF_Histologic_Disease_Exclusion_Codes,
                                                             DF_Histologic_Disease_Exclusion_pre)
@@ -88,16 +93,33 @@ for (tab_No in which(names(PATIENT_VARIANT_REPORT) == "Disease Exclusion LOOK-UP
   remove(DF_Histologic_Disease_Exclusion_pre, Disease_Exclusion_file,Arm_Name,Histo_No,row_end,row_start,row_start_list,tab_No)
 }
   
-colnames(DF_Histologic_Disease_Exclusion_Codes) <- c("Arm_Name","CTEP.CATEGORY","CTEP.SUBCATEGORY",
-                                                     "CTEP.TERM","SHORT.NAME","MedDRA.CODE")
+if (isTRUE(Patient_Variant_Report_timestamp == "2018-01-01")) {
+  colnames(DF_Histologic_Disease_Exclusion_Codes) <- c("Arm_Name","SHORT.NAME","CTEP.CATEGORY",
+                                                       "CTEP.TERM","CTEP.SUBCATEGORY","MedDRA.CODE")
+  
+  DF_Histologic_Disease_Exclusion_Codes <- 
+    DF_Histologic_Disease_Exclusion_Codes[, c("Arm_Name","CTEP.CATEGORY","CTEP.SUBCATEGORY","CTEP.TERM","SHORT.NAME","MedDRA.CODE")]
+  
+} else {
+  colnames(DF_Histologic_Disease_Exclusion_Codes) <- c("Arm_Name","CTEP.CATEGORY","CTEP.SUBCATEGORY",
+                                                       "CTEP.TERM","SHORT.NAME","MedDRA.CODE")
+}
+
 ## Remove rows that are all empty
 DF_Histologic_Disease_Exclusion_Codes <- 
-  DF_Histologic_Disease_Exclusion_Codes[which(DF_Histologic_Disease_Exclusion_Codes$CTEP.CATEGORY != "None"),]
+  DF_Histologic_Disease_Exclusion_Codes[which(DF_Histologic_Disease_Exclusion_Codes$MedDRA.CODE != "None"),]
  
 ## Parse info across ARMs from original file into corresponding output files
 #----------------------------------------------
-arm_start = which(names(PATIENT_VARIANT_REPORT) == "Patient ID information") +1
-arm_end = which(names(PATIENT_VARIANT_REPORT) == "MOIs") -1
+if (isTRUE(Patient_Variant_Report_timestamp == "2018-01-01")) {
+  arm_start = which(names(PATIENT_VARIANT_REPORT) == "GENE-STRAND Look-up table") +1
+  arm_end = length(names(PATIENT_VARIANT_REPORT))
+  
+} else {
+  arm_start = which(names(PATIENT_VARIANT_REPORT) == "Patient ID information") +1
+  arm_end = which(names(PATIENT_VARIANT_REPORT) == "MOIs") -1
+  
+}
 
 for (Arm_No in arm_start:arm_end) {
   DF <- PATIENT_VARIANT_REPORT[[Arm_No]]
@@ -193,6 +215,7 @@ DF_Exclusion_Variants <- DF_Exclusion_Variants[DF_Exclusion_Variants$Gene_Name !
 
 DF_Inclusion_Variants <- 
   DF_Inclusion_Variants[rowSums(is.na(DF_Inclusion_Variants)) != ncol(DF_Inclusion_Variants),]  
+DF_Inclusion_Variants <- DF_Inclusion_Variants[DF_Inclusion_Variants$Gene_Name != "None", ] 
 
 DF_IHC_Results <- DF_IHC_Results[rowSums(is.na(DF_IHC_Results)) != ncol(DF_IHC_Results),]
 DF_IHC_Results <- DF_IHC_Results[DF_IHC_Results$Gene != "none", ]  
@@ -200,33 +223,35 @@ DF_IHC_Results <- DF_IHC_Results[DF_IHC_Results$Gene != "none", ]
 DF_Comments <- DF_Comments[rowSums(is.na(DF_Comments)) != ncol(DF_Comments),]
 
 ################################
-## Manual edit
+## Manual edit = DF_Comments
 ################################
-DF_Comments$Note[max(which(DF_Comments$Arm_Name == "ARM-T"))] <- 
-  paste(DF_Comments$Gene[1], DF_Comments$Gene[2], DF_Comments$Gene[3], sep=" ")
-DF_Comments <- DF_Comments[DF_Comments$Arm_Name == "ARM-T" & 
-                      !is.na(DF_Comments$Note),]
-DF_Comments <- DF_Comments[,c(1:11,ncol(DF_Comments))]
-colnames(DF_Comments)[1:11] <- colnames(DF_Exclusion_Variants)[1:11]
+if (isTRUE(Patient_Variant_Report_timestamp %in% c("2019-02-01","2018-12-11","2018-09-06"))) {
+  DF_Comments$Note[max(which(DF_Comments$Arm_Name == "ARM-T"))] <- 
+    paste(DF_Comments$Gene[1], DF_Comments$Gene[2], DF_Comments$Gene[3], sep=" ")
+  DF_Comments <- DF_Comments[DF_Comments$Arm_Name == "ARM-T" & 
+                               !is.na(DF_Comments$Note),]
+  DF_Comments <- DF_Comments[,c(1:11,ncol(DF_Comments))]
+  colnames(DF_Comments)[1:11] <- colnames(DF_Exclusion_Variants)[1:11]
+}
 
-# Correction of fields
-#----------------------------------------------
 ################################
 ## Manual edit = DF_Inclusion_Variants
 ################################
+# Remove blank space after "p."
+for (row_No in 1:nrow(DF_Inclusion_Variants)) {
+  if (isTRUE(DF_Inclusion_Variants$Variant_Type[row_No] == "SNV")) {
+    DF_Inclusion_Variants$Protein[row_No] <- gsub("(^p.[[:blank:]]*)(.*)", "\\2", DF_Inclusion_Variants$Protein[row_No])
+    DF_Inclusion_Variants$Protein[row_No] <- paste("p.", DF_Inclusion_Variants$Protein[row_No], sep="")
+  }}
+
+# Spelling correction
+DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "Del")] <- "Indel"
+DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "SNV"
+
 if (Patient_Variant_Report_timestamp  == "2018-09-06") {
-  
-  # Remove blank space after "p."
-  for (row_No in 1:nrow(DF_Inclusion_Variants)) {
-    if (DF_Inclusion_Variants$Variant_Type[row_No] == "SNV") {
-      DF_Inclusion_Variants$Protein[row_No] <- gsub("(^p.[[:blank:]]*)(.*)", "\\2", DF_Inclusion_Variants$Protein[row_No])
-      DF_Inclusion_Variants$Protein[row_No] <- paste("p.", DF_Inclusion_Variants$Protein[row_No], sep="")
-    }}
-  
   # Spelling correction
   DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "p.Gly719Cys"
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "SNV"
-  
+
   # Editing of "MET Exon 14 skipping"
   DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082G>C")] <- "p.Asp1028His"
   # Input coding info for intronic mutations
@@ -242,9 +267,6 @@ if (Patient_Variant_Report_timestamp  == "2018-09-06") {
   DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Protein == "p.Lys650Thr")] <- "SNV"
   
 } else if (Patient_Variant_Report_timestamp  == "2018-12-11") {
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "Del")] <- "Indel"
-  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Variant_Type == "MNV")] <- "SNV"
-  
   # Editing of "MET Exon 14 skipping"
   DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082G>C")] <- "p.Asp1028His"
   DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.2:c.3082+1G>T")] <- "c.3082+1G>T"
@@ -258,8 +280,26 @@ if (Patient_Variant_Report_timestamp  == "2018-09-06") {
   # NM_000368.4(TSC1):c.1907_1908del (p.Glu636Glyfs)
   DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Protein == "p.Glu636fs51")] <- "p.Glu636Glyfs"
   
-  DF_Exclusion_Variants$Variant_Type[which(DF_Exclusion_Variants$Variant_Type == "MNV")] <- "SNV"
-}
+} else if (Patient_Variant_Report_timestamp  == "2019-02-01") {
+  # Editing of "MET Exon 14 skipping"
+  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082G>C")] <- "p.Asp1028His"
+  # Input coding info for intronic mutations
+  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Variant_ID == "MVAR27")] <- "c.3082_3082+26del"
+  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$HGVS == "NM_001127500.1:c.3082+1G>A")] <- "c.3082+1G>A"
+  
+  # NM_000368.4(TSC1):c.1907_1908del (p.Glu636Glyfs)
+  DF_Inclusion_Variants$Protein[which(DF_Inclusion_Variants$Protein == "p.Glu636fs51")] <- "p.Glu636Glyfs"
+  
+  # NM_000142.4(FGFR3):c.1949A>C (p.Lys650Thr)
+  DF_Inclusion_Variants$Variant_Type[which(DF_Inclusion_Variants$Protein == "p.Lys650Thr")] <- "SNV"
+
+  } else if (Patient_Variant_Report_timestamp  == "2018-01-01") {
+    row.change <- which(grepl("Va", DF_Inclusion_Variants$Protein) == TRUE & DF_Inclusion_Variants$Variant_Type == "Indel")
+    DF_Inclusion_Variants$Protein[row.change] <- gsub("Va", "VA", DF_Inclusion_Variants$Protein[row.change])
+    
+    row.change <- which(grepl("Va", DF_Exclusion_Variants$Protein) == TRUE & DF_Exclusion_Variants$Variant_Type == "Indel")
+    DF_Exclusion_Variants$Protein[row.change] <- gsub("Va", "VA", DF_Exclusion_Variants$Protein[row.change])
+  }
 
 ################################
 ## Manual edit = DF_Exclusion_Variants
@@ -271,8 +311,47 @@ for (row_No in 1:nrow(DF_Exclusion_Variants)) {
     DF_Exclusion_Variants$Protein[row_No] <- paste("p.", DF_Exclusion_Variants$Protein[row_No], sep="")
   }}
 
+# Spelling correction
+DF_Exclusion_Variants$Variant_Type[which(DF_Exclusion_Variants$Variant_Type == "Del")] <- "Indel"
+DF_Exclusion_Variants$Variant_Type[which(DF_Exclusion_Variants$Variant_Type == "MNV")] <- "SNV"
+
+################################
+## Manual edit = DF_Inclusion_Variants & DF_Exclusion_Variants
+################################
+if (isTRUE(Patient_Variant_Report_timestamp == "2018-01-01")) {
+  ## Convert codon nomenclature from 1-letter to 3-letters 
+  for (row_No in 1:nrow(DF_Inclusion_Variants)) {
+    if (isTRUE(DF_Inclusion_Variants$Variant_Type[row_No] %in% c("SNV","Indel"))) {
+      chars <- unlist(strsplit(DF_Inclusion_Variants$Protein[row_No], ""))
+      for (elem_No in 1:length(chars)) {
+        if (isTRUE(grepl("[[:upper:]]", chars[elem_No]))) {
+          chars[elem_No] <- AminoAcid_Conversion$Code3[which(AminoAcid_Conversion$Code1 == chars[elem_No])]
+        }
+      }
+      DF_Inclusion_Variants$Protein[row_No] <-  paste0(chars, collapse = "")
+    }
+  }
+  
+  for (row_No in 1:nrow(DF_Exclusion_Variants)) {
+    if (isTRUE(DF_Exclusion_Variants$Variant_Type[row_No] %in% c("SNV","Indel"))) {
+      chars <- unlist(strsplit(DF_Exclusion_Variants$Protein[row_No], ""))
+      for (elem_No in 1:length(chars)) {
+        if (isTRUE(grepl("[[:upper:]]", chars[elem_No]))) {
+          chars[elem_No] <- AminoAcid_Conversion$Code3[which(AminoAcid_Conversion$Code1 == chars[elem_No])]
+        }
+      }
+      DF_Exclusion_Variants$Protein[row_No] <-  paste0(chars, collapse = "")
+    }
+  }
+  
+  # Convert asterisk to "Ter"
+  DF_Inclusion_Variants$Protein <- gsub("\\*", "Ter", DF_Inclusion_Variants$Protein)
+  DF_Exclusion_Variants$Protein <- gsub("\\*", "Ter", DF_Exclusion_Variants$Protein)
+  
+  remove(chars,elem_No)
+}
+
 # Annotate Variant_Type for consistency
-#----------------------------------------------
 for (row_No in 1:nrow(DF_Inclusion_Variants)) {
   if (isTRUE(DF_Inclusion_Variants$Variant_Type[row_No] == "Indel")) {
     if (grepl("fs", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
@@ -320,8 +399,8 @@ list_of_datasets <- list("Inclusion_Variants" = DF_Inclusion_Variants,
                          "IHC_Results" = DF_IHC_Results,
                          "Comments" = DF_Comments,
                          "Disease_Exclusion_Codes" = DF_Histologic_Disease_Exclusion_Codes)
-write.xlsx(list_of_datasets, file = paste(outdir_int, Patient_Variant_Report_timestamp,
-                                          "Patient_Variant_Report_QC.xlsx", sep=""))
+write.xlsx(list_of_datasets, file = paste(tempdir, Patient_Variant_Report_timestamp,
+                                          "_Patient_Variant_Report_QC.xlsx", sep=""))
 
 remove(DF,list_of_datasets,arm_end,Arm_No,arm_start,row_int_end,row_int_start,row_No,
        DF_Inclusion_Variants, DF_Exclusion_Variants, DF_Inclusion_NonHotspot_Rules,
