@@ -4,6 +4,12 @@
 
 cat(paste("Timestamp of data visualization generation START: ", Sys.time(), sep=""),"\n")
 
+library("gridExtra")
+library("gtable")
+library("grid")
+library("ggrepel")
+library("RColorBrewer")
+
 if (isTRUE(AgePlot.FILTER)) {
   
   #################################
@@ -45,9 +51,9 @@ if (isTRUE(AgePlot.FILTER)) {
   # Specify Age.Cohort
   DF_subset$Age.Cohort <- NA
   for (row_No in 1:nrow(DF_subset)) {
-    if (DF_subset$age[row_No] < 18) {
+    if (isTRUE(DF_subset$age[row_No] < 18)) {
       DF_subset$Age.Cohort[row_No] <- "Child (< 18yo)"
-    } else if (DF_subset$age[row_No] < 65) {
+    } else if (isTRUE(DF_subset$age[row_No] < 65)) {
       DF_subset$Age.Cohort[row_No] <- "Adult (18-64yo)"
     } else {
       DF_subset$Age.Cohort[row_No] <- "Older Adult (>= 65yo)"
@@ -78,7 +84,7 @@ if (isTRUE(AgePlot.FILTER)) {
   
   # Save to local computer
   #----------------------------------------------
-  tiff(filename = paste(outdir_int, Syapse_Export_timestamp,"_syapse_GenderAgeDistribution_",
+  tiff(filename = paste(outdir, Syapse_Export_timestamp,"_syapse_GenderAgeDistribution_",
                         cohort,".tiff", sep=""),
        width = 15, height = 7.5, units = "in", res = 200)
   grid.arrange(plot, Output.table, 
@@ -283,7 +289,7 @@ if (isTRUE(VariantPlot.FILTER)) {
   
   # Save to local computer
   #----------------------------------------------
-  tiff(filename = paste(outdir_int, Syapse_Export_timestamp, "_syapse_PathoVarTypeDistribution_",
+  tiff(filename = paste(outdir, Syapse_Export_timestamp, "_syapse_PathoVarTypeDistribution_",
                         cohort,".tiff", sep=""),
        width = 14, height = 8, units = "in", res = 150)
   grid.arrange(pie, Output.table, ncol=2, widths=c(1.5, 1))
@@ -293,4 +299,5 @@ if (isTRUE(VariantPlot.FILTER)) {
          InFrame,pathogenic,row_No,VUS,getPalette)
 }
 
+remove(DF,cohort)
 cat(paste("Timestamp of data visualization generation FINISH: ", Sys.time(), sep=""),"\n")
