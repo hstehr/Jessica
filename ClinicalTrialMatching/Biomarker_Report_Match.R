@@ -135,7 +135,12 @@ if (isTRUE(Internal_match)) {
                         protein_name <- paste("p.",aa.start_list[start_num],var.position_list[pos_num],
                                               aa.end_list[end_num], sep="")
                         biomarker_detail_name_patient <- append(biomarker_detail_name_patient, protein_name)      
-                      }}}}
+                      }}}
+                  remove(end_num,pos_num,protein_name,start_num)
+                }
+                remove(aa.end_list,aa.end_match,aa.end_patient,aa.end_trial,
+                       aa.start_list,aa.start_match,aa.start_patient,aa.start_trial,
+                       var.position_list,var.position_match,var.position_patient,var.position_trial)
               }
             }
             
@@ -384,10 +389,15 @@ if (isTRUE(Internal_match)) {
                             # Append to Output file
                             DF_Output_OnCore_Biomarker <- rbind(DF_Output_OnCore_Biomarker, DF_Output_pre)
                             
+                            remove(DF_Output_pre,Trial_INFO,core_num,OnCore_No)
+                            
                           } else {
                             DF_patient$OnCore_Report_Status[pt_rowNo] <- "Disease Site criteria NOT satisfied"
                           }
+                          remove(disease.site_id,pt_rowNo)
                         }
+                        remove(Disease.Site.patient,disease_site_name_patient,disease_site_name_trial,
+                               Disease.Site.trial,site_num)
                         
                       } else {
                         if (isTRUE(stop_checkpoint_na)) {
@@ -404,9 +414,14 @@ if (isTRUE(Internal_match)) {
                                                                   DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
                             "Disease Group Category criteria NOT satisfied"
                         }}
+                      remove(disease.cat_id)
                     }
+                    remove(Disease.category.trial,Disease.category.patient,disease_category_name_trial,
+                           disease_category_name_patient,cat_num)
                   }
+                  remove(age_gate)
                 }
+                remove(pathogenicity_gate,pathogenic_id)
                 
               } else {
                 if (isTRUE(stop_checkpoint_na)) {
@@ -421,14 +436,19 @@ if (isTRUE(Internal_match)) {
                                                           DF_patient$VariantHGVSProtein == bio.detail_id)] <-
                     "Biomarker Detail criteria NOT satisfied"
                 }}
+              remove(bio.detail_id,stop_checkpoint_na,stop_checkpoint)
             }
+            remove(biomarker_detail_name_patient,biomarker_detail_name_trial,biomarker.detail.patient,
+                   biomarker.detail.trial,det_num)
             
           } else {
             DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
                                                     DF_patient$var.anno == bio.cond_id)] <-
               "Biomarker Condition criteria NOT satisfied"
           }
+          remove(bio.cond_id)
         }
+        remove(biomarker.condition.patient,biomarker.condition.trial,cond_num,DF_Gene_OnCore_Biomarker)
         
       } else {
         DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id)] <- 
@@ -453,20 +473,5 @@ if (isTRUE(Internal_match)) {
                            groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
   
-  remove(DF_Gene_OnCore_Biomarker,DF_Output_pre,DF_patient,patient,trial,Trial_INFO,
-         aa.end_list,aa.end_match,aa.end_patient,aa.end_trial,aa.start_list,aa.start_match,
-         aa.start_patient,aa.start_trial,age_gate,bio.cond_id,bio.detail_id,
-         biomarker_detail_name_patient,biomarker_detail_name_trial,
-         biomarker.condition.patient,biomarker.condition.trial,biomarker.detail.patient,
-         biomarker.detail.trial,cat_num,cond_num,core_num,det_num,
-         disease_category_name_patient,disease_category_name_trial,
-         disease_site_name_patient,disease_site_name_trial,disease.cat_id,
-         Disease.category.patient,Disease.category.trial,disease.site_id,
-         Disease.Site.patient,Disease.Site.trial,end_num,gene_id,gene_num,gene.patient,
-         genes.OnCore_Biomarker,ncol_OnCore,ncol_STAMP,OnCore_No,pathogenic_id,
-         pathogenicity_gate,patient_id,patient_num,pos_num,protein_name,pt_rowNo,
-         site_num,start_num,var.position_list,var.position_match,var.position_patient,
-         var.position_trial,stop_checkpoint,stop_checkpoint_na)
-  
-  cat(paste("Timestamp of Internal clinical trial matching FINISH: ", Sys.time(), sep=""),"\n","\n")
+  remove(DF_patient,gene_id,gene_num,gene.patient,genes.OnCore_Biomarker,ncol_OnCore,ncol_STAMP,patient_id,patient_num)
 }
