@@ -1,11 +1,30 @@
 #!/bin/bash
 
-data_root="/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching"
+# Directories
+script_root="/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching"
+data_root="/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/STAMP_v2.4_reports"
 
-outdir=${data_root}
-outdir_anno="Version3"
-STAMP=${data_root}/../STAMP/2018-10-18_syapse_export_all_variants_patientNameAndMrnRemoved.csv
-OnCore=${data_root}/Biomarker_Report_2018-10.csv
-NCI=${data_root}/PATIENT_VARIANT_REPORT_TEMPLATE_2018-12-11.xlsx
+# Reference files
+stamp_reference_transcripts=${script_root}/../STAMP/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt
+exons_ensembl=${script_root}/../STAMP/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt
+aminoAcid_conversion=${script_root}/../STAMP/AminoAcid_Conversion.csv
 
-Rscript ClinicalTrial_Matching_PIPELINE.R $outdir $outdir_anno $STAMP $OnCore $NCI  
+# Clinical trials 
+OnCore=${script_root}/Biomarker_Report_2018-10.csv
+NCI=${script_root}/PATIENT_VARIANT_REPORT_TEMPLATE_2019-02-25.xlsx
+
+# Extract STAMP sequence files and patient ID
+
+ls ${data_root}/reports/*.variant_report.txt | awk -F"/" '{print $NF}' > ${data_root}/trial_names.tsv
+lookup=${data_root}/trial_names.tsv
+
+for i in $(seq 1 $(wc -l ${lookup}| awk '{print $1}'))
+do
+	STAMP=$(cat ${lookup} | awk -F',' -v row=$i '(NR==row){print $0}')
+	patient=$(cat ${lookup} | awk -F',' -v row=$i '(NR==row){print $0}' | cut -f1 -d ".")
+
+ 	echo $patient
+ 	Rscript ClinicalTrial_Matching_PIPELINE.R $data_root ${data_root}/reports/$STAMP $patient $OnCore $NCI $script_root $stamp_reference_transcripts $exons_ensembl $aminoAcid_conversion
+done
+
+rm ${data_root}/trial_names.tsv
