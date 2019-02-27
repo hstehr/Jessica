@@ -6,8 +6,6 @@
 
 if (isTRUE(NCI_match)) {
   
-  cat(paste("Timestamp of NCI-MATCH trial Inclusion NonHotspot matching START: ", Sys.time(), sep=""),"\n","\n")
-  
   ncol_STAMP <- as.numeric(ncol(STAMP_DF))
   ncol_InclusionNonHotspot <- as.numeric(ncol(Inclusion_NonHotspot_Rules))
   
@@ -272,9 +270,6 @@ if (isTRUE(NCI_match)) {
                               exclusion_continue <- as.logical("FALSE")
                             }
                           }
-                          
-                          if (isTRUE(exists("var.patient.list"))) {remove(var.patient.list)}
-                          if (isTRUE(exists("var.exclude.list"))) {remove(var.exclude.list)}
                         }
                         
                         ## Assess Disease Exclusion Codes
@@ -331,7 +326,9 @@ if (isTRUE(NCI_match)) {
                             
                             remove(disease_comment)
                           }
+                          remove(CTEP.CATEGORY,CTEP.SUBCATEGORY,CTEP.TERM,SHORT.NAME,histologicaldx.match)
                         }
+                        remove(tumorsite.patient,dx.patient)
                         
                         ## Generate output file for candidate MATCH
                         #----------------------------------------------
@@ -355,13 +352,22 @@ if (isTRUE(NCI_match)) {
                               DF_Output_Patient_NonHotspot_int <- rbind.fill(DF_Output_Patient_NonHotspot_int, 
                                                                              cbind(patient_INFO,trial_INFO_matched[row_No,]))
                             }
+                            remove(trial_INFO_matched)
                           }
                           remove(patient_INFO,row_No)
                         }
                       }
+                      remove(arm_id,arm_num)
                     }  
+                    remove(arm.match)
+                    if (isTRUE(exists("var.patient.list"))) {remove(var.patient.list)}
+                    if (isTRUE(exists("var.exclude.list"))) {remove(var.exclude.list)}
+                    if (isTRUE(exists("var.patient"))) {remove(var.patient)}
+                    if (isTRUE(exists("var.exclude"))) {remove(var.exclude)}
                   }
+                  remove(age_gate)
                 }
+                remove(pathogenic_id,pathogenicity_gate)
                 
               }  else {
                 DF_patient$Patient_Variant_NonHotspot_Status[which(DF_patient$VariantGene == gene_id &
@@ -369,6 +375,7 @@ if (isTRUE(NCI_match)) {
                                                                      DF_patient$Exon_Number == exon_id)] <-
                   "Variant Exon criteria NOT satisfied"
               }
+              remove(exon_id,exon_num,exon.patient,exon.trial)
             }
             
           }  else {
@@ -377,6 +384,8 @@ if (isTRUE(NCI_match)) {
               "Variant Type criteria NOT satisfied"
           }
         }
+        remove(var.type.trial,var.type.patient,var.type_id_syn,var.type_id,
+               type_num,DF_Gene_Patient_NonHotspot)
         
       } else {
         DF_patient$Patient_Variant_NonHotspot_Status[which(DF_patient$VariantGene == gene_id)] <- 
@@ -404,15 +413,10 @@ if (isTRUE(NCI_match)) {
                            dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
   
-  if (isTRUE(exists("exclusion_comment"))) {remove(exclusion_comment)}
+  remove(DF_patient,gene_id,gene_num,gene.patient,genes.Inclusion_NonHotspot,
+         ncol_InclusionNonHotspot,ncol_STAMP,patient_id,patient_num)
   
-  remove(DF_Exclude_Arm,DF_patient,age_gate,arm_id,arm_num,arm.match,
-         gene_id,gene_num,gene.patient,genes.Inclusion_NonHotspot,
-         ncol_InclusionNonHotspot,ncol_STAMP,pathogenic_id,DF_Gene_Patient_NonHotspot,
-         pathogenicity_gate,patient_id,patient_num,pt_rowNo,type_num,var.exclude,var.patient,
-         var.type_id,var.type_id_syn,var.type.patient, var.type.trial,dx.patient,CTEP.CATEGORY,
-         CTEP.SUBCATEGORY,CTEP.TERM,SHORT.NAME,tumorsite.patient,histologicaldx.match,
-         exon_id,exon_num,exon.patient,exon.trial)
-  
-  cat(paste("Timestamp of NCI-MATCH trial Inclusion NonHotspot matching FINISH: ", Sys.time(), sep=""),"\n","\n")
+  if (isTRUE(exists("pt_rowNo"))){remove(pt_rowNo)}
+  if (isTRUE(exists("DF_Exclude_Arm"))){remove(DF_Exclude_Arm)}
+  if (isTRUE(exists("exclusion_comment"))){remove(exclusion_comment)}
 }
