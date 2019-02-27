@@ -9,9 +9,6 @@
 # NCI-MATCH Protein entries without HGVS nomenclature will be missed 
 
 if (isTRUE(NCI_match)) {
-  
-  cat(paste("Timestamp of NCI-MATCH trial Inclusion Variant matching START: ", Sys.time(), sep=""),"\n","\n")
-  
   ncol_STAMP <- as.numeric(ncol(STAMP_DF))
   ncol_InclusionVariants <- as.numeric(ncol(Inclusion_Variants))
   
@@ -279,9 +276,6 @@ if (isTRUE(NCI_match)) {
                               exclusion_continue <- as.logical("FALSE")
                             }
                           }
-                          
-                          if (isTRUE(exists("var.patient.list"))) {remove(var.patient.list)}
-                          if (isTRUE(exists("var.exclude.list"))) {remove(var.exclude.list)}
                         }
                         
                         ## Assess Disease Exclusion Codes
@@ -338,7 +332,9 @@ if (isTRUE(NCI_match)) {
                             
                             remove(disease_comment)
                           }
+                          remove(CTEP.CATEGORY,CTEP.SUBCATEGORY,CTEP.TERM,SHORT.NAME,histologicaldx.match)
                         }
+                        remove(tumorsite.patient,dx.patient)
                         
                         ## Generate output file for candidate MATCH
                         #----------------------------------------------
@@ -363,12 +359,22 @@ if (isTRUE(NCI_match)) {
                                                                           cbind(patient_INFO,trial_INFO_matched[row_No,])) 
                               
                             }
+                            remove(trial_INFO_matched)
                           }
+                          remove(patient_INFO,row_No)
                         }
                       }
+                      remove(arm_id,arm_num)
                     }
+                    remove(arm.match)
+                    if (isTRUE(exists("var.patient.list"))) {remove(var.patient.list)}
+                    if (isTRUE(exists("var.exclude.list"))) {remove(var.exclude.list)}
+                    if (isTRUE(exists("var.patient"))) {remove(var.patient)}
+                    if (isTRUE(exists("var.exclude"))) {remove(var.exclude)}
                   }
+                  remove(age_gate)
                 }
+                remove(pathogenic_id,pathogenicity_gate)
                 
               } else {
                 if (isTRUE(is.na(protein_id))) {
@@ -385,6 +391,7 @@ if (isTRUE(NCI_match)) {
                 }
               }
             }
+            remove(pro_num,protein.patient,protein.trial,protein_id)
             
           } else {
             DF_patient$Patient_Variant_Inclusion_Status[which(DF_patient$VariantGene == gene_id &
@@ -392,6 +399,7 @@ if (isTRUE(NCI_match)) {
               "Variant Type criteria NOT satisfied"
           }
         }
+        remove(var.type.trial,var.type.patient,var.type_id,type_num,DF_Gene_Patient_Variant)
         
       } else {
         DF_patient$Patient_Variant_Inclusion_Status[which(DF_patient$VariantGene == gene_id)] <- 
@@ -419,12 +427,10 @@ if (isTRUE(NCI_match)) {
                            dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
   
-  remove(CTEP.CATEGORY,CTEP.SUBCATEGORY,CTEP.TERM,DF_Exclude_Arm,DF_Gene_Patient_Variant,DF_patient,
-         SHORT.NAME,age_gate,arm.match,arm_id,arm_num,dx.patient,exclusion_comment,gene.patient,
-         gene_id,gene_num,genes.Inclusion_Variants,histologicaldx.match,ncol_InclusionVariants,
-         ncol_STAMP,pathogenic_id,pathogenicity_gate,patient_INFO,patient_id,patient_num,pro_num,
-         protein.patient,protein.trial,protein_id,pt_rowNo,row_No,trial_INFO_matched,tumorsite.patient,
-         type_num,var.exclude,var.patient,var.type.patient,var.type.trial,var.type_id)
+  remove(DF_patient,gene.patient,gene_id,gene_num,genes.Inclusion_Variants,
+         ncol_InclusionVariants,ncol_STAMP,patient_id,patient_num)
   
-  cat(paste("Timestamp of NCI-MATCH trial Inclusion Variant matching FINISH: ", Sys.time(), sep=""),"\n","\n")
+  if (isTRUE(exists("pt_rowNo"))){remove(pt_rowNo)}
+  if (isTRUE(exists("DF_Exclude_Arm"))){remove(DF_Exclude_Arm)}
+  if (isTRUE(exists("exclusion_comment"))){remove(exclusion_comment)}
 }
