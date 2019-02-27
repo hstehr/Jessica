@@ -13,10 +13,10 @@ library(openxlsx)
 args = commandArgs(trailingOnly=TRUE)
 # 1. Directory to save output to.
 data.root = args[1]
-# 2. Annotation of Output folder.
-outdir_anno = args[2]
-# 3. Location of STAMP entries (syapse export).
-STAMP.file = args[3]
+# 2. Location of STAMP entries (syapse export).
+STAMP.file = args[2]
+# 3. Patient ID.
+patient.id = args[3]
 # 4. Location of OnCore Report (Stanford Internal Clinical Trials).
 OnCore.file = args[4]
 # 5. Location of Patient Variant Report (NCI-MATCH Clinical Trials).
@@ -29,21 +29,21 @@ stamp_reference_transcripts = args[7]
 exons_ensembl = args[8]
 # 9. Location of amino acid conversion key.
 aminoAcid_conversion = args[9]
-  
+
 ## Directories
-outdir = paste(data.root,"trials/",sep="")
+outdir = paste(data.root,"/trials/",sep="")
 if (!dir.exists(outdir)){dir.create(outdir)} 
-tempdir = paste(data.root,"temp/",sep="")
+tempdir = paste(data.root,"/temp/",sep="")
 if (!dir.exists(tempdir)){dir.create(tempdir)} 
 
 # Specify output file
-out.ouput = paste(outdir,Sys.Date(),"_",outdir_anno,".out",sep="")
-err.output = paste(outdir,Sys.Date(),"_",outdir_anno,".err",sep="")
+out.ouput = paste(outdir,patient.id,".out",sep="")
+err.output = paste(outdir,patient.id,".err",sep="")
 
 ## Load files 
 #----------------------------------------------
 STAMP_DF <- 
-  read.csv(file = STAMP.file, header = TRUE, na.strings = c(""," ","NA"), stringsAsFactors = FALSE, sep = ",")
+  read.csv(file = STAMP.file, header = TRUE, na.strings = c(""," ","<NA>","NA"), stringsAsFactors = FALSE, sep = "\t")
 
 OnCore_Biomarker_Report <- 
   read.csv(file = OnCore.file, header = TRUE, na.strings = c("NA", ""), stringsAsFactors = FALSE, sep = ",")
@@ -65,9 +65,9 @@ exons_ensembl <-
 
 ## Merge Gene-Exon Key Table
 stamp_reference_full <- left_join(stamp_reference_transcripts,exons_ensembl,
-                                by = c("Transcript" = "enst"))
+                                  by = c("Transcript" = "enst"))
 remove(stamp_reference_transcripts,exons_ensembl)
-                                
+
 ## Specify script location
 setwd(script.root)
 
@@ -78,10 +78,6 @@ source("DiseaseGroupCategories.R")
 source("HistologicalDx_CTEP_Match.R")
 
 ## Timestamp
-Syapse_Export_timestamp <- 
-  format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",
-                      sub(".*/", "", STAMP.file))), format= "%Y-%m-%d")
-
 OnCore_Biomarker_Report_timestamp <- 
   format(as.Date(paste(gsub("([[:digit:]]{4}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*_", "", OnCore.file)), 
                        "-01",sep="")), format= "%Y-%m")
@@ -91,7 +87,7 @@ Patient_Variant_Report_timestamp <-
                       sub(".*_", "", NCI.file))), format= "%Y-%m-%d")
 
 ## Customize trial output
-Internal_match = FALSE
+Internal_match = TRUE
 NCI_match = TRUE
 
 ## Default filters 
@@ -100,12 +96,12 @@ pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
 
 ## Customizeable filters
 pathogenic_FILTER = FALSE
-disease.group_FILTER = TRUE
-disease.site_FILTER = TRUE # Dependent on disease.group_FILTER == TRUE
-disease.code_FILTER = TRUE 
+disease.group_FILTER = FALSE
+disease.site_FILTER = FALSE # Dependent on disease.group_FILTER == TRUE
+disease.code_FILTER = FALSE 
 
-AgePlot.FILTER = TRUE
-VariantPlot.FILTER = TRUE
+AgePlot.FILTER = FALSE
+VariantPlot.FILTER = FALSE
 
 ## Filters APPLIED
 if (isTRUE(adult.group_FILTER)) { ageName <- "AdultGroupON" } else { ageName <- "AdultGroupOFF" }
@@ -122,7 +118,7 @@ options(max.print=999999)
 
 ## Print parameters to output
 #----------------------------------------------
-cat("Syapse Timestamp: ", Syapse_Export_timestamp, "\n", "\n",
+cat("Patient ID:", patient.id, "\n", "\n",
     "Stanford Internal Trial Timestamp: ", OnCore_Biomarker_Report_timestamp, "\n",
     "\t", "FILTERs: disease group matched: ", disease.group_FILTER, "; disease site matched: ", disease.site_FILTER, "\n",
     "NCI-MATCH Trial Timestamp: ", Patient_Variant_Report_timestamp, "\n",
@@ -135,54 +131,26 @@ cat("Syapse Timestamp: ", Syapse_Export_timestamp, "\n", "\n",
 ## PIPELINE
 #----------------------------------------------
 # Clean up patient data from Syapse
-source("Syapse_Export_QC.R")
-source("Syapse_VariantAnnotate.R")
-
-# Replication of Appendix A MATCH Designated Lab Application
-# Filter patients from 2017-07-01 to 2017-12-31, inclusive
-STAMP_DF$AssayReportDateReviewed <- as.Date(STAMP_DF$AssayReportDateReviewed, format = "%m/%d/%y")
-STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayReportDateReviewed >= "2017-07-01" &
-                       STAMP_DF$AssayReportDateReviewed <= "2017-12-31"),]
-write.table(STAMP_DF, file = paste(tempdir, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
-            append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
-
-DF = STAMP_DF
-cohort = "all"
-source("Syapse_Visualizations.R")
+source("Patient_Export_QC.R")
 
 # Extract patient_id
 patient.list <- sort(unique(STAMP_DF$PatientID))
 
-# Clean up Clinical Trial data
-source("Biomarker_Report_QC.R")
-source("Patient_Variant_Report_QC.R")
-
-# Clinical trial Match
-source("Biomarker_Report_Match.R") 
-source("Patient_Variant_Report_InclusionMatch.R")
-source("Patient_Variant_Report_NonHotspotMatch.R")
-
-## Generate OUTPUT file 
-source("ClinicalTrial_Graphics.R")
-source("ClinicalTrial_MatchOutput.R")
+if (length(patient.list) > 0) {
+  # Clean up Clinical Trial data
+  source("Biomarker_Report_QC.R")
+  source("Patient_Variant_Report_QC.R")
+  
+  # Clinical trial Match
+  source("Biomarker_Report_Match.R") 
+  source("Patient_Variant_Report_InclusionMatch.R")
+  source("Patient_Variant_Report_NonHotspotMatch.R")
+  
+  ## Generate OUTPUT file 
+  source("ClinicalTrial_MatchOutput.R")
+}
 
 sink()
 
 # Delete temporary directory
-# if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)} 
-
-DF_Output_Patient_Variant_export <- 
-  DF_Output_Patient_Variant[,c("Arm_Name","PatientID","PatientDOB","AssayReportDateReviewed",
-                               "HistologicalDx","PrimaryTumorSite","VariantLabel","VariantPathogenicityStatus",
-                               "Variant_Type","Protein")]
-
-DF_Output_Patient_Variant_export <- 
-  DF_Output_Patient_Variant_export[order(DF_Output_Patient_Variant_export$PatientDOB, decreasing = FALSE),]
-
-DF_Output_Patient_Variant_export <- 
-  DF_Output_Patient_Variant_export[order(DF_Output_Patient_Variant_export$Arm_Name, decreasing = FALSE),]
-
-write.table(DF_Output_Patient_Variant_export, file = paste(outdir, "Output_Patient_Variant.csv", sep=""),
-            append = FALSE, sep = ",", row.names = FALSE, col.names = TRUE)
-
-remove(DF_Output_Patient_Variant_export)
+if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)} 
