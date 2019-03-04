@@ -1,5 +1,9 @@
-## Install relevant R packages from CRAN
+## Installation Instructions
 ```
+## Run R from command line
+$ R
+
+## Installation of relevant R packages from CRAN
 > install.packages("plyr", dependencies = TRUE)
 > install.packages("dplyr", dependencies = TRUE)
 > install.packages("Biobase", dependencies = TRUE)
@@ -9,10 +13,8 @@
 > install.packages("rio", dependencies = TRUE)
 > install.packages("stringr", dependencies = TRUE)
 > install.packages("openxlsx", dependencies = TRUE)
-```
 
 ## Confirm installation of R packages 
-```
 > library(plyr)
 > library(dplyr)
 > library(Biobase)
@@ -22,6 +24,9 @@
 > library(rio)
 > library(stringr)
 > library(openxlsx)
+
+## Exit R 
+> quit()
 ```
 
 ## Clinical Trial Matching (NCI-MATCH and Stanford Internal)
