@@ -52,60 +52,81 @@ $ R
 ```
 #!/bin/bash
 
-script_root="/Users/jessicachen/Documents/"
-data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
+# Directories
+data_root="/Users/jessicachen/STAMP_v2.4_reports"
+script_root="/Users/jessicachen/ClinicalTrialMatching"
 
-stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
-exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script.root,"/HistologicalDx_CTEP.csv",sep="")
+# Reference files
+stamp_reference=${script_root}/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt
+exons_ensembl=${script_root}/nsembl-Gene-Exon-Annotations/exons_ensembl75.txt
+histoDx_key=${script_root}/HistologicalDx_CTEP.csv
 
-OnCore_file=paste(script.root,"/Biomarker_Report_YYYY-MM.csv",sep="")
-NCI_file=paste(script.root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
+# Clinical trials 
+OnCore=${script_root}/Biomarker_Report_YYYY-MM.csv
+NCI=${script_root}/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx
+
+# Extract STAMP sequence files and patient ID
+ls ${data_root}/reports/*.variant_report.txt | awk -F"/" '{print $NF}' > ${data_root}/trial_names.tsv
+lookup=${data_root}/trial_names.tsv
 
 STAMP_file=paste(data.root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
 patient_id="LastNameFirstName_PatientID"
 
-Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore_file $NCI_file $script_root $stamp_reference_file $exons_ensembl_file $histoDx_key
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore $NCI $script_root $stamp_reference $exons_ensembl $histoDx_key
 ```
 
 #### EXAMPLE - match to Internal clinical trials ONLY.
 ```
 #!/bin/bash
 
-script_root="/Users/jessicachen/Documents/"
-data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
+# Directories
+data_root="/Users/jessicachen/STAMP_v2.4_reports"
+script_root="/Users/jessicachen/ClinicalTrialMatching"
 
-stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
-exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script.root,"/HistologicalDx_CTEP.csv",sep="")
+# Reference files
+stamp_reference=${script_root}/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt
+exons_ensembl=${script_root}/nsembl-Gene-Exon-Annotations/exons_ensembl75.txt
+histoDx_key=${script_root}/HistologicalDx_CTEP.csv
 
-OnCore_file=paste(script.root,"/Biomarker_Report_YYYY-MM.csv",sep="")
-NCI_file="FALSE"
+# Clinical trials 
+OnCore=${script_root}/Biomarker_Report_YYYY-MM.csv
+NCI="FALSE"
+
+# Extract STAMP sequence files and patient ID
+ls ${data_root}/reports/*.variant_report.txt | awk -F"/" '{print $NF}' > ${data_root}/trial_names.tsv
+lookup=${data_root}/trial_names.tsv
 
 STAMP_file=paste(data.root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
 patient_id="LastNameFirstName_PatientID"
 
-Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore_file $NCI_file $script_root $stamp_reference_file $exons_ensembl_file $histoDx_key
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore $NCI $script_root $stamp_reference $exons_ensembl $histoDx_key
 ```
 
 #### EXAMPLE - match to NCI-MATCH clinical trials ONLY.
 ```
 #!/bin/bash
 
-script_root="/Users/jessicachen/Documents/"
-data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
+# Directories
+data_root="/Users/jessicachen/STAMP_v2.4_reports"
+script_root="/Users/jessicachen/ClinicalTrialMatching"
 
-stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
-exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script.root,"/HistologicalDx_CTEP.csv",sep="")
+# Reference files
+stamp_reference=${script_root}/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt
+exons_ensembl=${script_root}/nsembl-Gene-Exon-Annotations/exons_ensembl75.txt
+histoDx_key=${script_root}/HistologicalDx_CTEP.csv
 
-OnCore_file="FALSE"
-NCI_file=paste(script.root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
+# Clinical trials 
+OnCore="FALSE"
+NCI=${script_root}/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx
+
+# Extract STAMP sequence files and patient ID
+ls ${data_root}/reports/*.variant_report.txt | awk -F"/" '{print $NF}' > ${data_root}/trial_names.tsv
+lookup=${data_root}/trial_names.tsv
 
 STAMP_file=paste(data.root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
 patient_id="LastNameFirstName_PatientID"
 
-Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore_file $NCI_file $script_root $stamp_reference_file $exons_ensembl_file $histoDx_key
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore $NCI $script_root $stamp_reference $exons_ensembl $histoDx_key
 ```
 
 # Mutation plots (STAMP entries)
