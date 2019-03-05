@@ -7,8 +7,8 @@
 STAMP_DF_structured <- 
   cbind(data.frame(sys.uniqueId = patient.id, stringsAsFactors = FALSE), STAMP_DF)
 
-# Subset for variants with status = "ACCEPT"
-STAMP_DF_structured <- STAMP_DF_structured[which(STAMP_DF_structured$Status == "ACCEPT"),]
+# Subset for variants with status != "NOT REPORTED"
+STAMP_DF_structured <- STAMP_DF_structured[which(STAMP_DF_structured$Status != "NOT_REPORTED"),]
 
 # Restructure STAMP dataframe
 #----------------------------------------------
@@ -17,38 +17,23 @@ if (nrow(STAMP_DF_structured) > 0) {
   STAMP_DF_structured$CDS.Change <- paste("c.",STAMP_DF_structured$CDS.Change, sep="")
   STAMP_DF_structured$AA.Change <- paste("p.",STAMP_DF_structured$AA.Change, sep="")
   STAMP_DF_structured$hgvsGenomic <- 
-    paste("g.",STAMP_DF_structured$Position,STAMP_DF_structured$Ref,">",STAMP_DF_structured$Var,sep="")
-  
-  # Convert codon nomenclature from 1-letter to 3-letters 
-  for (row_No in 1:nrow(STAMP_DF_structured)) {
-    chars <- unlist(strsplit(STAMP_DF_structured$AA.Change[row_No], ""))
-    for (elem_No in 1:length(chars)) {
-      if (isTRUE(grepl("[[:upper:]]", chars[elem_No]))) {
-        chars[elem_No] <- AminoAcid_Conversion$Code3[which(AminoAcid_Conversion$Code1 == chars[elem_No])]
-      }
-    }
-    STAMP_DF_structured$AA.Change[row_No] <-  paste0(chars, collapse = "")
-  }
-  
-  # Convert asterisk to "Ter"
-  STAMP_DF_structured$AA.Change <- gsub("\\*", "Ter", STAMP_DF_structured$AA.Change)
+    paste(STAMP_DF_structured$Chr,":g.",STAMP_DF_structured$Position,STAMP_DF_structured$Ref,">",STAMP_DF_structured$Var,sep="")
   
   STAMP_DF_structured$sys.label <- 
     paste(STAMP_DF_structured$Gene, " ", STAMP_DF_structured$CDS.Change, " (", STAMP_DF_structured$AA.Change, ")", sep="")
   
   # Subset columns of interest
   #----------------------------------------------
-  colnames_keep <- c("sys.uniqueId","Chr","hgvsGenomic","sys.label","Gene","CDS.Change","AA.Change")
+  colnames_keep <- c("sys.uniqueId","hgvsGenomic","sys.label","Gene","CDS.Change","AA.Change")
   STAMP_DF_structured <- STAMP_DF_structured[,colnames_keep]
   
-  colnames_generic <- c("PatientID","VariantCHR","VariantHGVSGenomic","VariantLabel","VariantGene",
+  colnames_generic <- c("PatientID","VariantHGVSGenomic","VariantLabel","VariantGene",
                         "VariantHGVSCoding","VariantHGVSProtein")
   colnames(STAMP_DF_structured) <- colnames_generic
   
   # Categorize protein sequence variants (var.type)
   #----------------------------------------------
   DF_var <- data.frame(PatientID=STAMP_DF_structured$PatientID,
-                       VariantCHR=STAMP_DF_structured$VariantCHR,
                        VariantHGVSGenomic=STAMP_DF_structured$VariantHGVSGenomic,
                        VariantLabel=STAMP_DF_structured$VariantLabel,
                        VariantGene=STAMP_DF_structured$VariantGene,
@@ -56,7 +41,7 @@ if (nrow(STAMP_DF_structured) > 0) {
                        VariantHGVSProtein=STAMP_DF_structured$VariantHGVSProtein,
                        
                        # Categorize based on HGVS.Protein
-                       SNVprotein=grepl("^p.[[:upper:]]{1}[[:lower:]]{2}[[:digit:]]+[[:upper:]]{1}[[:lower:]]{2}",
+                       SNVprotein=grepl("^p.[[:upper:]]{1}[[:digit:]]+[[:upper:]]{1}",
                                         STAMP_DF_structured$VariantHGVSProtein),
                        fs=grepl("fs", STAMP_DF_structured$VariantHGVSProtein),
                        
@@ -75,7 +60,7 @@ if (nrow(STAMP_DF_structured) > 0) {
                        stringsAsFactors = FALSE)
   
   for (i in 1:nrow(DF_var)) {
-    if (length(grep(FALSE, DF_var[i,8:15])) == 8) { DF_var$remain[i] <- TRUE
+    if (length(grep(FALSE, DF_var[i,7:14])) == 8) { DF_var$remain[i] <- TRUE
     } else { DF_var$remain[i] <- FALSE
     }}
   
@@ -106,13 +91,13 @@ if (nrow(STAMP_DF_structured) > 0) {
       }
     }
     
-    DF_intron <- DF_intron[,c(1:7,17)]
+    DF_intron <- DF_intron[,c(1:6,17)]
     DF_intron <- cbind(DF_intron, 
                        data.frame(aa.start = NA, var.position = NA, aa.end = NA))
   }
   
   # SNV Variants
-  DF_SNV <- DF_var[DF_var$SNVprotein == TRUE | DF_var$SNVcoding == TRUE, 1:7]
+  DF_SNV <- DF_var[DF_var$SNVprotein == TRUE | DF_var$SNVcoding == TRUE, 1:6]
   if (isTRUE(exists("DF_SNV") & nrow(DF_SNV) > 0)) {DF_SNV$var.type <- "SNV"}
   
   # Frameshift Variants
@@ -125,19 +110,19 @@ if (nrow(STAMP_DF_structured) > 0) {
       } else if (isTRUE(DF_Frameshift$del[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Deletion"
       } else if (isTRUE(DF_Frameshift$dup[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Duplication"
       }}
-    DF_Frameshift <- DF_Frameshift[,c(1:7,17)]
+    DF_Frameshift <- DF_Frameshift[,c(1:6,17)]
   }
   
   # Delins Variants
   DF_delins <- DF_var[DF_var$delins == TRUE & DF_var$intron == FALSE & 
-                        DF_var$fs == FALSE , 1:7]
+                        DF_var$fs == FALSE , 1:6]
   if (isTRUE(exists("DF_delins") & nrow(DF_delins) > 0)) { 
     DF_delins$var.type <- "Delins"
   }
   
   # Insertion Variants
   DF_ins <- DF_var[DF_var$ins == TRUE & DF_var$delins == FALSE & 
-                     DF_var$intron == FALSE & DF_var$fs == FALSE , 1:7]
+                     DF_var$intron == FALSE & DF_var$fs == FALSE , 1:6]
   if (isTRUE(exists("DF_ins") & nrow(DF_ins) > 0)) { 
     DF_ins$var.type <- "Insertion"
   }
@@ -145,7 +130,7 @@ if (nrow(STAMP_DF_structured) > 0) {
   # Deletion Variants
   DF_del <- DF_var[DF_var$del == TRUE & DF_var$ins == FALSE & 
                      DF_var$intron == FALSE & DF_var$delins == FALSE & 
-                     DF_var$fs == FALSE, 1:7]
+                     DF_var$fs == FALSE, 1:6]
   if (isTRUE(exists("DF_del") & nrow(DF_del))) { 
     DF_del$var.type <- "Deletion"
   }
@@ -153,13 +138,13 @@ if (nrow(STAMP_DF_structured) > 0) {
   # Duplication Variants
   DF_dup <- DF_var[DF_var$dup == TRUE & DF_var$del == FALSE & 
                      DF_var$ins == FALSE & DF_var$delins == FALSE & 
-                     DF_var$intron == FALSE & DF_var$fs == FALSE , 1:7]
+                     DF_var$intron == FALSE & DF_var$fs == FALSE , 1:6]
   if (isTRUE(exists("DF_dup") & nrow(DF_dup) > 0)) { 
     DF_dup$var.type <- "Duplication"
   }
   
   # Uncategorized Variants
-  DF_remain <- DF_var[DF_var$remain == TRUE, 1:7]
+  DF_remain <- DF_var[DF_var$remain == TRUE, 1:6]
   cat(paste("No. entries not categorized based on type of nucleotide change: n=", nrow(DF_remain), sep=""),"\n")
   
   # Merge entries from SNV, Frameshift & In-Frame mutations 
@@ -170,83 +155,9 @@ if (nrow(STAMP_DF_structured) > 0) {
   #----------------------------------------------
   DF_NAprotein <- STAMP_DF_structured_anno[is.na(STAMP_DF_structured_anno$VariantHGVSProtein),]
   cat(paste("STAMP entries missing VariantHGVSProtein field: n=",(nrow(DF_NAprotein)), sep=""),"\n")
-  
-  # FUNCTION: Extract variant positions 
-  #----------------------------------------------
-  Extract_VarPosition <- function(DF) {
-    DF$aa.start <- gsub("(^p.)([[:alpha:]]{3})(.*)", "\\2", DF$VariantHGVSProtein)
-    
-    DF$var.position <- gsub("(^p.[[:alpha:]]{3})([[:digit:]]{,4})(.*)", "\\2", 
-                            DF$VariantHGVSProtein)
-    
-    ## aa.end indicates first amino acid or codon interuption following codon No. 
-    ## i.e. frameshift (fs), termination (Ter), deletion (del), duplication (dup)
-    for (row_No in 1:nrow(DF)) {
-      
-      if (isTRUE(DF$var.type[row_No] == "SNV")) {
-        DF$aa.end[row_No] <- gsub("(^p.[[:alpha:]]{3}[[:digit:]]{,4})([[:alpha:]]{3})(.*)", "\\2", 
-                                  DF$VariantHGVSProtein[row_No])
-        
-      } else if (isTRUE(grepl("Frameshift", DF$var.type[row_No]))) {
-        DF$aa.end[row_No] <- gsub("(^p.[[:alpha:]]{3}[[:digit:]]{,4})([[:alpha:]]{2,3})(.*)", "\\2", 
-                                  DF$VariantHGVSProtein[row_No])
-        
-      } else if (isTRUE(DF$var.type[row_No] == "Delins")) {
-        DF$aa.end[row_No] <- gsub("(^p.[[:alpha:]]{3}[[:digit:]]{,4}[_]*[[:digit:]]*[delins]*)([[:alpha:]]{3})(.*)", "\\2", 
-                                  DF$VariantHGVSProtein[row_No])
-        
-      } else if (isTRUE(DF$var.type[row_No] == "Insertion")) {
-        DF$aa.end[row_No] <- gsub("(^p.[[:alpha:]]{3}[[:digit:]]{,4}[_]*[[:digit:]]*[ins]*)([[:alpha:]]{3})(.*)", "\\2", 
-                                  DF$VariantHGVSProtein[row_No])
-        
-      } else if (isTRUE(DF$var.type[row_No] == "Deletion")) {
-        DF$aa.end[row_No] <- gsub("(^p.[[:alpha:]]{3}[[:digit:]]{,4}[_]*[[:digit:]]*)([[:alpha:]]{3})(.*)", "\\2", 
-                                  DF$VariantHGVSProtein[row_No])
-        
-      } else if (isTRUE(DF$var.type[row_No] == "Duplication")) {
-        DF$aa.end[row_No] <- gsub("(^p.[[:alpha:]]{3}[[:digit:]]{,4}[_]*)([[:alpha:]]{3})(.*)", "\\2", 
-                                  DF$VariantHGVSProtein[row_No])
-      }
-    }
-    
-    for (row_No in 1:nrow(DF)) {
-      if (isTRUE(grepl("^[[:alpha:]]{,3}$", DF$aa.start[row_No]) == FALSE)) {
-        DF$aa.start[row_No] <- NA
-      }
-      
-      if (isTRUE(grepl("^[[:digit:]]+$", DF$var.position[row_No]) == FALSE)) {
-        DF$var.position[row_No] <- NA
-      } else {
-        DF$var.position[row_No] <- as.numeric(DF$var.position[row_No] )
-      }
-      
-      if (isTRUE(grepl("^[[:alpha:]]{,3}$", DF$aa.end[row_No]) == FALSE)) {
-        DF$aa.end[row_No] <- NA
-      }
-      
-      if (isTRUE(grepl("^[[:alpha:]]{,3}$", DF$aa.end[row_No]) == FALSE)) {
-        DF$aa.end[row_No] <- NA
-      }
-      
-      if (isTRUE(grepl("^p.[[:alpha:]]{3}[[:digit:]]+.*$", DF$VariantHGVSProtein[row_No]) == FALSE)) {
-        DF$VariantHGVSProtein[row_No] <- NA
-      }
-    }
-    
-    assign("DF", DF, envir = .GlobalEnv)
-  } 
-  
-  # Extract variant positions for entries with VariantHGVSProtein field (aa.start, var.position, aa.end)
-  #----------------------------------------------
-  STAMP_DF_structured_anno <- STAMP_DF_structured_anno[!is.na(STAMP_DF_structured_anno$VariantHGVSProtein),]
-  Extract_VarPosition(DF = STAMP_DF_structured_anno)
-  STAMP_DF_structured_anno <- DF
-  STAMP_DF_structured_anno <- rbind(STAMP_DF_structured_anno, DF_intron)
-  
-  # Modify if changes made to nomenclature
-  STAMP_DF_structured_anno$VariantLabel <- paste(STAMP_DF_structured_anno$VariantGene, " ",
-                                                 STAMP_DF_structured_anno$VariantHGVSCoding, " (",
-                                                 STAMP_DF_structured_anno$VariantHGVSProtein, ")",sep="")
+
+  STAMP_DF_structured_anno <- 
+    rbind(STAMP_DF_structured_anno[!is.na(STAMP_DF_structured_anno$VariantHGVSProtein),],DF_intron)
   
   # Classification of variants for clinical trial matching (var.anno)
   #----------------------------------------------
@@ -256,7 +167,7 @@ if (nrow(STAMP_DF_structured) > 0) {
   #----------------------------------------------
   for (row_No in 1:nrow(STAMP_DF_structured_anno)) {
     gene_id <- STAMP_DF_structured_anno$VariantGene[row_No]
-    genomic_pos <- gsub("(^g.)([[:digit:]]+)([_]*[[:digit:]]*[[:alpha:]]+.*)", "\\2", 
+    genomic_pos <- gsub("(^chr[[:digit:]]+[:]g.)([[:digit:]]+)([_]*[[:digit:]]*[[:alpha:]]+.*)", "\\2", 
                         STAMP_DF_structured_anno$VariantHGVSGenomic[row_No])
     
     Gene.ExonTable <- stamp_reference_full[stamp_reference_full$Gene == gene_id,]
@@ -282,9 +193,9 @@ if (nrow(STAMP_DF_structured) > 0) {
   write.table(STAMP_DF_structured_anno, file = paste(tempdir, patient.id, "_QC.tsv", sep=""),
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
   
-  remove(DF,DF_del,DF_delins,DF_dup,DF_Frameshift,DF_ins,DF_intron,DF_NAprotein,
-         DF_remain,DF_SNV,DF_var,STAMP_DF_structured,chars,colnames_generic,colnames_keep,
-         elem_No,exon_end,exon_row_No,exon_start,gene_id,genomic_pos,i,row_No,Extract_VarPosition)
+  remove(DF_del,DF_delins,DF_dup,DF_Frameshift,DF_ins,DF_intron,DF_NAprotein,
+         DF_remain,DF_SNV,DF_var,STAMP_DF_structured,colnames_generic,colnames_keep,
+         exon_end,exon_row_No,exon_start,gene_id,genomic_pos,i,row_No)
   
 } else {
   STAMP_DF_structured_anno <- data.frame(matrix(ncol = 16, nrow = 0))
@@ -316,7 +227,7 @@ if (nrow(DF_patient) == 0) {
   sink(file = err.output, append = TRUE, split = FALSE)
   options(max.print=999999)
   
-  cat(paste(patient.id, " has no entries with variants with ACCEPTED status.", sep=""),"\n","\n")
+  cat(paste(patient.id, " has no entries with variants with statuses that are not \"NOT REPORTED \".", sep=""),"\n","\n")
   sink()
 } 
 remove(DF_patient)
@@ -384,19 +295,6 @@ if (nrow(out.DF) > 0) {
 }
 remove(stamp_reference_gene.list)
 
-out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSProtein) &
-                           grepl("^p.[[:alpha:]]{3}[[:digit:]]+.*", STAMP_DF$VariantHGVSProtein) == FALSE),]
-if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with HGVS protein nomenclature formatted incorrectly:", "\n")
-  print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
-  cat("\n")
-  
-  sink()
-}
-
 out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSCoding) &
                            grepl("^c.[-]*[[:digit:]]+.*", STAMP_DF$VariantHGVSCoding) == FALSE),]
 if (nrow(out.DF) > 0) {
@@ -411,7 +309,7 @@ if (nrow(out.DF) > 0) {
 }
 
 out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSGenomic) &
-                           grepl("^g.[[:digit:]]+.*", STAMP_DF$VariantHGVSGenomic) == FALSE),]
+                           grepl("^chr[[:alnum:]]{1,}:g.[[:digit:]]+.*", STAMP_DF$VariantHGVSGenomic) == FALSE),]
 if (nrow(out.DF) > 0) {
   sink(file = err.output, append = TRUE, split = FALSE)
   options(max.print=999999)
