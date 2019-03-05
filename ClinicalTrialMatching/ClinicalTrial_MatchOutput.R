@@ -60,8 +60,8 @@ for (patient_num in 1:length(patient.list)) {
   if (isTRUE(exists("DF_Output_Patient_Variant") | exists("DF_Output_Patient_NonHotspot"))) {
     cat("\n")
     cat("NCI-MATCH clinical trials:", "\n",
-        "Order of matching: gene > variant type > protein name (inclusion variants only) > ",
-        "exon number (inclusion nonhotspots only) > exclusion variants identified (gene name > variant type  > protein name) ", 
+        "Order of matching: gene > variant type > genomic region (inclusion variants only) > ",
+        "exon number (inclusion nonhotspots only) > exclusion variants identified (gene name > variant type  > genomic region) ", 
         "> exclusion nonhotspots identified (gene name > variant type  > exon number).",
         " Trial criteria indicated by NonHotspot Rules, IHC Results, Comments, and Disease Exclusion Codes need to be manually assessed.","\n","\n")
     
@@ -76,10 +76,21 @@ for (patient_num in 1:length(patient.list)) {
       print(DF_patient[order(DF_patient$VariantGene), 
                        c("Variant_Identified_in_Patient","Inclusion_NonHotspot_Match")], row.names = FALSE)
     }
-    
-    cat("\n","\n")
+    cat("\n")
+  }
+  
+  cat("\n")
+  if (isTRUE(Internal_match & NCI_match)) {
     cat(paste("OnCore Biomarker Report updated on ", OnCore_Biomarker_Report_timestamp, 
               " and Patient Variant Report updated on ", Patient_Variant_Report_timestamp, 
+              ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
+    
+  } else if (isTRUE(Internal_match)) {
+    cat(paste("OnCore Biomarker Report updated on ", OnCore_Biomarker_Report_timestamp, 
+              ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
+    
+  } else if (isTRUE(NCI_match)) {
+    cat(paste("Patient Variant Report updated on ", Patient_Variant_Report_timestamp, 
               ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
   }
   sink()
@@ -214,6 +225,9 @@ if (isTRUE(exists("patient.list.matched") & length(patient.list.matched) > 0)) {
           # Extract trial INFO based on trial_id match in Matched_Internal
           DF_patient_trial <- unique(Matched_Internal[Matched_Internal$OnCore.No == trial_id, ])
           
+          # Remove trailing whitespace
+          DF_patient_trial$Biomarker.Description <- gsub("\n$", "", DF_patient_trial$Biomarker.Description)
+          
           # Output notification
           #----------------------------------------------
           cat(paste("No.", num_internal, ": Clinical Trial #", trial_id, ": ", unique(DF_patient_trial$Title), sep=""),"\n",
@@ -223,16 +237,17 @@ if (isTRUE(exists("patient.list.matched") & length(patient.list.matched) > 0)) {
           cat(paste("Primary Clinical Research Coordinator: ", unique(DF_patient_trial$Primary.CRC), 
                     " (", unique(DF_patient_trial$Primary.CRC.Email), ")", sep=""),"\n","\n")
           cat("Biomarker criteria:", "\n", "\t", unique(DF_patient_trial$Biomarker.Description),"\n")
-          cat(paste("Disease group criteria: ", unique(DF_patient_trial$Disease.Group), sep=""),"\n")
-          cat(paste("Disease site criteria: ", unique(DF_patient_trial$Disease.Sites), sep=""),"\n","\n")
           
+          cat("\n")
           cat("Relevant mutations identified in patient:", "\n")
           Output.patient <-  unique(paste(DF_patient_trial$VariantGene, ": ", DF_patient_trial$VariantHGVSProtein, sep=""))
           for (entry_num in 1:length(Output.patient)) { cat("\t", Output.patient[entry_num],"\n")}
-          cat("\n","\n")
+          cat("\n")
+          
+          cat("Trial criteria to be manually assessed: ", "\n")  
+          cat("\t",paste("Disease group criteria: ", unique(DF_patient_trial$Disease.Group), sep=""),"\n")
+          cat("\t",paste("Disease site criteria: ", unique(DF_patient_trial$Disease.Sites), sep=""),"\n","\n","\n")
         }
-        
-        remove(Matched_Internal)
         
       } else {num_internal = 0}
       
@@ -259,7 +274,6 @@ if (isTRUE(exists("patient.list.matched") & length(patient.list.matched) > 0)) {
           cat(paste("No.", (num_internal + num_variant), ": NCI-MATCH Trial Treatment ", trial_id, sep=""),"\n", 
               "----------------------------------------------------------------------", "\n")
           cat("Inclusion criteria: ", "\n")
-          # Several matches with same HGVS protein nomenclature but different CHR:POS_REF_ALT nomenclature
           Output.trial <- unique(paste(DF_patient_trial$Gene_Name, ": ", DF_patient_trial$Protein, sep=""))
           for (entry_num in 1:length(Output.trial)) { cat("\t", Output.trial[entry_num],"\n") }
           
@@ -335,17 +349,45 @@ if (isTRUE(exists("patient.list.matched") & length(patient.list.matched) > 0)) {
           cat("\n","\n")
         } 
         
-        remove(match.nonhotspot.list,num_nonhotspot)
-      }
+        remove(match.nonhotspot.list)
+      } else {num_nonhotspot = 0}
+      
+    } else {num_nonhotspot = 0}
+    
+    if (isTRUE(Internal_match & NCI_match)) {
+      cat("NOTES:","\n")
+      cat("- Stanford Internal trials: Criteria indicated by Disease group, Disease site and Comments need to be manually assessed.","\n")
+      cat("- NCI-MATCH trials: Criteria i.e. IHC Results, Comments and Disease Exclusion Codes need to be manually assessed.","\n")
+      cat("\n")
+      
+    } else if (isTRUE(Internal_match)) {
+      cat("NOTES:","\n")
+      cat("- Stanford Internal trials: Criteria indicated by Disease group, Disease site and Comments need to be manually assessed.","\n")
+      cat("\n")
+      
+    } else if (isTRUE(NCI_match)) {
+      cat("NOTES:","\n")
+      cat("- NCI-MATCH trials: Criteria i.e. IHC Results, Comments and Disease Exclusion Codes need to be manually assessed.","\n")
+      cat("\n")
     }
     
-    cat("NOTES:","\n")
-    cat("- Stanford Internal trials: Criteria indicated by Disease group, Disease site and Comments need to be manually assessed.","\n")
-    cat("- NCI-MATCH trials: Criteria i.e. IHC Results, Comments and Disease Exclusion Codes need to be manually assessed.","\n")
-    cat("\n")
-    cat(paste("OnCore Biomarker Report updated on ", OnCore_Biomarker_Report_timestamp, 
-              " and Patient Variant Report updated on ", Patient_Variant_Report_timestamp, 
-              ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
+    if (num_internal > 0 & (num_variant + num_nonhotspot > 0)) {
+      cat(paste("OnCore Biomarker Report updated on ", OnCore_Biomarker_Report_timestamp, 
+                " and Patient Variant Report updated on ", Patient_Variant_Report_timestamp, 
+                ". This email was generated on ", Sys.time(), ".", sep=""),"\n")  
+      
+    } else if (num_internal > 0) {
+      cat(paste("OnCore Biomarker Report updated on ", OnCore_Biomarker_Report_timestamp, 
+                ". This email was generated on ", Sys.time(), ".", sep=""),"\n")
+      
+    } else if (num_variant + num_nonhotspot > 0) {
+      cat(paste("Patient Variant Report updated on ", Patient_Variant_Report_timestamp, 
+                ". This email was generated on ", Sys.time(), ".", sep=""),"\n")  
+      
+    } else {
+      cat(paste("This email was generated on ", Sys.time(), ".", sep=""),"\n")  
+    }
+    
     sink()
   }
 }
@@ -354,46 +396,53 @@ if (isTRUE(exists("patient.list.matched") & length(patient.list.matched) > 0)) {
 ## GENERATE tsv output for positive matches
 #---------------------------------------------- 
 # Iterate through each patient_id of patient.oncore.matched
-if (isTRUE(exists("patient.oncore.matched") & length(patient.oncore.matched) > 0)) {
-  for (patient_num  in 1:length(patient.oncore.matched)) {
-    patient_id <- patient.oncore.matched[patient_num]
-    
-    # Import STAMP entries per patient
-    DF_patient_Oncore <- unique(DF_Output_OnCore_Biomarker[DF_Output_OnCore_Biomarker$PatientID == patient_id,
-                                                           c("PatientID","VariantGene","VariantHGVSCoding",
-                                                             "VariantHGVSProtein","OnCore.No","NCT..")])
-    # Rename column name
-    colnames(DF_patient_Oncore)[6] <- "NCT"
-    
-    # Write to match results per patient to local computer
-    #----------------------------------------------
-    write.table(DF_patient_Oncore, file = paste(outdir, patient_id, ".OnCore.tsv", sep=""),
-                append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+if (isTRUE(Internal_match)) {
+  if (isTRUE(exists("patient.oncore.matched") & length(patient.oncore.matched) > 0)) {
+    for (patient_num  in 1:length(patient.oncore.matched)) {
+      patient_id <- patient.oncore.matched[patient_num]
+      
+      # Import STAMP entries per patient
+      DF_patient_Oncore <- 
+        unique(DF_Output_OnCore_Biomarker[DF_Output_OnCore_Biomarker$PatientID == patient_id,
+                                          c("PatientID","VariantGene","VariantHGVSCoding",
+                                            "VariantHGVSProtein","VariantHGVSGenomic",
+                                            "OnCore.No","NCT..")])
+      # Rename column name
+      colnames(DF_patient_Oncore)[6] <- "NCT"
+      
+      # Write to match results per patient to local computer
+      #----------------------------------------------
+      write.table(DF_patient_Oncore, file = paste(outdir, patient_id, ".OnCore.tsv", sep=""),
+                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+    }
   }
-  remove(patient.oncore.matched,DF_patient_Oncore)
 }
 
 # Iterate through each patient_id of patient.nci.matched
-if (isTRUE(exists("patient.nci.matched") & length(patient.nci.matched) > 0)) {
-  for (patient_num  in 1:length(patient.nci.matched)) {
-    patient_id <- patient.nci.matched[patient_num]
-    
-    # Import STAMP entries per patient
-    DF_patient_NCI.Variants <- DF_Output_Patient_Variant[DF_Output_Patient_Variant$PatientID == patient_id,
-                                                         c("PatientID","VariantGene","VariantHGVSCoding",
-                                                           "VariantHGVSProtein","Arm_Name")]
-    DF_patient_NCI.NonHotspot <- DF_Output_Patient_NonHotspot[DF_Output_Patient_NonHotspot$PatientID == patient_id,
-                                                              c("PatientID","VariantGene","VariantHGVSCoding",
-                                                                "VariantHGVSProtein","Arm_Name")]
-    DF_patient_NCI <- unique(rbind(DF_patient_NCI.Variants, DF_patient_NCI.NonHotspot))
-    DF_patient_NCI$NCT <- "NCT02465060"
-    
-    # Write to match results per patient to local computer
-    #----------------------------------------------
-    write.table(DF_patient_NCI, file = paste(outdir, patient_id, ".NCI.tsv", sep=""),
-                append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+if (isTRUE(NCI_match)) {
+  if (isTRUE(exists("patient.nci.matched") & length(patient.nci.matched) > 0)) {
+    for (patient_num  in 1:length(patient.nci.matched)) {
+      patient_id <- patient.nci.matched[patient_num]
+      
+      # Import STAMP entries per patient
+      DF_patient_NCI.Variants <- 
+        unique(DF_Output_Patient_Variant[DF_Output_Patient_Variant$PatientID == patient_id,
+                                         c("PatientID","VariantGene","VariantHGVSCoding",
+                                           "VariantHGVSProtein","VariantHGVSGenomic","Arm_Name")])
+      
+      DF_patient_NCI.NonHotspot <- 
+        unique(DF_Output_Patient_NonHotspot[DF_Output_Patient_NonHotspot$PatientID == patient_id,
+                                            c("PatientID","VariantGene","VariantHGVSCoding",
+                                              "VariantHGVSProtein","VariantHGVSGenomic","Arm_Name")])
+      DF_patient_NCI <- unique(rbind(DF_patient_NCI.Variants, DF_patient_NCI.NonHotspot))
+      DF_patient_NCI$NCT <- "NCT02465060"
+      
+      # Write to match results per patient to local computer
+      #----------------------------------------------
+      write.table(DF_patient_NCI, file = paste(outdir, patient_id, ".NCI.tsv", sep=""),
+                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+    }
   }
-  remove(patient.nci.matched,DF_patient_NCI.Variants,DF_patient_NCI.NonHotspot)
 }
 
 cat(paste("Timestamp of matching output FINISH: ", Sys.time(), sep=""),"\n")
