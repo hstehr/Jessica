@@ -1,5 +1,5 @@
 # Match by gene > variant type/function > pathogenicity.status > age.group (i.e. adult) \
-# > exclusion variant <Gene Protein Variant_Type> \
+# > exclusion variant <Gene Genomic_Region Variant_Type> \
 # > exclusion nonhotspot <Gene Exon_Number Variant_Type>
 ## Search Output: individual patient file with stop point
 ## Match Output: "NCIMatch_NonHotspot_Matched.tsv"
@@ -94,7 +94,7 @@ if (isTRUE(NCI_match)) {
             for (exon_num in 1:length(exon.patient)) {
               exon_id <- exon.patient[exon_num]
               
-              ## Match Protein
+              ## Match Exon Number
               #----------------------------------------------
               if (isTRUE(exon_id %in% exon.trial & nrow(DF_Gene_Patient_NonHotspot) > 0)) {
                 
@@ -175,11 +175,11 @@ if (isTRUE(NCI_match)) {
                         if (nrow(DF_Exclude_Arm) > 0) {
                           
                           # All variant labels for Arm_No in Exclusion_Variants
-                          var.exclude <- sort(unique(paste(DF_Exclude_Arm$Gene_Name, " ", DF_Exclude_Arm$Protein, " (", 
+                          var.exclude <- sort(unique(paste(DF_Exclude_Arm$Gene_Name, " ", DF_Exclude_Arm$Genomic, " (", 
                                                            DF_Exclude_Arm$Variant_Type, ")", sep="")))
                           
                           # All variant labels for patient in DF_patient
-                          var.patient <- sort(unique(paste(DF_patient$VariantGene, " ", DF_patient$VariantHGVSProtein, " (",
+                            var.patient <- sort(unique(paste(DF_patient$VariantGene, " ", DF_patient$VariantHGVSGenomic, " (",
                                                            DF_patient$var.type, ")", sep="")))
                           
                           # Identify overlapping variants
