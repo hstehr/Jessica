@@ -1,5 +1,3 @@
-## Confirmed for timestamp = c("2018-10-18")
-
 ## QC-parameters: smpl.assayName, smpl.pipelineVersion, base.gene, smpl.hgvsProtein, smpl.hgvsCoding, smpl.hgvsGenomic
 ## Calculate patient age > merge with primary tumor site data > filter for STAMP entries 
 ## Output: "syapse_export_all_variants_QC.csv"
