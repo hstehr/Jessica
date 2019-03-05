@@ -91,7 +91,7 @@ if (nrow(STAMP_DF_structured) > 0) {
       }
     }
     
-    DF_intron <- DF_intron[,c(1:6,17)]
+    DF_intron <- DF_intron[,c(1:6,16)]
     DF_intron <- cbind(DF_intron, 
                        data.frame(aa.start = NA, var.position = NA, aa.end = NA))
   }
@@ -110,7 +110,7 @@ if (nrow(STAMP_DF_structured) > 0) {
       } else if (isTRUE(DF_Frameshift$del[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Deletion"
       } else if (isTRUE(DF_Frameshift$dup[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Duplication"
       }}
-    DF_Frameshift <- DF_Frameshift[,c(1:6,17)]
+    DF_Frameshift <- DF_Frameshift[,c(1:6,16)]
   }
   
   # Delins Variants
