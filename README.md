@@ -57,7 +57,7 @@ data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
 
 stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
 exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script.root,"/../STAMP/HistologicalDx_CTEP.csv",sep="")
+histoDx_key=paste(script.root,"/HistologicalDx_CTEP.csv",sep="")
 
 OnCore_file=paste(script.root,"/Biomarker_Report_YYYY-MM.csv",sep="")
 NCI_file=paste(script.root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
@@ -77,7 +77,7 @@ data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
 
 stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
 exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script.root,"/../STAMP/HistologicalDx_CTEP.csv",sep="")
+histoDx_key=paste(script.root,"/HistologicalDx_CTEP.csv",sep="")
 
 OnCore_file=paste(script.root,"/Biomarker_Report_YYYY-MM.csv",sep="")
 NCI_file="FALSE"
@@ -97,7 +97,7 @@ data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
 
 stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
 exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script.root,"/../STAMP/HistologicalDx_CTEP.csv",sep="")
+histoDx_key=paste(script.root,"/HistologicalDx_CTEP.csv",sep="")
 
 OnCore_file="FALSE"
 NCI_file=paste(script.root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
