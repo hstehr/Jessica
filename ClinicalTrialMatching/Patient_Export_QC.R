@@ -15,7 +15,11 @@ STAMP_DF_structured <- STAMP_DF_structured[which(STAMP_DF_structured$Status != "
 if (nrow(STAMP_DF_structured) > 0) {
   # Modify nomenclature
   STAMP_DF_structured$CDS.Change <- paste("c.",STAMP_DF_structured$CDS.Change, sep="")
+  STAMP_DF_structured$CDS.Change[which(grepl("^c..$",STAMP_DF_structured$CDS.Change))] <- NA
+  
   STAMP_DF_structured$AA.Change <- paste("p.",STAMP_DF_structured$AA.Change, sep="")
+  STAMP_DF_structured$AA.Change[which(grepl("^p..$",STAMP_DF_structured$AA.Change))] <- NA
+  
   STAMP_DF_structured$hgvsGenomic <- 
     paste(STAMP_DF_structured$Chr,":g.",STAMP_DF_structured$Position,STAMP_DF_structured$Ref,">",STAMP_DF_structured$Var,sep="")
   
@@ -41,8 +45,10 @@ if (nrow(STAMP_DF_structured) > 0) {
                        VariantHGVSProtein=STAMP_DF_structured$VariantHGVSProtein,
                        
                        # Categorize based on HGVS.Protein
-                       SNVprotein=grepl("^p.[[:upper:]]{1}[[:digit:]]+[[:upper:]]{1}",
-                                        STAMP_DF_structured$VariantHGVSProtein),
+                       SNV_Protein_Genomic=(grepl("^p.[[:upper:]]{1}[[:digit:]]+[[:upper:]]{1}",
+                                         STAMP_DF_structured$VariantHGVSProtein) | 
+                                     grepl("^chr[[:alnum:]]+:g.[[:digit:]]+[[:upper:]]{1}>[[:upper:]]{1}",
+                                           STAMP_DF_structured$VariantHGVSGenomic)),
                        fs=grepl("fs", STAMP_DF_structured$VariantHGVSProtein),
                        
                        # Categorize based on HGVS.Coding
@@ -65,7 +71,7 @@ if (nrow(STAMP_DF_structured) > 0) {
     }}
   
   # Classification correction
-  DF_var$SNVprotein[which(DF_var$SNVprotein == TRUE & 
+  DF_var$SNV_Protein_Genomic[which(DF_var$SNV_Protein_Genomic == TRUE & 
                             (DF_var$delins == TRUE | DF_var$ins == TRUE | 
                                DF_var$del == TRUE | DF_var$dup == TRUE))] <- FALSE
   
@@ -97,7 +103,7 @@ if (nrow(STAMP_DF_structured) > 0) {
   }
   
   # SNV Variants
-  DF_SNV <- DF_var[DF_var$SNVprotein == TRUE | DF_var$SNVcoding == TRUE, 1:6]
+  DF_SNV <- DF_var[DF_var$SNV_Protein_Genomic == TRUE | DF_var$SNVcoding == TRUE, 1:6]
   if (isTRUE(exists("DF_SNV") & nrow(DF_SNV) > 0)) {DF_SNV$var.type <- "SNV"}
   
   # Frameshift Variants
@@ -151,13 +157,12 @@ if (nrow(STAMP_DF_structured) > 0) {
   #----------------------------------------------
   STAMP_DF_structured_anno <- rbind(DF_SNV, DF_Frameshift,DF_delins,DF_ins,DF_del,DF_dup)
   
-  # Subset entries with missing VariantHGVSProtein field
+  # Count number entries with missing VariantHGVSProtein field
   #----------------------------------------------
-  DF_NAprotein <- STAMP_DF_structured_anno[is.na(STAMP_DF_structured_anno$VariantHGVSProtein),]
+  DF_NAprotein <- STAMP_DF_structured_anno[is.na(STAMP_DF_structured_anno$VariantHGVSProtein),
+                                           c("PatientID","VariantHGVSGenomic","VariantLabel")]
   cat(paste("STAMP entries missing VariantHGVSProtein field: n=",(nrow(DF_NAprotein)), sep=""),"\n")
-
-  STAMP_DF_structured_anno <- 
-    rbind(STAMP_DF_structured_anno[!is.na(STAMP_DF_structured_anno$VariantHGVSProtein),],DF_intron)
+  print(DF_NAprotein)
   
   # Classification of variants for clinical trial matching (var.anno)
   #----------------------------------------------
