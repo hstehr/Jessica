@@ -1,4 +1,4 @@
-# Match by gene > biomarker.condition > biomarker.detail > pathogenicity.status \
+# Match by gene > biomarker.condition > biomarker.detail (if specified, match only for SNVs) > pathogenicity.status \
 # > age.group (i.e. adult) > disease.group.category > disease.site
 ## Search Output: individual patient file with stop point
 ## Match Output: "OnCore_Biomarker_Matched.tsv"
@@ -71,7 +71,7 @@ if (isTRUE(Internal_match)) {
           #----------------------------------------------
           if (bio.cond_id %in% biomarker.condition.trial) {
             
-            ## Parse Biomarker_Detail
+            ## Parse Biomarker_Detail == possible only for SNVs
             #----------------------------------------------
             biomarker.detail.trial <- 
               unique(DF_Gene_OnCore_Biomarker$Biomarker_Detail[DF_Gene_OnCore_Biomarker$Biomarker_Condition == bio.cond_id])
@@ -89,8 +89,10 @@ if (isTRUE(Internal_match)) {
                 
               } else {
                 ## Assume Amino acid change
-                aa.start_trial <- gsub("(^[[:alpha:]]{3})(.*)","\\1", biomarker.detail.trial[det_num])
-                aa.start_patient <- unique(DF_patient$aa.start[DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id])
+                aa.start_trial <- gsub("(^[[:alpha:]])(.*)","\\1", biomarker.detail.trial[det_num])
+                aa.start_patient <- gsub("(^p.)([[:alpha:]]{1})(.*)","\\2", 
+                                         unique(DF_patient$VariantHGVSProtein[
+                                           which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id)]))
                 
                 if (aa.start_trial == "*") {
                   aa.end_match <- as.logical("TRUE")
@@ -100,8 +102,10 @@ if (isTRUE(Internal_match)) {
                   aa.start_list <- str_extract(aa.start_patient, aa.start_trial)
                 }
                 
-                var.position_trial <- gsub("(^[[:alpha:]]{3})([[:digit:]]{,4})(.*)","\\2", biomarker.detail.trial[det_num])
-                var.position_patient <- unique(DF_patient$var.position[DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id])
+                var.position_trial <- gsub("(^[[:alpha:]]{1})([[:digit:]]{,4})(.*)","\\2", biomarker.detail.trial[det_num])
+                var.position_patient <- gsub("(^p.[[:alpha:]]{1})([[:digit:]]{,4})(.*)","\\2", 
+                                             unique(DF_patient$VariantHGVSProtein[
+                                               which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id)]))
                 
                 if (var.position_trial == "*") {
                   var.position_match <- as.logical("TRUE")
@@ -112,7 +116,9 @@ if (isTRUE(Internal_match)) {
                 }
                 
                 aa.end_trial <- gsub("(^[[:alpha:]]{3}[[:digit:]]{,4})(.*)","\\2", biomarker.detail.trial[det_num])
-                aa.end_patient <- unique(DF_patient$aa.end[DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id])
+                aa.end_patient <- gsub("(^p.[[:alpha:]]{1}[[:digit:]]{,4})(.*)","\\2", 
+                                       unique(DF_patient$VariantHGVSProtein[
+                                              which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id)]))
                 
                 if (aa.end_trial == "*") {
                   aa.end_match <- as.logical("TRUE")
