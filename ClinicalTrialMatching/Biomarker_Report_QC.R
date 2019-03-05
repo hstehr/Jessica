@@ -1,5 +1,3 @@
-## Confirmed for timestamp = c("2018-10")
-
 ## Convert to long format: Biomarker.Description, Disease.Sites
 ## Classification #1 (Disease.Site): most general from Disease.Sites
 ## Classification #2 (Disease.Group.category): based on Disease.Group
@@ -19,7 +17,7 @@ if (length(OnCore_Biomarker_QC$Current.Status[!grepl("OPEN TO ACCRUAL", OnCore_B
   
   cat("Current status of clinical trials from Biomarker Report that are not OPEN TO ACCRUAL:","\n")
   cat(paste("NOTE: corresponding rows (n=", length(which(OnCore_Biomarker_QC$Current.Status != "OPEN TO ACCRUAL")),
-  ") have been removed from downstream processing", sep=""),"\n")
+            ") have been removed from downstream processing", sep=""),"\n")
   print(OnCore_Biomarker_QC[which(OnCore_Biomarker_QC$Current.Status != "OPEN TO ACCRUAL"), ], 
         row.names = FALSE)
   
@@ -40,10 +38,10 @@ if (length(OnCore_Biomarker_QC$Protocol.Type[!grepl("Treatment", OnCore_Biomarke
   
   cat("Protocol type of clinical trials from Biomarker Report that are not TREATMENT:","\n")
   cat(paste("NOTE: corresponding rows (n=", length(which(OnCore_Biomarker_QC$Protocol.Type != "Treatment")),
-              ") have been removed from downstream processing", sep=""),"\n")
+            ") have been removed from downstream processing", sep=""),"\n")
   print(OnCore_Biomarker_QC[which(OnCore_Biomarker_QC$Protocol.Type != "Treatment"), ], 
         row.names = FALSE)
-
+  
   ## Remove clinical trials not OPEN TO ACCRUAL from spreadsheet
   rowkeep <- which(OnCore_Biomarker_QC$Protocol.Type == "Treatment")
   OnCore_Biomarker_QC <- OnCore_Biomarker_QC[rowkeep, ]
@@ -70,8 +68,8 @@ col_No <- as.numeric(ncol(OnCore_Biomarker_QC))
 ## Columns appended to end of dataframe
 OnCore_Biomarker_QC$Biomarker <- OnCore_Biomarker_QC$Biomarker.Description
 OnCore_Biomarker_QC <- cSplit(OnCore_Biomarker_QC, "Biomarker", ",", 
-                                  stripWhite = TRUE, type.convert="as.character",
-                                  drop = FALSE)
+                              stripWhite = TRUE, type.convert="as.character",
+                              drop = FALSE)
 
 ## Convert to long format 
 OnCore_Biomarker_QC <- melt(OnCore_Biomarker_QC, id.vars=colname_keep)
@@ -81,7 +79,7 @@ OnCore_Biomarker_QC <- OnCore_Biomarker_QC[which(OnCore_Biomarker_QC$variable !=
 ## Strip Biomarker.Description into components
 #----------------------------------------------
 OnCore_Biomarker_QC <- cSplit(OnCore_Biomarker_QC, "value", "|", 
-                                  stripWhite = TRUE, type.convert="as.character")
+                              stripWhite = TRUE, type.convert="as.character")
 colnames(OnCore_Biomarker_QC)[c((col_No +2):(col_No +4))] <- c("Biomarker_GeneName","Biomarker_Condition","Biomarker_Detail")
 OnCore_Biomarker_QC$Biomarker_Comment <- NA
 colname_keep <- append(colname_keep, colnames(OnCore_Biomarker_QC)[c((col_No +2):(col_No +5))])
@@ -101,11 +99,6 @@ for (x in 1:nrow(OnCore_Biomarker_QC)) {
 #----------------------------------------------
 OnCore_Biomarker_QC$Biomarker_Detail <- 
   gsub("^\\*[[:blank:]]*$", "All mutations accepted", OnCore_Biomarker_QC$Biomarker_Detail)
-
-################################
-## Manual correction: Amino acid change
-################################
-OnCore_Biomarker_QC$Biomarker_Detail[OnCore_Biomarker_QC$Biomarker_Detail == "V600*"] <- "Val600*"
 
 ## CONFIRMATION: Biomarker Gene alterations are within permitted terms
 #----------------------------------------------
@@ -228,7 +221,7 @@ colname_keep <- append(colname_keep, "Disease.Site")
 ################################
 # Select columns of interest
 colname_keep <- c("OnCore.No","Age.Group","Disease.Group.category","Disease.Site",
-                   "Biomarker_GeneName","Biomarker_Condition","Biomarker_Detail")
+                  "Biomarker_GeneName","Biomarker_Condition","Biomarker_Detail")
 OnCore_Biomarker_QC <- OnCore_Biomarker_QC[order(OnCore_Biomarker_QC$OnCore.No),colname_keep]
 
 ## Write variable in global environment
@@ -242,4 +235,5 @@ write.table(OnCore_Biomarker_QC, paste(tempdir,OnCore_Biomarker_Report_timestamp
 
 remove(alterations_okay,col_No,colname_keep,Disease.Group.key,Disease.Group.Report,
        DiseaseGroupCategory.name,elem_No,row_No,rowkeep,x)
+
 cat("\n")
