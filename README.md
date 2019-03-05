@@ -1,9 +1,11 @@
-## Installation Instructions
+# Installation Instructions
+#### Run R from command line
 ```
-## Run R from command line
 $ R
+```
 
-## Installation of relevant R packages from CRAN
+#### Installation of relevant R packages from CRAN
+```
 > install.packages("plyr", dependencies = TRUE)
 > install.packages("dplyr", dependencies = TRUE)
 > install.packages("Biobase", dependencies = TRUE)
@@ -13,8 +15,10 @@ $ R
 > install.packages("rio", dependencies = TRUE)
 > install.packages("stringr", dependencies = TRUE)
 > install.packages("openxlsx", dependencies = TRUE)
+```
 
-## Confirm installation of R packages 
+#### Confirm installation of R packages 
+```
 > library(plyr)
 > library(dplyr)
 > library(Biobase)
@@ -24,17 +28,87 @@ $ R
 > library(rio)
 > library(stringr)
 > library(openxlsx)
+```
 
-## Exit R 
+#### Exit R 
+```
 > quit()
 ```
 
-## Clinical Trial Matching (NCI-MATCH and Stanford Internal)
+# Clinical Trial Matching PIPELINE 
+#### Arguments
+###### args[1]: Directory to save output to.
+###### args[2]: Location of STAMP entries.
+###### args[3]: Patient ID.
+###### args[4]: Location of OnCore Report (Stanford Internal Clinical Trials). To turn off matching, set args == FALSE.
+###### args[5]: Location of Patient Variant Report (NCI-MATCH Clinical Trials). To turn off matching, set args == FALSE.
+###### args[6]: Directory of pipeline scripts.
+###### args[7]: Location of stamp_reference_transcripts.
+###### args[8]: Location of exons_ensembl.
+###### args[9]: Location of disease exclusion key.
+
+
+#### EXAMPLE - match to both set of clinical trials.
 ```
-bash ClinicalTrialMatching/ClinicalTrial_Matching.sh
+#!/bin/bash
+
+script_root="/Users/jessicachen/Documents/"
+data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
+
+stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
+exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
+histoDx_key=paste(script.root,"/../STAMP/HistologicalDx_CTEP.csv",sep="")
+
+OnCore_file=paste(script.root,"/Biomarker_Report_YYYY-MM.csv",sep="")
+NCI_file=paste(script.root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
+
+STAMP_file=paste(data.root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
+patient_id="LastNameFirstName_PatientID"
+
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore_file $NCI_file $script_root $stamp_reference_file $exons_ensembl_file $histoDx_key
 ```
 
-## Mutation plots (STAMP entries)
+#### EXAMPLE - match to Internal clinical trials ONLY.
+```
+#!/bin/bash
+
+script_root="/Users/jessicachen/Documents/"
+data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
+
+stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
+exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
+histoDx_key=paste(script.root,"/../STAMP/HistologicalDx_CTEP.csv",sep="")
+
+OnCore_file=paste(script.root,"/Biomarker_Report_YYYY-MM.csv",sep="")
+NCI_file="FALSE"
+
+STAMP_file=paste(data.root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
+patient_id="LastNameFirstName_PatientID"
+
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore_file $NCI_file $script_root $stamp_reference_file $exons_ensembl_file $histoDx_key
+```
+
+#### EXAMPLE - match to NCI-MATCH clinical trials ONLY.
+```
+#!/bin/bash
+
+script_root="/Users/jessicachen/Documents/"
+data_root="/Users/jessicachen/Documents/STAMP_v2.4_reports"
+
+stamp_reference_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
+exons_ensembl_file=paste(script.root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
+histoDx_key=paste(script.root,"/../STAMP/HistologicalDx_CTEP.csv",sep="")
+
+OnCore_file="FALSE"
+NCI_file=paste(script.root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
+
+STAMP_file=paste(data.root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
+patient_id="LastNameFirstName_PatientID"
+
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP_file $patient_id $OnCore_file $NCI_file $script_root $stamp_reference_file $exons_ensembl_file $histoDx_key
+```
+
+# Mutation plots (STAMP entries)
 ```
 source("Mutation_Hotspot/STAMP_lollipop_PIPELINE.R")
 ```
