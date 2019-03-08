@@ -1,3 +1,6 @@
+HistologicalDxCategory <-
+  read.csv(file = histoDx.key, header = TRUE, na.strings = c(""," ","NA","."), stringsAsFactors = FALSE, sep = ",")
+
 # Remove NA histological dx columns
 HistologicalDxCategory <- HistologicalDxCategory[which(!is.na(HistologicalDxCategory$histologicalDiagnosis)),]
 
