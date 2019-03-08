@@ -1,17 +1,17 @@
 #!/usr/bin/env Rscript
 
-library(plyr)
-library(dplyr)
-library(Biobase)
-library(eeptools)
-library(splitstackshape)
-library(reshape)
-library(rio)
-library(stringr)
-library(openxlsx)
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
+suppressMessages(library(Biobase))
+suppressMessages(library(eeptools))
+suppressMessages(library(splitstackshape))
+suppressMessages(library(reshape))
+suppressMessages(library(rio))
+suppressMessages(library(stringr))
+suppressMessages(library(openxlsx))
 
 args = commandArgs(trailingOnly=TRUE)
-# 1. Directory to save output to.
+# 1. Directory of "reports" folder.
 data.root = args[1]
 # 2. Location of STAMP entries.
 STAMP.file = args[2]
@@ -23,12 +23,14 @@ OnCore.file = args[4]
 NCI.file = args[5]
 # 6. Directory of pipeline scripts.
 script.root = args[6]
-# 7. Location of stamp_reference_transcripts.
-stamp_reference.file = args[7]
-# 8. Location of exons_ensembl.
-exons_ensembl.file = args[8]
-# 9. Location of disease exclusion key.
-histoDx.key = args[9]
+# 7. Directory to save output files to. 
+outdir.root = args[7]
+# 8. Location of stamp_reference_transcripts.
+stamp_reference.file = args[8]
+# 9. Location of exons_ensembl.
+exons_ensembl.file = args[9]
+# 10. Location of disease exclusion key.
+histoDx.key = args[10]
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {
@@ -44,9 +46,9 @@ if (isTRUE(NCI.file == "FALSE")) {
 }
 
 ## Directories
-outdir = paste(data.root,"/trials/",sep="")
+outdir = outdir.root
 if (!dir.exists(outdir)){dir.create(outdir)} 
-tempdir = paste(data.root,"/temp/",sep="")
+tempdir = paste(outdir.root,"/../temp/",sep="")
 if (!dir.exists(tempdir)){dir.create(tempdir)} 
 
 # Specify output file
@@ -61,22 +63,19 @@ STAMP_DF <-
 if (isTRUE(Internal_match)) {
   OnCore_Biomarker_Report <- 
     read.csv(file = OnCore.file, header = TRUE, na.strings = c("NA", ""), stringsAsFactors = FALSE, sep = ",")
-  
-  OnCore_Biomarker_Report_timestamp <- 
+
+    OnCore_Biomarker_Report_timestamp <- 
     format(as.Date(paste(gsub("([[:digit:]]{4}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*_", "", OnCore.file)), 
                          "-01",sep="")), format= "%Y-%m")
 }
 
 if (isTRUE(NCI_match)) {
-  PATIENT_VARIANT_REPORT <- import_list(NCI.file, setclass = "tbl")
+  PATIENT_VARIANT_REPORT <- suppressMessages(import_list(NCI.file, setclass = "tbl"))
   
   Patient_Variant_Report_timestamp <- 
     format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",
                         sub(".*_", "", NCI.file))), format= "%Y-%m-%d")
 }
-
-HistologicalDxCategory <- 
-  read.csv(file = histoDx.key, header = TRUE, na.strings = c(""," ","NA","."), stringsAsFactors = FALSE, sep = ",")
 
 stamp_reference_transcripts <- 
   read.csv(file = stamp_reference.file, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
@@ -94,8 +93,6 @@ setwd(script.root)
 
 ## Disease Ontology 
 source("DiseaseGroupCategories.R")
-
-## Histological Dx Ontology
 source("HistologicalDx_CTEP_Match.R")
 
 ## Default filters 
