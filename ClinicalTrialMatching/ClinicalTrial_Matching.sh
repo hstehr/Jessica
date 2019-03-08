@@ -15,14 +15,12 @@ NCI=${script_root}/PATIENT_VARIANT_REPORT_TEMPLATE_2019-02-25.xlsx
 
 # Extract STAMP sequence files and patient ID
 ls ${data_root}/reports/*.variant_report.txt | awk -F"/" '{print $NF}' > ${data_root}/trial_names.tsv
-lookup=${data_root}/trial_names.tsv
-
-for i in $(seq 1 $(wc -l ${lookup}| awk '{print $1}'))
+while read STAMP
 do
-	STAMP=$(cat ${lookup} | awk -F',' -v row=$i '(NR==row){print $0}')
-	patient=$(cat ${lookup} | awk -F',' -v row=$i '(NR==row){print $0}' | cut -f1 -d ".")
+	patient=$(basename $STAMP .variant_report.txt)
 
+	echo $patient
  	Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $data_root/reports/$STAMP $patient $OnCore $NCI $script_root $stamp_reference $exons_ensembl $histoDx_key
-done
+done < ${data_root}/trial_names.tsv  
 
 rm ${data_root}/trial_names.tsv
