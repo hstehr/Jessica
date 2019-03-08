@@ -1,4 +1,4 @@
-cat("Melanoma and Blood have NOT been classified into a primaryTumorSite","\n","\n")
+## Note: Melanoma and Blood have NOT been classified into a primaryTumorSite
 
 #################################
 ## Customize disease group categories 
