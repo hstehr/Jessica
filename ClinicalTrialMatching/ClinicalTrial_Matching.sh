@@ -2,7 +2,8 @@
 
 # Directories
 data_root="/Users/jessicachen/STAMP_v2.4_reports"
-script_root="/Users/jessicachen/ClinicalTrialMatching"
+script_root="/Users/jessicachen/scripts"
+outdir=${data_root}/trials
 
 # Reference files
 stamp_reference=${script_root}/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt
@@ -20,7 +21,7 @@ do
 	patient=$(basename $STAMP .variant_report.txt)
 
 	echo $patient
- 	Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $data_root/reports/$STAMP $patient $OnCore $NCI $script_root $stamp_reference $exons_ensembl $histoDx_key
+ 	Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $data_root/reports/$STAMP $patient $OnCore $NCI $script_root $outdir $stamp_reference $exons_ensembl $histoDx_key
 done < ${data_root}/trial_names.tsv  
 
 rm ${data_root}/trial_names.tsv
