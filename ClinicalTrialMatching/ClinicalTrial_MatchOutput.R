@@ -413,7 +413,8 @@ if (isTRUE(Internal_match)) {
       # Write to match results per patient to local computer
       #----------------------------------------------
       write.table(DF_patient_Oncore, file = paste(outdir, patient_id, ".OnCore.tsv", sep=""),
-                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE,
+                  quote = FALSE)
     }
   }
 }
@@ -440,7 +441,8 @@ if (isTRUE(NCI_match)) {
       # Write to match results per patient to local computer
       #----------------------------------------------
       write.table(DF_patient_NCI, file = paste(outdir, patient_id, ".NCI.tsv", sep=""),
-                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE,
+                  quote = FALSE)
     }
   }
 }
