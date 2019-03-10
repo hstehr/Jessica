@@ -36,6 +36,12 @@ $ R
 ```
 
 # Clinical Trial Matching PIPELINE 
+#### Render file executable for user 
+```
+$ chmod u+x ClinicalTrial_Matching.sh
+$ ClinicalTrial_Matching.sh
+```
+
 #### Arguments
 ###### args[1]: Directory to save output to.
 ###### args[2]: Location of STAMP entries.
