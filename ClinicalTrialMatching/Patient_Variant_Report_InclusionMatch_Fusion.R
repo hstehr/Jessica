@@ -463,8 +463,7 @@ if (isTRUE(NCI_match)) {
                       }
                       remove(patient_INFO)
                     }
-                    remove(DF_Exclude_Arm,DF_Exclude_Arm_CNV,DF_Exclude_Arm_Fusion,DF_Exclude_Arm_SNV,
-                           DF_patient_SNVIndel,DF_patient_CNV,exclusion_CNV_continue,exclusion_SNV_continue,
+                    remove(DF_patient_SNVIndel,DF_patient_CNV,exclusion_CNV_continue,exclusion_SNV_continue,
                            exclusion_continue)
                   }
                   remove(arm_id,arm_num)
