@@ -1,9 +1,9 @@
-## Tabs corresponding to arms no longer open must be removed from file
+## Tabs corresponding to arms no longer open MUST BE REMOVED from file
 ## Parse info across ARMs into separate dataframes
 ## Classification #1 (Variant_Type): SNV, Frameshift/In-frame (i.e. Delins, Insertions, Deletions, Duplications)
 ## Output: "Patient_Variant_Report_QC_.xlsx"
 
-cat(paste("Timestamp of Patient_Variant_Report: ", Patient_Variant_Report_timestamp, sep=""),"\n","\n")
+cat(paste("Timestamp of Patient_Variant_Report QC Processing START: ", Sys.time(), sep=""),"\n","\n")
 
 ## Specify parameters of output files 
 #----------------------------------------------
@@ -71,7 +71,8 @@ for (tab_No in which(names(PATIENT_VARIANT_REPORT) == "Disease Exclusion LOOK-UP
     if (isTRUE(row_start_list[Histo_No] == 1)) { DF_Histologic_Disease_Exclusion_Codes <- DF_Histologic_Disease_Exclusion_pre
     } else { DF_Histologic_Disease_Exclusion_Codes <- rbind(DF_Histologic_Disease_Exclusion_Codes,
                                                             DF_Histologic_Disease_Exclusion_pre)
-    }}
+    }
+  }
   remove(DF_Histologic_Disease_Exclusion_pre, Disease_Exclusion_file,Arm_Name,Histo_No,row_end,row_start,row_start_list,tab_No)
 }
 
@@ -116,7 +117,8 @@ for (Arm_No in arm_start:arm_end) {
       colnames(DF_Inclusion_NonHotspot_Rules_pre) <- colnames(DF_Inclusion_NonHotspot_Rules) 
       DF_Inclusion_NonHotspot_Rules_pre$Arm_Name <- Arm_Name
       DF_Inclusion_NonHotspot_Rules <- rbind(DF_Inclusion_NonHotspot_Rules, DF_Inclusion_NonHotspot_Rules_pre)
-    }}
+    }
+  }
   
   row_start = (which(DF[[2]] == "Exclusion Variants")) +2
   row_end = (which(DF[[2]] == "Inclusion Variants")) -1
@@ -198,7 +200,8 @@ for (row_No in 1:nrow(DF_Inclusion_Variants)) {
   if (DF_Inclusion_Variants$Variant_Type[row_No] == "SNV") {
     DF_Inclusion_Variants$Protein[row_No] <- gsub("(^p.[[:blank:]]*)(.*)", "\\2", DF_Inclusion_Variants$Protein[row_No])
     DF_Inclusion_Variants$Protein[row_No] <- paste("p.", DF_Inclusion_Variants$Protein[row_No], sep="")
-  }}
+  }
+}
 
 # Remove entries with incorrect protein nomenclature
 DF_Inclusion_Variants$Protein[which(grepl("^p.c.", DF_Inclusion_Variants$Protein))] <- NA
@@ -217,7 +220,8 @@ for (row_No in 1:nrow(DF_Inclusion_Variants)) {
     
   } else {
     DF_Inclusion_Variants$Genomic[row_No] <- NA
-  }}
+  }
+}
 
 # Annotate Variant_Type for consistency
 for (row_No in 1:nrow(DF_Inclusion_Variants)) {
@@ -232,7 +236,9 @@ for (row_No in 1:nrow(DF_Inclusion_Variants)) {
       DF_Inclusion_Variants$Variant_Type[row_No] <- "Deletion"
     } else if (grepl("dup", DF_Inclusion_Variants$Protein[row_No]) == TRUE) {
       DF_Inclusion_Variants$Variant_Type[row_No] <- "Duplication"
-    }}}
+    }
+  }
+}
 
 ################################
 ## DF_Exclusion_Variants
@@ -242,7 +248,8 @@ for (row_No in 1:nrow(DF_Exclusion_Variants)) {
   if (DF_Exclusion_Variants$Variant_Type[row_No] == "SNV") {
     DF_Exclusion_Variants$Protein[row_No] <- gsub("(^p.[[:blank:]]*)(.*)", "\\2", DF_Exclusion_Variants$Protein[row_No])
     DF_Exclusion_Variants$Protein[row_No] <- paste("p.", DF_Exclusion_Variants$Protein[row_No], sep="")
-  }}
+  }
+}
 
 # Remove entries with incorrect protein nomenclature
 DF_Exclusion_Variants$Protein[which(grepl("^p.c.", DF_Exclusion_Variants$Protein))] <- NA
@@ -261,7 +268,8 @@ for (row_No in 1:nrow(DF_Exclusion_Variants)) {
     
   } else {
     DF_Exclusion_Variants$Genomic[row_No] <- NA
-  }}
+  }
+}
 
 # Annotate Variant_Type for consistency
 for (row_No in 1:nrow(DF_Exclusion_Variants)) {
@@ -276,7 +284,9 @@ for (row_No in 1:nrow(DF_Exclusion_Variants)) {
       DF_Exclusion_Variants$Variant_Type[row_No] <- "Deletion"
     } else if (grepl("dup", DF_Exclusion_Variants$Protein[row_No]) == TRUE) {
       DF_Exclusion_Variants$Variant_Type[row_No] <- "Duplication"
-    }}}
+    }
+  }
+}
 
 ## Write variables in global environment
 #----------------------------------------------
@@ -304,3 +314,5 @@ remove(DF,list_of_datasets,arm_end,Arm_No,arm_start,row_int_end,row_int_start,ro
        DF_Inclusion_Variants, DF_Exclusion_Variants, DF_Inclusion_NonHotspot_Rules,
        DF_Exclusion_NonHotspot_Rules, DF_IHC_Results, DF_Comments,
        DF_Histologic_Disease_Exclusion_Codes)
+
+cat(paste("Timestamp of Patient_Variant_Report QC Processing FINISH: ", Sys.time(), sep=""),"\n","\n")
