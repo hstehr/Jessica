@@ -1,21 +1,23 @@
-# Match by gene > biomarker.condition > biomarker.detail (if specified, match only for SNVs) > pathogenicity.status \
-# > age.group (i.e. adult) > disease.group.category > disease.site
+# Match by gene > biomarker.condition > biomarker.detail  (if specified, match only for SNVs) \
+# > pathogenicity.status > age.group (i.e. adult) > disease.group.category > disease.site
 ## Search Output: individual patient file with stop point
-## Match Output: "OnCore_Biomarker_Matched.tsv"
+## Match Output: "OnCore_Matched_SNVIndel.tsv"
 
 if (isTRUE(Internal_match)) {
-  
   cat(paste("Timestamp of Internal clinical trial matching START: ", Sys.time(), sep=""),"\n","\n")
   
-  ncol_STAMP <- as.numeric(ncol(STAMP_DF))
   ncol_OnCore <- as.numeric(ncol(OnCore_Biomarker_Report))
+  ncol_SNVIndel = 12
+  SNVIndel.colnames <- c("PatientID","VariantHGVSGenomic","VariantLabel","VariantGene","VariantHGVSCoding",
+                         "VariantHGVSProtein","var.type","var.anno","Exon_Number",
+                         "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
   
   # Extract gene from OnCore_Biomarker_QC
   genes.OnCore_Biomarker <- sort(unique(OnCore_Biomarker_QC$Biomarker_GeneName))
   
   # Output file of matched mutations with clinical trials
-  DF_Output_OnCore_Biomarker <- data.frame(matrix(NA, ncol = (ncol_STAMP + ncol_OnCore)))
-  colnames(DF_Output_OnCore_Biomarker) <- append(colnames(STAMP_DF), colnames(OnCore_Biomarker_Report))
+  DF_Output_SNVIndel_OnCore <- data.frame(matrix(NA, ncol = (ncol_SNVIndel + ncol_OnCore)))
+  colnames(DF_Output_SNVIndel_OnCore) <- append(SNVIndel.colnames, colnames(OnCore_Biomarker_Report))
   
   ## Iterate through each patient_id of patient.list
   #----------------------------------------------
@@ -23,60 +25,45 @@ if (isTRUE(Internal_match)) {
     patient_id <- patient.list[patient_num]
     
     # Import STAMP entries per patient
-    DF_patient <- read.csv(file = paste(tempdir, patient_id, ".tsv", sep=""),
+    DF_patient <- read.csv(file = paste(tempdir, patient_id, "_SNVIndel.tsv", sep=""),
                            header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
     
-    # Extract unique genes per patient
-    gene.patient <- sort(unique(DF_patient$VariantGene))
-    
-    # Clinical match result
-    DF_patient$OnCore_Report_Status <- NA
-    
-    ## Iterate through each gene_id of gene.patient
-    #----------------------------------------------
-    for (gene_num in 1:length(gene.patient)) {
-      gene_id <- gene.patient[gene_num]
+    if (nrow(DF_patient) > 0) {
+      # Extract unique genes per patient
+      gene.patient <- sort(unique(DF_patient$VariantGene))
       
-      ## Match Biomarker_GeneName
+      # Clinical match result
+      DF_patient$OnCore_SNVIndel_Status <- NA
+      
+      ## Iterate through each gene_id of gene.patient
       #----------------------------------------------
-      if (gene_id %in% genes.OnCore_Biomarker) {
+      for (gene_num in 1:length(gene.patient)) {
+        gene_id <- gene.patient[gene_num]
         
-        # Extract gene_id match from OnCore_Biomarker_Report
-        DF_Gene_OnCore_Biomarker <-
-          OnCore_Biomarker_QC[which(OnCore_Biomarker_QC$Biomarker_GeneName == gene_id),]
-        DF_Gene_OnCore_Biomarker$Disease.Group.category <- as.character(DF_Gene_OnCore_Biomarker$Disease.Group.category)
-        DF_Gene_OnCore_Biomarker$Disease.Site <- as.character(DF_Gene_OnCore_Biomarker$Disease.Site)
-        
-        ## Parse Biomarker_Condition
+        ## Match Biomarker_GeneName
         #----------------------------------------------
-        biomarker.condition.trial <- unique(DF_Gene_OnCore_Biomarker$Biomarker_Condition)
-        biomarker.condition.patient <- unique(DF_patient$var.anno[DF_patient$VariantGene == gene_id])
-        
-        # Remove no match Biomarker_Condition from OnCore_Biomarker_Report
-        for (cond_num in 1:length(biomarker.condition.trial)) {
-          if (!(biomarker.condition.trial[cond_num] %in% biomarker.condition.patient)) {
-            DF_Gene_OnCore_Biomarker <- DF_Gene_OnCore_Biomarker[DF_Gene_OnCore_Biomarker$Biomarker_Condition !=
-                                                                   biomarker.condition.trial[cond_num],]
-          }}
-        
-        # Update list 
-        biomarker.condition.trial <- unique(DF_Gene_OnCore_Biomarker$Biomarker_Condition)
-        
-        ## Iterate through each bio.cond_id of biomarker.condition.patient
-        #----------------------------------------------
-        for (cond_num in 1:length(biomarker.condition.patient)) {
-          bio.cond_id <- biomarker.condition.patient[cond_num]
+        if (gene_id %in% genes.OnCore_Biomarker) {
           
-          ## Match Biomarker_Condition
+          # Extract gene_id match from OnCore_Biomarker_Report
+          DF_Gene_OnCore_Biomarker <-
+            OnCore_Biomarker_QC[which(OnCore_Biomarker_QC$Biomarker_GeneName == gene_id),]
+          DF_Gene_OnCore_Biomarker$Disease.Group.category <- as.character(DF_Gene_OnCore_Biomarker$Disease.Group.category)
+          DF_Gene_OnCore_Biomarker$Disease.Site <- as.character(DF_Gene_OnCore_Biomarker$Disease.Site)
+          
+          ## Parse Biomarker_Condition
           #----------------------------------------------
-          if (bio.cond_id %in% biomarker.condition.trial) {
+          if (isTRUE("MUTATION" %in% unique(DF_Gene_OnCore_Biomarker$Biomarker_Condition))) {
+            
+            # Specify Biomarker_Condition == "MUTATION"
+            DF_Gene_OnCore_Biomarker <- 
+              DF_Gene_OnCore_Biomarker[which(DF_Gene_OnCore_Biomarker$Biomarker_Condition == "MUTATION"), ]
             
             ## Parse Biomarker_Detail == possible only for SNVs
             #----------------------------------------------
             biomarker.detail.trial <- 
-              unique(DF_Gene_OnCore_Biomarker$Biomarker_Detail[DF_Gene_OnCore_Biomarker$Biomarker_Condition == bio.cond_id])
+              unique(DF_Gene_OnCore_Biomarker$Biomarker_Detail[DF_Gene_OnCore_Biomarker$Biomarker_Condition == "MUTATION"])
             biomarker.detail.patient <- 
-              unique(DF_patient$VariantHGVSProtein[DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id])
+              unique(DF_patient$VariantHGVSProtein[DF_patient$VariantGene == gene_id & DF_patient$var.anno == "MUTATION"])
             biomarker_detail_name_trial <- NA
             biomarker_detail_name_patient <- NA
             
@@ -92,7 +79,7 @@ if (isTRUE(Internal_match)) {
                 aa.start_trial <- gsub("(^[[:alpha:]])(.*)","\\1", biomarker.detail.trial[det_num])
                 aa.start_patient <- gsub("(^p.)([[:alpha:]]{1})(.*)","\\2", 
                                          unique(DF_patient$VariantHGVSProtein[
-                                           which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id)]))
+                                           which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == "MUTATION")]))
                 
                 if (aa.start_trial == "*") {
                   aa.end_match <- as.logical("TRUE")
@@ -105,7 +92,7 @@ if (isTRUE(Internal_match)) {
                 var.position_trial <- gsub("(^[[:alpha:]]{1})([[:digit:]]{,4})(.*)","\\2", biomarker.detail.trial[det_num])
                 var.position_patient <- gsub("(^p.[[:alpha:]]{1})([[:digit:]]{,4})(.*)","\\2", 
                                              unique(DF_patient$VariantHGVSProtein[
-                                               which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id)]))
+                                               which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == "MUTATION")]))
                 
                 if (var.position_trial == "*") {
                   var.position_match <- as.logical("TRUE")
@@ -118,7 +105,7 @@ if (isTRUE(Internal_match)) {
                 aa.end_trial <- gsub("(^[[:alpha:]]{3}[[:digit:]]{,4})(.*)","\\2", biomarker.detail.trial[det_num])
                 aa.end_patient <- gsub("(^p.[[:alpha:]]{1}[[:digit:]]{,4})(.*)","\\2", 
                                        unique(DF_patient$VariantHGVSProtein[
-                                              which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == bio.cond_id)]))
+                                         which(DF_patient$VariantGene == gene_id & DF_patient$var.anno == "MUTATION")]))
                 
                 if (aa.end_trial == "*") {
                   aa.end_match <- as.logical("TRUE")
@@ -141,7 +128,9 @@ if (isTRUE(Internal_match)) {
                         protein_name <- paste("p.",aa.start_list[start_num],var.position_list[pos_num],
                                               aa.end_list[end_num], sep="")
                         biomarker_detail_name_patient <- append(biomarker_detail_name_patient, protein_name)      
-                      }}}
+                      }
+                    }
+                  }
                   remove(end_num,pos_num,protein_name,start_num)
                 }
                 remove(aa.end_list,aa.end_match,aa.end_patient,aa.end_trial,
@@ -158,7 +147,8 @@ if (isTRUE(Internal_match)) {
               if (isTRUE(!(biomarker.detail.trial[det_num] %in% biomarker_detail_name_trial))) {
                 DF_Gene_OnCore_Biomarker <- DF_Gene_OnCore_Biomarker[DF_Gene_OnCore_Biomarker$Biomarker_Detail !=
                                                                        biomarker.detail.trial[det_num],]
-              }}
+              }
+            }
             
             ## Iterate through each bio.detail_id of biomarker.detail.patient
             #----------------------------------------------
@@ -184,13 +174,13 @@ if (isTRUE(Internal_match)) {
                 
                 if (isTRUE(pathogenic_FILTER)) {
                   if (isTRUE(DF_patient$VariantPathogenicityStatus[which(DF_patient$VariantGene == gene_id &
-                                                                         DF_patient$var.anno == bio.cond_id &
+                                                                         DF_patient$var.anno == "MUTATION" &
                                                                          DF_patient$VariantHGVSProtein == bio.detail_id)] 
                              %in% pathogenic_accepted)) {
                     pathogenicity_gate <- as.logical("TRUE")
                     
                   } else if (isTRUE(DF_patient$VariantPathogenicityStatus[which(DF_patient$VariantGene == gene_id &
-                                                                                DF_patient$var.anno == bio.cond_id &
+                                                                                DF_patient$var.anno == "MUTATION" &
                                                                                 is.na(DF_patient$VariantHGVSProtein))] 
                                     %in% pathogenic_accepted) & stop_checkpoint_na) {
                     pathogenicity_gate <- as.logical("TRUE")
@@ -199,24 +189,26 @@ if (isTRUE(Internal_match)) {
                     pathogenicity_gate <- as.logical("FALSE")
                     
                     if (isTRUE(stop_checkpoint_na)) {
-                      DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                              DF_patient$var.anno == bio.cond_id &
-                                                              is.na(DF_patient$VariantHGVSProtein))] <-
+                      DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                                DF_patient$var.anno == "MUTATION" &
+                                                                is.na(DF_patient$VariantHGVSProtein))] <-
                         "Pathogenicity criteria NOT satisfied"
                     } else {
-                      DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                              DF_patient$var.anno == bio.cond_id &
-                                                              DF_patient$VariantHGVSProtein == bio.detail_id)] <-
+                      DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                                DF_patient$var.anno == "MUTATION" &
+                                                                DF_patient$VariantHGVSProtein == bio.detail_id)] <-
                         "Pathogenicity criteria NOT satisfied"
-                    }}}
+                    }
+                  }
+                }
                 
                 if (isTRUE(stop_checkpoint_na)) {
                   pathogenic_id <- DF_patient$VariantPathogenicityStatus[which(DF_patient$VariantGene == gene_id &
-                                                                                 DF_patient$var.anno == bio.cond_id &
+                                                                                 DF_patient$var.anno == "MUTATION" &
                                                                                  is.na(DF_patient$VariantHGVSProtein))] 
                 } else {
                   pathogenic_id <- DF_patient$VariantPathogenicityStatus[which(DF_patient$VariantGene == gene_id &
-                                                                                 DF_patient$var.anno == bio.cond_id &
+                                                                                 DF_patient$var.anno == "MUTATION" &
                                                                                  DF_patient$VariantHGVSProtein == bio.detail_id)]   
                 }
                 
@@ -236,19 +228,21 @@ if (isTRUE(Internal_match)) {
                       age_gate <- as.logical("FALSE")
                       
                       if (isTRUE(stop_checkpoint_na)) {
-                        DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                                DF_patient$var.anno == bio.cond_id &
-                                                                is.na(DF_patient$VariantHGVSProtein) &
-                                                                DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
+                        DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                                  DF_patient$var.anno == "MUTATION" &
+                                                                  is.na(DF_patient$VariantHGVSProtein) &
+                                                                  DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
                           "Age criteria NOT satisfied"
                         
                       } else {
-                        DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                                DF_patient$var.anno == bio.cond_id &
-                                                                DF_patient$VariantHGVSProtein == bio.detail_id &
-                                                                DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
+                        DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                                  DF_patient$var.anno == "MUTATION" &
+                                                                  DF_patient$VariantHGVSProtein == bio.detail_id &
+                                                                  DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
                           "Age criteria NOT satisfied"
-                      }}}
+                      }
+                    }
+                  }
                   
                   ## Match Age.Group criteria
                   #----------------------------------------------
@@ -280,7 +274,8 @@ if (isTRUE(Internal_match)) {
                           disease_category_name_patient <- append(disease_category_name_patient, 
                                                                   str_extract(Disease.category.patient,Disease.category.trial[cat_num]))
                           
-                        }}
+                        }
+                      }
                       
                       disease_category_name_trial <- disease_category_name_trial[which(!is.na(disease_category_name_trial))]
                       disease_category_name_patient <- unique(disease_category_name_patient[which(!is.na(disease_category_name_patient))])
@@ -296,7 +291,8 @@ if (isTRUE(Internal_match)) {
                       if (isTRUE(!(Disease.category.trial[cat_num] %in% disease_category_name_trial))) {
                         DF_Gene_OnCore_Biomarker <- DF_Gene_OnCore_Biomarker[DF_Gene_OnCore_Biomarker$Disease.Group.category !=
                                                                                Disease.category.trial[cat_num],]
-                      }}
+                      }
+                    }
                     
                     ## Iterate through each disease.cat_id of Disease.category.patient
                     #----------------------------------------------
@@ -332,7 +328,8 @@ if (isTRUE(Internal_match)) {
                               disease_site_name_trial <- append(disease_site_name_trial, Disease.Site.trial[site_num])
                               disease_site_name_patient <- append(disease_site_name_patient, 
                                                                   str_extract(Disease.Site.patient, Disease.Site.trial[site_num]))
-                            }}
+                            }
+                          }
                           
                           disease_site_name_trial <- disease_site_name_trial[which(!is.na(disease_site_name_trial))]
                           disease_site_name_patient <- unique(disease_site_name_patient[which(!is.na(disease_site_name_patient))])
@@ -348,7 +345,8 @@ if (isTRUE(Internal_match)) {
                           if (isTRUE(!(Disease.Site.trial[site_num] %in% disease_site_name_trial))) {
                             DF_Gene_OnCore_Biomarker <- DF_Gene_OnCore_Biomarker[DF_Gene_OnCore_Biomarker$Disease.Site !=
                                                                                    Disease.Site.trial[site_num],]
-                          }}
+                          }
+                        }
                         
                         ## Iterate through each disease.site_id of Disease.Site.patient
                         #----------------------------------------------
@@ -359,46 +357,45 @@ if (isTRUE(Internal_match)) {
                           # PrimaryTumorSite.Category and PrimaryTumorSite is consistent throughout DF_patient
                           if (isTRUE(stop_checkpoint_na)) {
                             pt_rowNo <- which(DF_patient$VariantGene == gene_id &
-                                                DF_patient$var.anno == bio.cond_id &
+                                                DF_patient$var.anno == "MUTATION" &
                                                 is.na(DF_patient$VariantHGVSProtein) &
-                                                DF_patient$VariantPathogenicityStatus == pathogenic_id)
+                                                DF_patient$VariantPathogenicityStatus %in% pathogenic_id)
                           } else {
                             pt_rowNo <- which(DF_patient$VariantGene == gene_id &
-                                                DF_patient$var.anno == bio.cond_id &
+                                                DF_patient$var.anno == "MUTATION" &
                                                 DF_patient$VariantHGVSProtein == bio.detail_id &
-                                                DF_patient$VariantPathogenicityStatus == pathogenic_id)
+                                                DF_patient$VariantPathogenicityStatus %in% pathogenic_id)
                           }
                           
                           ## Match Disease.Site
                           #----------------------------------------------
                           if (isTRUE(disease.site_id %in% disease_site_name_patient)) {
-                            DF_patient$OnCore_Report_Status[pt_rowNo] <- "Candidate trial IDENTIFIED"
                             
                             ## Generate output file for candidate MATCH
                             #----------------------------------------------
                             # Corresponding OnCore.No
                             OnCore_No <- unique(DF_Gene_OnCore_Biomarker$OnCore.No)
                             
+                            DF_patient$OnCore_SNVIndel_Status[pt_rowNo] <- 
+                              paste("Candidate trial IDENTIFIED: ", paste(OnCore_No, collapse = ", "), sep="")
+                            
                             # Corresponding trial INFO in OnCore_Biomarker_Report
-                            Trial_INFO <- OnCore_Biomarker_Report[OnCore_Biomarker_Report$OnCore.No %in% OnCore_No,]
+                            Trial_INFO <- OnCore_Biomarker_Report[which(OnCore_Biomarker_Report$OnCore.No %in% OnCore_No),]
                             
                             # Merge patient INFO with trial INFO
-                            DF_Output_pre <- data.frame(matrix(NA, ncol = ncol(DF_Output_OnCore_Biomarker)))
-                            colnames(DF_Output_pre) <- colnames(DF_Output_OnCore_Biomarker)
+                            DF_Output_pre <- data.frame(matrix(NA, ncol = ncol(DF_Output_SNVIndel_OnCore)))
+                            colnames(DF_Output_pre) <- colnames(DF_Output_SNVIndel_OnCore)
                             
-                            for (core_num in 1:length(OnCore_No)) {
-                              patient <- data.frame(DF_patient[pt_rowNo, c(1:ncol_STAMP)])
-                              trial <- data.frame(Trial_INFO[core_num,])
-                              DF_Output_pre[core_num,] <- cbind(patient,trial)
-                            }
+                            patient <- data.frame(DF_patient[pt_rowNo, c(1:ncol_SNVIndel)])
+                            DF_Output_pre <- crossing(patient, Trial_INFO)
                             
                             # Append to Output file
-                            DF_Output_OnCore_Biomarker <- rbind(DF_Output_OnCore_Biomarker, DF_Output_pre)
+                            DF_Output_SNVIndel_OnCore <- rbind(DF_Output_SNVIndel_OnCore, DF_Output_pre)
                             
-                            remove(DF_Output_pre,Trial_INFO,core_num,OnCore_No)
+                            remove(DF_Output_pre,Trial_INFO,OnCore_No,patient)
                             
                           } else {
-                            DF_patient$OnCore_Report_Status[pt_rowNo] <- "Disease Site criteria NOT satisfied"
+                            DF_patient$OnCore_SNVIndel_Status[pt_rowNo] <- "Disease Site criteria NOT satisfied"
                           }
                           remove(disease.site_id,pt_rowNo)
                         }
@@ -407,19 +404,20 @@ if (isTRUE(Internal_match)) {
                         
                       } else {
                         if (isTRUE(stop_checkpoint_na)) {
-                          DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                                  DF_patient$var.anno == bio.cond_id &
-                                                                  is.na(DF_patient$VariantHGVSProtein) &
-                                                                  DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
+                          DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                                    DF_patient$var.anno == "MUTATION" &
+                                                                    is.na(DF_patient$VariantHGVSProtein) &
+                                                                    DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
                             "Disease Group Category criteria NOT satisfied"
                           
                         } else {
-                          DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                                  DF_patient$var.anno == bio.cond_id &
-                                                                  DF_patient$VariantHGVSProtein == bio.detail_id &
-                                                                  DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
+                          DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                                    DF_patient$var.anno == "MUTATION" &
+                                                                    DF_patient$VariantHGVSProtein == bio.detail_id &
+                                                                    DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
                             "Disease Group Category criteria NOT satisfied"
-                        }}
+                        }
+                      }
                       remove(disease.cat_id)
                     }
                     remove(Disease.category.trial,Disease.category.patient,disease_category_name_trial,
@@ -431,53 +429,56 @@ if (isTRUE(Internal_match)) {
                 
               } else {
                 if (isTRUE(stop_checkpoint_na)) {
-                  DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                          DF_patient$var.anno == bio.cond_id &
-                                                          is.na(DF_patient$VariantHGVSProtein))] <-
+                  DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                            DF_patient$var.anno == "MUTATION" &
+                                                            is.na(DF_patient$VariantHGVSProtein))] <-
                     "Biomarker Detail criteria NOT satisfied"
                   
                 } else {
-                  DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                          DF_patient$var.anno == bio.cond_id &
-                                                          DF_patient$VariantHGVSProtein == bio.detail_id)] <-
+                  DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                            DF_patient$var.anno == "MUTATION" &
+                                                            DF_patient$VariantHGVSProtein == bio.detail_id)] <-
                     "Biomarker Detail criteria NOT satisfied"
-                }}
+                }
+              }
               remove(bio.detail_id,stop_checkpoint_na,stop_checkpoint)
             }
             remove(biomarker_detail_name_patient,biomarker_detail_name_trial,biomarker.detail.patient,
                    biomarker.detail.trial,det_num)
             
           } else {
-            DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id &
-                                                    DF_patient$var.anno == bio.cond_id)] <-
+            DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id &
+                                                      DF_patient$var.anno == "MUTATION")] <-
               "Biomarker Condition criteria NOT satisfied"
           }
-          remove(bio.cond_id)
+          remove(DF_Gene_OnCore_Biomarker)
+          
+        } else {
+          DF_patient$OnCore_SNVIndel_Status[which(DF_patient$VariantGene == gene_id)] <- 
+            "Gene NOT found"
         }
-        remove(biomarker.condition.patient,biomarker.condition.trial,cond_num,DF_Gene_OnCore_Biomarker)
-        
-      } else {
-        DF_patient$OnCore_Report_Status[which(DF_patient$VariantGene == gene_id)] <- 
-          "Gene NOT found"
+        remove(gene_id,gene_num)
       }
+      remove(gene.patient)
+      
+      # Write to match results per patient to local computer
+      #----------------------------------------------
+      write.table(DF_patient, file = paste(tempdir, patient_id, "_SNVIndel.tsv", sep=""),
+                  append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
     }
-    
-    # Write to match results per patient to local computer
-    #----------------------------------------------
-    write.table(DF_patient, file = paste(tempdir, patient_id, ".tsv", sep=""),
-                append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+    remove(patient_id,patient_num,DF_patient)
   }
   
   ## Remove rows that are all empty
-  DF_Output_OnCore_Biomarker <- 
-    DF_Output_OnCore_Biomarker[rowSums(is.na(DF_Output_OnCore_Biomarker)) != ncol(DF_Output_OnCore_Biomarker),]
+  DF_Output_SNVIndel_OnCore <- 
+    DF_Output_SNVIndel_OnCore[rowSums(is.na(DF_Output_SNVIndel_OnCore)) != ncol(DF_Output_SNVIndel_OnCore),]
   
   ## Write to match results for positive candidacy local computer
   #----------------------------------------------
-  write.table(DF_Output_OnCore_Biomarker, 
-              file = paste(tempdir,"OnCore_Biomarker_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
+  write.table(DF_Output_SNVIndel_OnCore, 
+              file = paste(tempdir,"OnCore_SNVIndel_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
                            groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
   
-  remove(DF_patient,gene_id,gene_num,gene.patient,genes.OnCore_Biomarker,ncol_OnCore,ncol_STAMP,patient_id,patient_num)
+  remove(genes.OnCore_Biomarker,ncol_OnCore,ncol_SNVIndel,DF_Output_SNVIndel_OnCore,SNVIndel.colnames)
 }
