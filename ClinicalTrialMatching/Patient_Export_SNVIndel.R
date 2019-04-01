@@ -1,7 +1,9 @@
 ## Classification #1 (var.type): SNV, Frameshift/In-frame (i.e. Delins, Insertions, Deletions, Duplications)
 ## Classification #2 (var.anno): "MUTATION"
 ## Classification #3 (Exon_Number)
-## Output: "patient_id_QC.tsv"
+## Output: "patient_id_SNVIndel.tsv"
+
+cat(paste("Timestamp of patient STAMP processing START: ", Sys.time(), sep=""),"\n","\n")
 
 # Load relevant file from global environment 
 STAMP_DF_structured <- 
@@ -12,7 +14,19 @@ STAMP_DF_structured <- STAMP_DF_structured[which(STAMP_DF_structured$Status != "
 
 # Restructure STAMP dataframe
 #----------------------------------------------
-if (nrow(STAMP_DF_structured) > 0) {
+if (nrow(STAMP_DF_structured) == 0) {
+  
+  # Generate empty dataframe
+  STAMP_DF_structured_anno <- data.frame(matrix(ncol = 12, nrow = 0))
+  colnames(STAMP_DF_structured_anno) <- c("PatientID","VariantHGVSGenomic","VariantLabel","VariantGene","VariantHGVSCoding",
+                                          "VariantHGVSProtein","var.type","var.anno","Exon_Number",
+                                          "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+  
+  # Output indication to file
+  cat(paste(patient.id, " does not have any SNV/Indel entries with statuses that are not \"NOT REPORTED \".", sep=""),"\n","\n")
+  
+} else if (nrow(STAMP_DF_structured) > 0) {
+  
   # Modify nomenclature
   STAMP_DF_structured$CDS.Change <- paste("c.",STAMP_DF_structured$CDS.Change, sep="")
   STAMP_DF_structured$CDS.Change[which(grepl("^c..$",STAMP_DF_structured$CDS.Change))] <- NA
@@ -46,9 +60,9 @@ if (nrow(STAMP_DF_structured) > 0) {
                        
                        # Categorize based on HGVS.Protein
                        SNV_Protein_Genomic=(grepl("^p.[[:upper:]]{1}[[:digit:]]+[[:upper:]]{1}",
-                                         STAMP_DF_structured$VariantHGVSProtein) | 
-                                     grepl("^chr[[:alnum:]]+:g.[[:digit:]]+[[:upper:]]{1}>[[:upper:]]{1}",
-                                           STAMP_DF_structured$VariantHGVSGenomic)),
+                                                  STAMP_DF_structured$VariantHGVSProtein) | 
+                                              grepl("^chr[[:alnum:]]+:g.[[:digit:]]+[[:upper:]]{1}>[[:upper:]]{1}",
+                                                    STAMP_DF_structured$VariantHGVSGenomic)),
                        fs=grepl("fs", STAMP_DF_structured$VariantHGVSProtein),
                        
                        # Categorize based on HGVS.Coding
@@ -68,12 +82,13 @@ if (nrow(STAMP_DF_structured) > 0) {
   for (i in 1:nrow(DF_var)) {
     if (length(grep(FALSE, DF_var[i,7:14])) == 8) { DF_var$remain[i] <- TRUE
     } else { DF_var$remain[i] <- FALSE
-    }}
+    }
+  }
   
   # Classification correction
   DF_var$SNV_Protein_Genomic[which(DF_var$SNV_Protein_Genomic == TRUE & 
-                            (DF_var$delins == TRUE | DF_var$ins == TRUE | 
-                               DF_var$del == TRUE | DF_var$dup == TRUE))] <- FALSE
+                                     (DF_var$delins == TRUE | DF_var$ins == TRUE | 
+                                        DF_var$del == TRUE | DF_var$dup == TRUE))] <- FALSE
   
   # Subset based on matching of strings in smpl.hgvsCoding or smpl.hgvsProtein
   # Classification order: SNV > Frameshift > In-Frame (delins > insertion > deletion > duplication)
@@ -115,7 +130,8 @@ if (nrow(STAMP_DF_structured) > 0) {
       } else if (isTRUE(DF_Frameshift$ins[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Insertion"
       } else if (isTRUE(DF_Frameshift$del[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Deletion"
       } else if (isTRUE(DF_Frameshift$dup[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Duplication"
-      }}
+      }
+    }
     DF_Frameshift <- DF_Frameshift[,c(1:6,16)]
   }
   
@@ -151,18 +167,11 @@ if (nrow(STAMP_DF_structured) > 0) {
   
   # Uncategorized Variants
   DF_remain <- DF_var[DF_var$remain == TRUE, 1:6]
-  cat(paste("No. entries not categorized based on type of nucleotide change: n=", nrow(DF_remain), sep=""),"\n")
+  cat(paste("No. entries not categorized based on type of nucleotide change: n=", nrow(DF_remain), sep=""),"\n","\n")
   
   # Merge entries from SNV, Frameshift & In-Frame mutations 
   #----------------------------------------------
   STAMP_DF_structured_anno <- rbind(DF_SNV, DF_Frameshift,DF_delins,DF_ins,DF_del,DF_dup)
-  
-  # Count number entries with missing VariantHGVSProtein field
-  #----------------------------------------------
-  DF_NAprotein <- STAMP_DF_structured_anno[is.na(STAMP_DF_structured_anno$VariantHGVSProtein),
-                                           c("PatientID","VariantHGVSGenomic","VariantLabel")]
-  cat(paste("STAMP entries missing VariantHGVSProtein field: n=",(nrow(DF_NAprotein)), sep=""),"\n")
-  print(DF_NAprotein)
   
   # Classification of variants for clinical trial matching (var.anno)
   #----------------------------------------------
@@ -185,6 +194,7 @@ if (nrow(STAMP_DF_structured) > 0) {
         STAMP_DF_structured_anno$Exon_Number[row_No] <- Gene.ExonTable$exon_number[exon_row_No]
       }
     }
+    remove(Gene.ExonTable)
   }
   
   # Missing information
@@ -193,28 +203,14 @@ if (nrow(STAMP_DF_structured) > 0) {
   STAMP_DF_structured_anno$PrimaryTumorSite <- "unknown"
   STAMP_DF_structured_anno$VariantPathogenicityStatus <- "NULL"
   
-  ## Write to local computer
-  #----------------------------------------------
-  write.table(STAMP_DF_structured_anno, file = paste(tempdir, patient.id, "_QC.tsv", sep=""),
-              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
-  
-  remove(DF_del,DF_delins,DF_dup,DF_Frameshift,DF_ins,DF_intron,DF_NAprotein,
+  remove(DF_del,DF_delins,DF_dup,DF_Frameshift,DF_ins,DF_intron,
          DF_remain,DF_SNV,DF_var,STAMP_DF_structured,colnames_generic,colnames_keep,
          exon_end,exon_row_No,exon_start,gene_id,genomic_pos,i,row_No)
-  
-} else {
-  STAMP_DF_structured_anno <- data.frame(matrix(ncol = 16, nrow = 0))
-  colnames(STAMP_DF_structured_anno) <- c("PatientID","VariantCHR","VariantHGVSGenomic",
-                                          "VariantLabel","VariantGene","VariantHGVSCoding",
-                                          "VariantHGVSProtein","var.type","aa.start","var.position",
-                                          "aa.end","var.anno","Exon_Number","PrimaryTumorSite.Category","PrimaryTumorSite",
-                                          "VariantPathogenicityStatus")
-}
+} 
 
 ## Overwrite variable in global environment
 #----------------------------------------------
 assign("STAMP_DF", STAMP_DF_structured_anno, envir = .GlobalEnv)
-remove(STAMP_DF_structured_anno)
 
 ## Export entries per patient into .tsv file
 #----------------------------------------------
@@ -225,106 +221,64 @@ DF_patient <- STAMP_DF[which(STAMP_DF$PatientID == patient.id),]
 DF_patient <- DF_patient[order(DF_patient$VariantGene, decreasing = FALSE),]
 
 ## Write to local computer
-write.table(DF_patient, file = paste(tempdir, patient.id, ".tsv", sep=""),
-            append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
-
-if (nrow(DF_patient) == 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat(paste(patient.id, " has no entries with variants with statuses that are not \"NOT REPORTED \".", sep=""),"\n","\n")
-  sink()
-} 
-remove(DF_patient)
+write.table(DF_patient, file = paste(tempdir, patient.id, "_SNVIndel.tsv", sep=""),
+            append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE,
+            quote = FALSE)
 
 ## Output potential matching errors due to structurization
 #----------------------------------------------
 # Missing information
 out.DF <- STAMP_DF[is.na(STAMP_DF$VariantGene),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Patient has entry with missing gene information", "\n","\n")
-  sink()
+  cat("STAMP entries missing VariantGene field:", "\n","\n")
+  print(out.DF, row.names = FALSE, quote = FALSE)
 }
 
 out.DF <- STAMP_DF[which(is.na(STAMP_DF$VariantHGVSProtein)),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with missing HGVS protein information:", "\n")
+  cat("STAMP entries missing VariantHGVSProtein field:", "\n")
   print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
   cat("\n")
-  
-  sink()
 }
 
 out.DF <- STAMP_DF[which(is.na(STAMP_DF$VariantHGVSCoding)),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with missing HGVS coding information:", "\n")
+  cat("STAMP entries missing VariantHGVSCoding field:", "\n")
   print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
   cat("\n")
-  
-  sink()
 }
 
 out.DF <- STAMP_DF[which(is.na(STAMP_DF$VariantHGVSGenomic)),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with missing HGVS genomic information:", "\n")
+  cat("STAMP entries missing VariantHGVSGenomic field:", "\n")
   print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
   cat("\n")
-  
-  sink()
 }
 
 # Incorrect structure
 stamp_reference_gene.list <- sort(unique(stamp_reference_full$Gene))
 out.DF <- STAMP_DF[!(STAMP_DF$VariantGene %in% stamp_reference_gene.list),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with gene not listed in stamp reference table:", "\n")
+  cat("STAMP entries with Gene not listed in stamp reference table:", "\n")
   print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
   cat("\n")
-  
-  sink()
 }
-remove(stamp_reference_gene.list)
 
 out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSCoding) &
                            grepl("^c.[-]*[[:digit:]]+.*", STAMP_DF$VariantHGVSCoding) == FALSE),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with HGVS coding nomenclature formatted incorrectly:", "\n")
+  cat("STAMP entries with VariantHGVSCoding field formatted incorrectly:", "\n")
   print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
   cat("\n")
-  
-  sink()
 }
 
 out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSGenomic) &
                            grepl("^chr[[:alnum:]]{1,}:g.[[:digit:]]+.*", STAMP_DF$VariantHGVSGenomic) == FALSE),]
 if (nrow(out.DF) > 0) {
-  sink(file = err.output, append = TRUE, split = FALSE)
-  options(max.print=999999)
-  
-  cat("Entry with HGVS genomic nomenclature formatted incorrectly:", "\n")
+  cat("STAMP entries with VariantHGVSGenomic field formatted incorrectly:", "\n")
   print(unique(out.DF[,c("VariantLabel","VariantHGVSGenomic")]), row.names = FALSE, quote = FALSE)
   cat("\n")
-  
-  sink()
 }
-remove(out.DF)
 
+remove(out.DF,DF_patient,STAMP_DF_structured_anno,stamp_reference_gene.list)
 cat("\n")
