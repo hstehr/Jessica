@@ -132,3 +132,8 @@ Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id 
 ```
 source("Mutation_Hotspot/STAMP_lollipop_PIPELINE.R")
 ```
+
+# STAMPEDE Visualizations (STAMP entries)
+```
+source("STAMPEDE_Visualizations/STAMPEDE_Visualization_PIPELINE.R")
+```
