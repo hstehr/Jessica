@@ -500,7 +500,7 @@ if (isTRUE(NCI_match)) {
                           remove(patient_INFO)
                         }
                         remove(exclusion_SNV_continue,exclusion_continue,exclusion_Fusion_continue,
-                               DF_patient_Fusion,DF_patient_SNVIndel,DF_Exclude_Arm)
+                               DF_patient_Fusion,DF_patient_SNVIndel)
                       }
                       remove(arm_id,arm_num)
                     }
