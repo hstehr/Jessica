@@ -128,12 +128,13 @@ Fusion_file=paste(data_root,"/reports/LastNameFirstName_PatientID.fusions.filter
 Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id $STAMP_file $CNV_file $Fusion_file $OnCore_file $NCI_file $script_root $outdir $stamp_reference_file $exons_ensembl_file $histoDx_key
 ```
 
-# Mutation plots (STAMP entries)
+# Visualization Graphics for STAMP database
+#### Mutation plots
 ```
 source("Mutation_Hotspot/STAMP_lollipop_PIPELINE.R")
 ```
 
-# STAMPEDE Visualizations (STAMP entries)
+#### STAMPEDE Visualizations (STAMP entries)
 ```
 source("STAMPEDE_Visualizations/STAMPEDE_Visualization_PIPELINE.R")
 ```
