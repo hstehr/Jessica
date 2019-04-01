@@ -208,7 +208,7 @@ if (length(patient.list) > 0) {
   ## Generate OUTPUT files 
   source("ClinicalTrial_Output_Details.R")
   source("ClinicalTrial_Output_tsv.R")
-  source("ClinicalTrial_Output_Candidates.R") ## EDIT
+  source("ClinicalTrial_Output_Candidates.R")
   
   remove(Comments,Disease_Exclusion_Codes,Exclusion_NonHotspot_Rules,Exclusion_Variants,IHC_Results)
 }
