@@ -345,7 +345,7 @@ if (isTRUE(length(patient.list.matched) > 0)) {
                   unique(DF_candidate_trial$PI.Email), ")", sep=""),"\n")
         cat(paste("Primary Clinical Research Coordinator: ", unique(DF_candidate_trial$Primary.CRC),
                   " (", unique(DF_candidate_trial$Primary.CRC.Email), ")", sep=""),"\n","\n")
-        cat("Biomarker criteria:", "\n", "\t", unique(DF_candidate_trial$Biomarker.Description),"\n","\n")
+        cat("Biomarker criteria:", "\n", "\t", gsub("\n","",unique(DF_candidate_trial$Biomarker.Description)),"\n","\n")
         cat("Relevant mutations identified in patient:", "\n")
         
         for (entry_num in 1:nrow(DF_candidate_trial)) {
@@ -404,7 +404,7 @@ if (isTRUE(length(patient.list.matched) > 0)) {
             
             if (DF_candidate_trial$var.anno[entry_num] == "Fusion") {
               DF_candidate_trial$Output[entry_num] <- 
-                paste(DF_candidate_trial$Gene_Name[entry_num], " Fusion (refer to trial criteria for additional details)", sep="")  
+                paste(DF_candidate_trial$Gene_Name[entry_num], " Fusion (refer to trial criteria for details)", sep="")  
               
             } else if (DF_candidate_trial$var.anno[entry_num] %in% c("AMP","DEL")) {
               DF_candidate_trial$Output[entry_num] <- 
@@ -446,12 +446,17 @@ if (isTRUE(length(patient.list.matched) > 0)) {
             DF_candidate_trial$Output[entry_num] <- 
               paste(DF_candidate_trial$Variant_Gene[entry_num], " Exon ", DF_candidate_trial$Exon_Number[entry_num], ": ", 
                     DF_candidate_trial$VariantHGVSProtein[entry_num], sep="")
-          } else if (DF_candidate_trial$var.anno[entry_num] == "FUSION") {
+            
+            
+          } else if (DF_candidate_trial$var.anno[entry_num] == "Fusion") {
             DF_candidate_trial$Output[entry_num] <- 
               paste(DF_candidate_trial$Variant_Gene[entry_num], " (", DF_candidate_trial$Variant_Detail[entry_num], " Fusion)", sep="")
-          } else {
+          } else if (DF_candidate_trial$var.anno[entry_num] %in% c("AMP","DEL")) {
             DF_candidate_trial$Output[entry_num] <- 
               paste(DF_candidate_trial$Variant_Gene[entry_num], " (", DF_candidate_trial$var.anno[entry_num], " CNV)", sep="")
+          } else {
+            DF_candidate_trial$Output[entry_num] <- 
+              paste("Potential ERROR in pipeline - manual assessment is needed")
           }
         }
         
