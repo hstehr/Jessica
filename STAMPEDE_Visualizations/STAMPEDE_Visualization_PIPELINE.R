@@ -178,7 +178,7 @@ site_count_fxn <- function (DF, cohort, outdir) {
   # HISTOGRAM
   #----------------------------------------------
   DF_tabulate$PrimaryTumorSite <- factor(DF_tabulate$PrimaryTumorSite, 
-                             levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$No.Patients)])
+                                         levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$No.Patients)])
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Patients)/10) * 10
@@ -219,7 +219,7 @@ site_count_fxn <- function (DF, cohort, outdir) {
           axis.text.y=element_text(size=20),
           axis.text.x=element_text(size=15,angle = 90, hjust = 1),
           axis.title=element_text(size=25,face="bold"))
-
+  
   # Save to local computer
   file_id = paste("site_count_", cohort, sep="")
   
@@ -246,8 +246,8 @@ site_count_fxn <- function (DF, cohort, outdir) {
 
 ## If less than 20 unique genes, output all genes
 ## If more than 20 unique genes 
-  # > apply cutoff = round down value of 20th top gene to nearest 5
-  # > if cutoff is less than n=2, remove genes with n=1
+# > apply cutoff = round down value of 20th top gene to nearest 5
+# > if cutoff is less than n=2, remove genes with n=1
 top_gene_count_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- DF[,c("PatientID","VariantGene")]
   
@@ -344,8 +344,8 @@ top_gene_count_fxn <- function (DF, cohort, outdir) {
 
 ## If all variants have n=1, exit function >> no plot generated
 ## If at least 1 variant have (n > 1) 
-  # If all variants have (n < 10), output all variants with (n > 1)
-  # If at least one variant have (n >= 10), output all variants with (n >= 10)
+# If all variants have (n < 10), output all variants with (n > 1)
+# If at least one variant have (n >= 10), output all variants with (n >= 10)
 top_variant_count_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- DF[,c("PatientID","VariantGene","VariantHGVSProtein")]
   
@@ -877,8 +877,8 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
   DF_tabulate <- DF_tabulate[order(DF_tabulate$Frequency, decreasing = TRUE),]
   
   specimen.missing <- setdiff(c("formalin-fixed paraffin embedded tissue (FFPE)",
-                              "bone marrow (BM)"),
-                            unique(DF_tabulate$Specimen_Type))
+                                "bone marrow (BM)"),
+                              unique(DF_tabulate$Specimen_Type))
   if (length(specimen.missing) > 0) {
     DF_tabulate <- rbind(DF_tabulate,
                          data.frame(Specimen_Type=specimen.missing,
@@ -886,8 +886,8 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
   }
   
   DF_tabulate$Specimen_Type <- factor(DF_tabulate$Specimen_Type,
-                                   levels = c("formalin-fixed paraffin embedded tissue (FFPE)",
-                                              "bone marrow (BM)"))
+                                      levels = c("formalin-fixed paraffin embedded tissue (FFPE)",
+                                                 "bone marrow (BM)"))
   DF_tabulate <- DF_tabulate[order(DF_tabulate$Specimen_Type),]
   
   Output.table <- tableGrob(DF_tabulate, rows = NULL, 
@@ -995,7 +995,7 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
   }
   
   DF_tabulate <- DF_tabulate[order(DF_tabulate$Tumor.Purity, decreasing = FALSE),]
-
+  
   # HISTOGRAM
   #----------------------------------------------
   # Y-axis parameters
@@ -1169,12 +1169,12 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     
     plot_dynamic_int$x$data[[3]]$text <- 
       gsub("<br />No.Patients:[[:blank:]]+.*","",plot_dynamic_int$x$data[[3]]$text)
-
+    
     p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
-    }
+  }
 }
 
 # Across all primary tumor sites
@@ -1209,7 +1209,7 @@ for (site_num in 1:nrow(site.list)) {
   site_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite == site.list$PrimaryTumorSite[site_num]),]
   
   print(paste(site_num,": ", cohort_id, sep=""))
-
+  
   top_gene_count_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
   top_variant_count_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
   gender_age_distribution_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
@@ -1218,7 +1218,7 @@ for (site_num in 1:nrow(site.list)) {
   tumor_purity_count_fxn (DF = site_DF, cohort=cohort_id,outdir = outdir)
 }
 
-sink()
+# sink()
 
 # Delete temporary directory
 if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)} 
@@ -1226,17 +1226,44 @@ if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)}
 # Plots whose x-axis labels need to be manually edited 
 # site_count_fxn
 # top_gene_count_fxn
-    ## If less than 20 unique genes, output all genes
-    ## If more than 20 unique genes 
-    # > apply cutoff = round down value of 20th top gene to nearest 5
-    # > if cutoff is less than n=2, remove genes with n=1
+## If less than 20 unique genes, output all genes
+## If more than 20 unique genes 
+# > apply cutoff = round down value of 20th top gene to nearest 5
+# > if cutoff is less than n=2, remove genes with n=1
 # top_variant_count_fxn
-    ## If all variants have n=1, exit function >> no plot generated
-    ## If at least 1 variant have (n > 1) 
-    # If all variants have (n < 10), output all variants with (n > 1)
-    # If at least one variant have (n >= 10), output all variants with (n >= 10)
+## If all variants have n=1, exit function >> no plot generated
+## If at least 1 variant have (n > 1) 
+# If all variants have (n < 10), output all variants with (n > 1)
+# If at least one variant have (n >= 10), output all variants with (n >= 10)
+
+# Generate tables
+#----------------------------------------------
+Site_List <- data.frame(PrimaryTumorSite = sort(unique(STAMP_DF$PrimaryTumorSite)),
+                        stringsAsFactors = FALSE)
+
+write.table(Site_List, 
+            file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_PrimaryTumorSite_List.csv",
+            append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)
+
+GeneName_List <- data.frame(VariantGene = sort(unique(STAMP_DF$VariantGene)),
+                            stringsAsFactors = FALSE)
+
+write.table(GeneName_List, 
+            file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_GeneName_List.csv",
+            append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)
+
+VariantLabel_List <- data.frame(VariantLabel = sort(unique(
+  paste(STAMP_DF$VariantGene, " ", STAMP_DF$VariantHGVSProtein, " (", STAMP_DF$VariantHGVSCoding, ")",sep=""))),
+  stringsAsFactors = FALSE)
+
+write.table(VariantLabel_List, 
+            file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_VariantLabel_List.csv",
+            append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)
+
+remove(Site_List,GeneName_List,VariantLabel_List)
 
 # Generate table of iframe codes
+#----------------------------------------------
 Folder_root = "STAMPEDE"
 
 DF_misc <- data.frame(Plot_Name = c("site_count","test_volume"), 
