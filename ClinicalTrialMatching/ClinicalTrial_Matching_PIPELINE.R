@@ -9,35 +9,39 @@ suppressMessages(library(reshape))
 suppressMessages(library(rio))
 suppressMessages(library(stringr))
 suppressMessages(library(openxlsx))
+suppressMessages(library(tidyr))
 
+## Script parameters
+#----------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
-# 1. Directory of "reports" folder.
+# 1. Directory location of "REPORTS" folder.
 data.root = args[1]
-# 2. Location of STAMP entries.
-STAMP.file = args[2]
-# 3. Patient ID.
-patient.id = args[3]
-# 4. Location of OnCore Report (Stanford Internal Clinical Trials). To turn off matching, set args == FALSE.
-OnCore.file = args[4]
-# 5. Location of Patient Variant Report (NCI-MATCH Clinical Trials). To turn off matching, set args == FALSE.
-NCI.file = args[5]
-# 6. Directory of pipeline scripts.
-script.root = args[6]
-# 7. Directory to save output files to. 
-outdir.root = args[7]
-# 8. Location of stamp_reference_transcripts.
-stamp_reference.file = args[8]
-# 9. Location of exons_ensembl.
-exons_ensembl.file = args[9]
-# 10. Location of disease exclusion key.
-histoDx.key = args[10]
+# 2. Patient ID - string format. 
+patient.id = args[2]
+# 3. File location of SNV/Indel entries.
+STAMP.file = args[3]
+# 4. File location of CNV entries.
+CNV.file = args[4]
+# 5. File location of Fusion entries.
+Fusion.file = args[5]
+# 6. File location of OnCore Report (Stanford Internal Clinical Trials). To turn off matching, set args == FALSE.
+OnCore.file = args[6]
+# 7. File location of Patient Variant Report (NCI-MATCH Clinical Trials). To turn off matching, set args == FALSE.
+NCI.file = args[7]
+# 8. Directory location of pipeline scripts.
+script.root = args[8]
+# 9. File location of OUTPUT directory. 
+outdir.root = args[9]
+# 10. File location of stamp_reference_transcripts file.
+stamp_reference.file = args[10]
+# 11. File location of exons_ensembl file.
+exons_ensembl.file = args[11]
+# 12. File location of disease exclusion key file.
+histoDx.key = args[12]
 
 ## Customize trial output
-if (isTRUE(OnCore.file == "FALSE")) {
-  Internal_match = FALSE  
-} else {
-  Internal_match = TRUE
-}
+if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
+} else {Internal_match = TRUE}
 
 if (isTRUE(NCI.file == "FALSE")) {
   NCI_match = FALSE  
@@ -46,7 +50,8 @@ if (isTRUE(NCI.file == "FALSE")) {
 }
 
 ## Directories
-outdir = outdir.root
+#----------------------------------------------
+outdir = paste(outdir.root,"/",sep="")
 if (!dir.exists(outdir)){dir.create(outdir)} 
 tempdir = paste(outdir.root,"/../temp/",sep="")
 if (!dir.exists(tempdir)){dir.create(tempdir)} 
@@ -57,35 +62,31 @@ err.output = paste(outdir,patient.id,".err",sep="")
 
 ## Load files and specify timestamps
 #----------------------------------------------
-STAMP_DF <- 
-  read.csv(file = STAMP.file, header = TRUE, na.strings = c(""," ","<NA>","NA"), stringsAsFactors = FALSE, sep = "\t")
+STAMP_DF <- read.csv(file = STAMP.file, header = TRUE, na.strings = c(""," ","<NA>","NA"), stringsAsFactors = FALSE, sep = "\t")
+
+STAMP_CNV <- read.delim(file = CNV.file, header = TRUE, na.strings = c(""," ","<NA>","NA"), 
+                        stringsAsFactors = FALSE, sep = "\t", comment.char = '#')
+
+STAMP_Fusion <- read.csv(file = Fusion.file, header = TRUE, na.strings = c(""," ","<NA>","NA"), stringsAsFactors = FALSE, sep = "\t")
 
 if (isTRUE(Internal_match)) {
-  OnCore_Biomarker_Report <- 
-    read.csv(file = OnCore.file, header = TRUE, na.strings = c("NA", ""), stringsAsFactors = FALSE, sep = ",")
-
-    OnCore_Biomarker_Report_timestamp <- 
-    format(as.Date(paste(gsub("([[:digit:]]{4}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*_", "", OnCore.file)), 
-                         "-01",sep="")), format= "%Y-%m")
+  OnCore_Biomarker_Report <- read.csv(file = OnCore.file, header = TRUE, na.strings = c("NA", ""), stringsAsFactors = FALSE, sep = ",")
+  
+  OnCore_Biomarker_Report_timestamp <- format(as.Date(paste(gsub("([[:digit:]]{4}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*_", "", OnCore.file)), "-01",sep="")), format= "%Y-%m")
 }
 
 if (isTRUE(NCI_match)) {
   PATIENT_VARIANT_REPORT <- suppressMessages(import_list(NCI.file, setclass = "tbl"))
   
-  Patient_Variant_Report_timestamp <- 
-    format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",
-                        sub(".*_", "", NCI.file))), format= "%Y-%m-%d")
+  Patient_Variant_Report_timestamp <- format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1", sub(".*_", "", NCI.file))), format= "%Y-%m-%d")
 }
 
-stamp_reference_transcripts <- 
-  read.csv(file = stamp_reference.file, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+stamp_reference_transcripts <- read.csv(file = stamp_reference.file, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
 
-exons_ensembl <-
-  read.csv(file = exons_ensembl.file, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+exons_ensembl <- read.csv(file = exons_ensembl.file, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
 
 ## Merge Gene-Exon Key Table
-stamp_reference_full <- left_join(stamp_reference_transcripts,exons_ensembl,
-                                  by = c("Transcript" = "enst"))
+stamp_reference_full <- left_join(stamp_reference_transcripts,exons_ensembl, by = c("Transcript" = "enst"))
 remove(stamp_reference_transcripts,exons_ensembl)
 
 ## Specify script location
@@ -105,15 +106,12 @@ disease.group_FILTER = FALSE
 disease.site_FILTER = FALSE # Dependent on disease.group_FILTER == TRUE
 disease.code_FILTER = FALSE 
 
-AgePlot.FILTER = FALSE
-VariantPlot.FILTER = FALSE
-
 ## Filters APPLIED
-if (isTRUE(adult.group_FILTER)) { ageName <- "AdultGroupON" } else { ageName <- "AdultGroupOFF" }
-if (isTRUE(pathogenic_FILTER)) { pathoName <- "pathogenicON" } else { pathoName <- "pathogenicOFF" }
-if (isTRUE(disease.group_FILTER)) { groupName <- "diseaseFILTER_groupON" } else { groupName <- "diseaseFILTER_groupOFF" }
-if (isTRUE(disease.group_FILTER & disease.site_FILTER)) { siteName <- "siteON" } else { siteName <- "siteOFF" }
-if (isTRUE(disease.code_FILTER)) { dxName <- "histologicaldxON" } else { dxName <- "histologicaldxOFF" }
+if (isTRUE(adult.group_FILTER)) {ageName <- "AdultGroupON"} else {ageName <- "AdultGroupOFF"}
+if (isTRUE(pathogenic_FILTER)) {pathoName <- "pathogenicON"} else {pathoName <- "pathogenicOFF"}
+if (isTRUE(disease.group_FILTER)) {groupName <- "diseaseFILTER_groupON"} else {groupName <- "diseaseFILTER_groupOFF"}
+if (isTRUE(disease.group_FILTER & disease.site_FILTER)) {siteName <- "siteON"} else {siteName <- "siteOFF"}
+if (isTRUE(disease.code_FILTER)) {dxName <- "histologicaldxON"} else {dxName <- "histologicaldxOFF"}
 filterName <- paste(groupName,siteName, "_", dxName, "_", pathoName, "_",  ageName, sep="")
 
 ## Generate error file
@@ -173,27 +171,46 @@ if (isTRUE(Internal_match & NCI_match)) {
 
 ## PIPELINE
 #----------------------------------------------
-# Clean up patient data
-source("Patient_Export_QC.R")
+# Extract relevant patient data
+source("Patient_Export_SNVIndel.R")
+source("Patient_Export_CNV.R")
+source("Patient_Export_Fusion.R")
 
 # Extract patient_id
-patient.list <- sort(unique(STAMP_DF$PatientID))
+patient.list <- unique(unlist(STAMP_DF$PatientID, STAMP_CNV$PatientID, STAMP_Fusion$PatientID))
+remove(STAMP_DF,STAMP_Fusion,STAMP_CNV,stamp_reference_full)
 
 if (length(patient.list) > 0) {
   
   if (isTRUE(Internal_match)) {
     source("Biomarker_Report_QC.R")
-    source("Biomarker_Report_Match.R") 
+    
+    source("Biomarker_Report_Match_SNVIndel.R")
+    source("Biomarker_Report_Match_CNV.R")
+    source("Biomarker_Report_Match_Fusion.R") 
+    
+    remove(OnCore_Biomarker_Report,OnCore_Biomarker_QC)
   }
   
   if (isTRUE(NCI_match)) {
     source("Patient_Variant_Report_QC.R")
-    source("Patient_Variant_Report_InclusionMatch.R")
-    source("Patient_Variant_Report_NonHotspotMatch.R")
+    
+    source("Patient_Variant_Report_InclusionMatch_SNVIndel.R")
+    source("Patient_Variant_Report_InclusionMatch_CNV.R")
+    source("Patient_Variant_Report_InclusionMatch_Fusion.R")
+    
+    source("Patient_Variant_Report_NonHotspotMatch_SNVIndel.R")
+    source("Patient_Variant_Report_NonHotspotMatch_CNV.R")
+    
+    remove(PATIENT_VARIANT_REPORT,Inclusion_NonHotspot_Rules,Inclusion_Variants)
   }
   
-  ## Generate OUTPUT file 
-  source("ClinicalTrial_MatchOutput.R")
+  ## Generate OUTPUT files 
+  source("ClinicalTrial_Output_Details.R")
+  source("ClinicalTrial_Output_tsv.R")
+  source("ClinicalTrial_Output_Candidates.R") ## EDIT
+  
+  remove(Comments,Disease_Exclusion_Codes,Exclusion_NonHotspot_Rules,Exclusion_Variants,IHC_Results)
 }
 
 sink()
