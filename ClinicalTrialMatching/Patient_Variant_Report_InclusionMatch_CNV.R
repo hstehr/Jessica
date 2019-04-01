@@ -181,123 +181,127 @@ if (isTRUE(NCI_match)) {
                         # Extract variants for Arm_No in Exclusion_Variants
                         DF_Exclude_Arm <- Exclusion_Variants[which(Exclusion_Variants$Arm_Name == arm_id), ]
                         
-                        ## Assess Exclusion Variants: CNVs
-                        #----------------------------------------------
-                        DF_Exclude_Arm_CNV <- DF_Exclude_Arm[which(DF_Exclude_Arm$Variant_Type == "CNV"),]
-                        
-                        DF_Exclude_Arm_CNV$Protein <- 
-                          tolower(gsub("(^[[:upper:]]{2,}.*[[:blank:]]+)([[:alpha:]]+)","\\2",DF_Exclude_Arm_CNV$Protein))
-                        
-                        if (nrow(DF_Exclude_Arm_CNV) > 0) {
+                        if (nrow(DF_Exclude_Arm) > 0) {
                           
-                          # All variant labels for Arm_No in Exclusion_Variants
-                          var.exclude <- tolower(sort(unique(paste(DF_Exclude_Arm_CNV$Variant_ID, " ", DF_Exclude_Arm_CNV$Protein, sep=""))))
-                          
-                          # All variant labels for patient in DF_patient
-                          var.patient <- tolower(sort(unique(paste(DF_patient$CNV_Gene, " ", DF_patient$var.anno, sep=""))))
-                          
-                          # Identify overlapping variants
-                          var.exclude <- var.exclude[which(var.exclude %in% var.patient)]
-                          
-                          ## Match Exclusion Variants
+                          ## Assess Exclusion Variants: CNVs
                           #----------------------------------------------
-                          if (length(var.exclude) > 0) {
+                          DF_Exclude_Arm_CNV <- DF_Exclude_Arm[which(DF_Exclude_Arm$Variant_Type == "CNV"),]
+                          
+                          DF_Exclude_Arm_CNV$Protein <- 
+                            tolower(gsub("(^[[:upper:]]{2,}.*[[:blank:]]+)([[:alpha:]]+)","\\2",DF_Exclude_Arm_CNV$Protein))
+                          
+                          if (nrow(DF_Exclude_Arm_CNV) > 0) {
                             
-                            # Update Match status with exclusion
-                            exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
-                                                       paste(sub("/.*", "", var.exclude), collapse = " & "), 
-                                                       " (CNV)", sep="")
-                            DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
+                            # All variant labels for Arm_No in Exclusion_Variants
+                            var.exclude <- tolower(sort(unique(paste(DF_Exclude_Arm_CNV$Variant_ID, " ", DF_Exclude_Arm_CNV$Protein, sep=""))))
                             
-                            cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
+                            # All variant labels for patient in DF_patient
+                            var.patient <- tolower(sort(unique(paste(DF_patient$CNV_Gene, " ", DF_patient$var.anno, sep=""))))
                             
-                            # Remove excluded ARM_No from DF_Gene_Patient_Variant
-                            DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
+                            # Identify overlapping variants
+                            var.exclude <- var.exclude[which(var.exclude %in% var.patient)]
                             
-                            DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
-                            
-                            # Checkpoint
-                            exclusion_continue <- as.logical("FALSE")
+                            ## Match Exclusion Variants
+                            #----------------------------------------------
+                            if (length(var.exclude) > 0) {
+                              
+                              # Update Match status with exclusion
+                              exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
+                                                         paste(sub("/.*", "", var.exclude), collapse = " & "), 
+                                                         " (CNV)", sep="")
+                              DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
+                              
+                              cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
+                              
+                              # Remove excluded ARM_No from DF_Gene_Patient_Variant
+                              DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
+                              
+                              DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
+                              
+                              # Checkpoint
+                              exclusion_continue <- as.logical("FALSE")
+                            }
                           }
-                        }
-                        
-                        ## Assess Exclusion Variants: SNVs
-                        #----------------------------------------------
-                        DF_Exclude_Arm_SNV <- DF_Exclude_Arm[which(DF_Exclude_Arm$Variant_Type == "SNV"),]
-                        
-                        if (isTRUE(nrow(DF_Exclude_Arm_SNV) > 0 & exclusion_continue & exclusion_SNV_continue)) {
                           
-                          # All variant labels for Arm_No in Exclusion_Variants
-                          var.exclude <- sort(unique(paste(DF_Exclude_Arm_SNV$Gene_Name, " ", DF_Exclude_Arm_SNV$Genomic, " (", 
-                                                           DF_Exclude_Arm_SNV$Variant_Type, ")", sep="")))
-                          
-                          # All variant labels for patient in DF_patient
-                          var.patient <- sort(unique(paste(DF_patient_SNVIndel$VariantGene, " ", DF_patient_SNVIndel$VariantHGVSGenomic, " (",
-                                                           DF_patient_SNVIndel$var.type, ")", sep="")))
-                          
-                          # Identify overlapping variants
-                          var.exclude <- var.exclude[which(var.exclude %in% var.patient)]
-                          
-                          ## Match Exclusion Variants
+                          ## Assess Exclusion Variants: SNVs
                           #----------------------------------------------
-                          if (length(var.exclude) > 0) {
+                          DF_Exclude_Arm_SNV <- DF_Exclude_Arm[which(DF_Exclude_Arm$Variant_Type == "SNV"),]
+                          
+                          if (isTRUE(nrow(DF_Exclude_Arm_SNV) > 0 & exclusion_continue & exclusion_SNV_continue)) {
                             
-                            # Update Match status with exclusion
-                            exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
-                                                       paste(sub("/.*", "", var.exclude), collapse = " & "), 
-                                                       " mutation", sep="")
-                            DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
+                            # All variant labels for Arm_No in Exclusion_Variants
+                            var.exclude <- sort(unique(paste(DF_Exclude_Arm_SNV$Gene_Name, " ", DF_Exclude_Arm_SNV$Genomic, " (", 
+                                                             DF_Exclude_Arm_SNV$Variant_Type, ")", sep="")))
                             
-                            cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
+                            # All variant labels for patient in DF_patient
+                            var.patient <- sort(unique(paste(DF_patient_SNVIndel$VariantGene, " ", DF_patient_SNVIndel$VariantHGVSGenomic, " (",
+                                                             DF_patient_SNVIndel$var.type, ")", sep="")))
                             
-                            # Remove excluded ARM_No from DF_Gene_Patient_Variant
-                            DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
+                            # Identify overlapping variants
+                            var.exclude <- var.exclude[which(var.exclude %in% var.patient)]
                             
-                            DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
-                            
-                            # Checkpoint
-                            exclusion_continue <- as.logical("FALSE")
+                            ## Match Exclusion Variants
+                            #----------------------------------------------
+                            if (length(var.exclude) > 0) {
+                              
+                              # Update Match status with exclusion
+                              exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
+                                                         paste(sub("/.*", "", var.exclude), collapse = " & "), 
+                                                         " mutation", sep="")
+                              DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
+                              
+                              cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
+                              
+                              # Remove excluded ARM_No from DF_Gene_Patient_Variant
+                              DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
+                              
+                              DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
+                              
+                              # Checkpoint
+                              exclusion_continue <- as.logical("FALSE")
+                            }
                           }
-                        }
-                        
-                        ## Assess Exclusion Variants: Fusions
-                        #----------------------------------------------
-                        DF_Exclude_Arm_Fusion <- DF_Exclude_Arm[which(DF_Exclude_Arm$Variant_Type == "Fusion"),]
-                        
-                        if (isTRUE(nrow(DF_Exclude_Arm_Fusion) > 0 & exclusion_continue & exclusion_Fusion_continue)) {
                           
-                          # All variant labels for Arm_No in Exclusion_Variants
-                          var.exclude <- sort(unique(paste(DF_Exclude_Arm_Fusion$Gene_Name, " (", 
-                                                           DF_Exclude_Arm_Fusion$Variant_Type, ")", sep="")))
-                          
-                          # All variant labels for patient in DF_patient
-                          var.patient <- sort(unique(paste(DF_patient_Fusion$Gene, " (",
-                                                           DF_patient_Fusion$var.type, ")", sep="")))
-                          
-                          # Identify overlapping variants
-                          var.exclude <- var.exclude[which(var.exclude %in% var.patient)]
-                          
-                          ## Match Exclusion Variants
+                          ## Assess Exclusion Variants: Fusions
                           #----------------------------------------------
-                          if (length(var.exclude) > 0) {
+                          DF_Exclude_Arm_Fusion <- DF_Exclude_Arm[which(DF_Exclude_Arm$Variant_Type == "Fusion"),]
+                          
+                          if (isTRUE(nrow(DF_Exclude_Arm_Fusion) > 0 & exclusion_continue & exclusion_Fusion_continue)) {
                             
-                            # Update Match status with exclusion
-                            exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
-                                                       paste(sub("/.*", "", var.exclude), collapse = " & "), sep="")
-                            DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
+                            # All variant labels for Arm_No in Exclusion_Variants
+                            var.exclude <- sort(unique(paste(DF_Exclude_Arm_Fusion$Gene_Name, " (", 
+                                                             DF_Exclude_Arm_Fusion$Variant_Type, ")", sep="")))
                             
-                            cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
+                            # All variant labels for patient in DF_patient
+                            var.patient <- sort(unique(paste(DF_patient_Fusion$Gene, " (",
+                                                             DF_patient_Fusion$var.type, ")", sep="")))
                             
-                            # Remove excluded ARM_No from DF_Gene_Patient_Variant
-                            DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
+                            # Identify overlapping variants
+                            var.exclude <- var.exclude[which(var.exclude %in% var.patient)]
                             
-                            DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
-                            
-                            # Checkpoint
-                            exclusion_continue <- as.logical("FALSE")
+                            ## Match Exclusion Variants
+                            #----------------------------------------------
+                            if (length(var.exclude) > 0) {
+                              
+                              # Update Match status with exclusion
+                              exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
+                                                         paste(sub("/.*", "", var.exclude), collapse = " & "), sep="")
+                              DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
+                              
+                              cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
+                              
+                              # Remove excluded ARM_No from DF_Gene_Patient_Variant
+                              DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
+                              
+                              DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
+                              
+                              # Checkpoint
+                              exclusion_continue <- as.logical("FALSE")
+                            }
                           }
+                          remove(DF_Exclude_Arm_SNV, DF_Exclude_Arm_CNV, DF_Exclude_Arm_Fusion)
                         }
-                        remove(DF_Exclude_Arm_SNV, DF_Exclude_Arm_CNV, DF_Exclude_Arm, DF_Exclude_Arm_Fusion)
+                        remove(DF_Exclude_Arm)
                         
                         # ## Assess Exclusion NonHotspots
                         # #----------------------------------------------
