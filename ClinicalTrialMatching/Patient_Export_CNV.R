@@ -41,6 +41,7 @@ if (nrow(STAMP_CNV_structured) == 0) {
   STAMP_CNV_structured$PrimaryTumorSite.Category <- "unknown"
   STAMP_CNV_structured$PrimaryTumorSite <- "unknown"
   STAMP_CNV_structured$VariantPathogenicityStatus <- "NULL"
+  STAMP_CNV_structured$HistologicalDx <- "NULL"
   
   remove(colnames_generic,colnames_keep)
 }
