@@ -3,14 +3,17 @@
 ## Search Output: individual patient file with stop point
 ## Match Output: "OnCore_Matched_SNVIndel.tsv"
 
+# Code SNVIndel dataframe: lines 11-15
+
 if (isTRUE(Internal_match)) {
   cat(paste("Timestamp of Internal clinical trial matching START: ", Sys.time(), sep=""),"\n","\n")
   
   ncol_OnCore <- as.numeric(ncol(OnCore_Biomarker_Report))
-  ncol_SNVIndel = 12
+  ncol_SNVIndel = 13
   SNVIndel.colnames <- c("PatientID","VariantHGVSGenomic","VariantLabel","VariantGene","VariantHGVSCoding",
                          "VariantHGVSProtein","var.type","var.anno","Exon_Number",
-                         "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+                         "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus",
+                         "HistologicalDx")
   
   # Extract gene from OnCore_Biomarker_QC
   genes.OnCore_Biomarker <- sort(unique(OnCore_Biomarker_QC$Biomarker_GeneName))
