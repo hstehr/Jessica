@@ -3,12 +3,15 @@
 ## Search Output: individual patient file with stop point
 ## Match Output: "OnCore_Biomarker_Matched.tsv"
 
+# Code Fusion dataframe: lines 11-14
+
 if (isTRUE(Internal_match)) {
   
   ncol_OnCore <- as.numeric(ncol(OnCore_Biomarker_Report))
-  ncol_Fusion = 9
+  ncol_Fusion = 10
   Fusion.colnames <- c("PatientID","Fusion_Detail","Gene","Break","var.type","var.anno",
-                       "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+                       "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus",
+                       "HistologicalDx")
   
   # Extract gene from OnCore_Biomarker_QC
   genes.OnCore_Biomarker <- sort(unique(OnCore_Biomarker_QC$Biomarker_GeneName))
