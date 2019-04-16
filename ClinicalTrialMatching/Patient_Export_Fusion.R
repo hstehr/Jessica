@@ -37,11 +37,12 @@ if (nrow(STAMP_Fusion) == 0) {
   STAMP_Fusion_structured$PrimaryTumorSite.Category <- "unknown"
   STAMP_Fusion_structured$PrimaryTumorSite <- "unknown"
   STAMP_Fusion_structured$VariantPathogenicityStatus <- "NULL"
+  STAMP_Fusion_structured$HistologicalDx <- "NULL"
   
   # Reformat to long format i.e. single gene per row 
   #----------------------------------------------
   colnames_merged <- c("PatientID","Fusion_Detail","Gene","Break","var.type","var.anno",
-                       "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+                       "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus","HistologicalDx")
   
   Gene1.list <- data.frame(STAMP_Fusion_structured$PatientID,
                            STAMP_Fusion_structured$Fusion_Detail,
@@ -52,6 +53,7 @@ if (nrow(STAMP_Fusion) == 0) {
                            STAMP_Fusion_structured$PrimaryTumorSite.Category,
                            STAMP_Fusion_structured$PrimaryTumorSite,
                            STAMP_Fusion_structured$VariantPathogenicityStatus,
+                           STAMP_Fusion_structured$HistologicalDx,
                            stringsAsFactors = FALSE)
   colnames(Gene1.list) <- colnames_merged
   
@@ -64,6 +66,7 @@ if (nrow(STAMP_Fusion) == 0) {
                            STAMP_Fusion_structured$PrimaryTumorSite.Category,
                            STAMP_Fusion_structured$PrimaryTumorSite,
                            STAMP_Fusion_structured$VariantPathogenicityStatus,
+                           STAMP_Fusion_structured$HistologicalDx,
                            stringsAsFactors = FALSE)
   colnames(Gene2.list) <- colnames_merged
   
