@@ -468,6 +468,8 @@ if (isTRUE(length(patient.list.matched) > 0)) {
         #---------------------------------------------- 
         cat("Trial criteria to be manually assessed: ", "\n")
         
+        assess_comment = ""
+        
         # Exclusion_NonHotspot_Rules matched by trial_id
         #----------------------------------------------
         Exclusion_NonHotspot_Output <-
@@ -486,6 +488,9 @@ if (isTRUE(length(patient.list.matched) > 0)) {
           Output.trial <-  unique(Exclusion_NonHotspot_Output$Output)
           for (entry_num in 1:length(Output.trial)) { cat("\t", Output.trial[entry_num],"\n")}
           cat("\n")
+          
+        } else {
+          assess_comment <- paste(assess_comment, "There are no exclusion nonhotspot rules indicated for ",trial_id,". ",sep="")
         }
         
         # IHC_Results matched by trial_id
@@ -502,20 +507,26 @@ if (isTRUE(length(patient.list.matched) > 0)) {
                                        "; Variant: ", IHC_Output$Variant_PRESENT_NEGATIVE_EMPTY, ")", sep=""))
           for (entry_num in 1:length(Output.trial)) { cat("\t", Output.trial[entry_num], "\n") }
           cat("\n")
-        }
-        
-        # Comments matched by trial_id
-        #----------------------------------------------
-        Comments_Output <- Comments[Comments$Arm_Name == trial_id,]
-        
-        if (nrow(Comments_Output) > 0) {
           
-          ## Output applicable Comments criteria
-          #----------------------------------------------
-          cat("Comments:", "\n")
-          print(Comments_Output, row.names = FALSE)
-          cat("\n")
+        } else {
+          assess_comment <- paste(assess_comment, "There are no immunohistochemical (IHC) assay criteria indicated for ",trial_id,". ",sep="")
         }
+        
+        # # Comments matched by trial_id
+        # #----------------------------------------------
+        # Comments_Output <- Comments[Comments$Arm_Name == trial_id,]
+        # 
+        # if (nrow(Comments_Output) > 0) {
+        #   
+        #   ## Output applicable Comments criteria
+        #   #----------------------------------------------
+        #   cat("Comments:", "\n")
+        #   print(Comments_Output, row.names = FALSE)
+        #   cat("\n")
+        #   
+        # } else {
+        #   assess_comment <- paste(assess_comment, "There are no comments indicated for ",trial_id,". ",sep="")
+        # }
         
         # Disease_Exclusion_Codes matched by trial_id
         #----------------------------------------------
@@ -528,11 +539,18 @@ if (isTRUE(length(patient.list.matched) > 0)) {
           cat("Histological disease exclusion codes:","\n")
           Output.trial <- sort(unique(Disease_Exclusion_Output$SHORT.NAME))
           for (entry_num in 1:length(Output.trial)) { cat("\t", Output.trial[entry_num], "\n") }
+        
+        } else {
+          assess_comment <- paste(assess_comment, "There are no histological disease exclusion codes indicated for ",trial_id,".",sep="")
+        }
+        
+        if (nchar(assess_comment) > 0) {
+          cat("\n",assess_comment,"\n") 
         }
         cat("\n","\n")
         
         remove(trial_id,DF_candidate_trial,entry_num,Output.patient,Exclusion_NonHotspot_Output,
-               IHC_Output,Comments_Output,Disease_Exclusion_Output)
+               IHC_Output,Disease_Exclusion_Output)
         if (isTRUE(exists("Output.trial"))){remove(Output.trial)}
       }
       remove(Output_NCI_FINAL,NCIArm.Variant.list,num_variant)
@@ -543,7 +561,7 @@ if (isTRUE(length(patient.list.matched) > 0)) {
       cat("[Stanford Internal Trials] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n")
     }
     if (isTRUE(NCI_match)) {
-      cat("[NCI-MATCH Trials] Trial criteria indicated by age group, variant pathogenicity, nonhotspot rules, IHC results, comments, and disease exclusions need to be manually assessed.","\n")
+      cat("[NCI-MATCH Trials] Trial criteria indicated by age group, variant pathogenicity, exclusion nonhotspot rules, IHC results, comments, and disease exclusions need to be manually assessed.","\n")
       cat("[NCI-MATCH Trials] If candidate trials have been matched based on inclusion nonhotspot rules, the pathogenicity status and variant type of the listed variants need to be manually assessed.","\n")
     }
     cat("\n")
