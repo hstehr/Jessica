@@ -28,16 +28,18 @@ Fusion.file = args[5]
 OnCore.file = args[6]
 # 7. File location of Patient Variant Report (NCI-MATCH Clinical Trials). To turn off matching, set args == FALSE.
 NCI.file = args[7]
-# 8. Directory location of pipeline scripts.
-script.root = args[8]
-# 9. File location of OUTPUT directory. 
-outdir.root = args[9]
-# 10. File location of stamp_reference_transcripts file.
-stamp_reference.file = args[10]
-# 11. File location of exons_ensembl file.
-exons_ensembl.file = args[11]
-# 12. File location of disease exclusion key file.
-histoDx.key = args[12]
+# 8. Names of NCI-MATCH Arms to remove
+NCI.ArmRemove = args[8]
+# 9. Directory location of pipeline scripts.
+script.root = args[9]
+# 10. File location of OUTPUT directory. 
+outdir.root = args[10]
+# 11. File location of stamp_reference_transcripts file.
+stamp_reference.file = args[11]
+# 12. File location of exons_ensembl file.
+exons_ensembl.file = args[12]
+# 13. File location of disease exclusion key file.
+histoDx.key = args[13]
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
