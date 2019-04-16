@@ -288,6 +288,35 @@ for (row_No in 1:nrow(DF_Exclusion_Variants)) {
   }
 }
 
+## Remove arms as indicated by args. Empty arg == "NULL"
+#----------------------------------------------
+if (isTRUE(NCI.ArmRemove != "NULL")) {
+  NCI.ArmRemove.list = unlist(strsplit(NCI.ArmRemove, ","))
+  
+  # Remove ARMs from dataframes
+  DF_Inclusion_Variants <- 
+    DF_Inclusion_Variants[!(DF_Inclusion_Variants$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  DF_Exclusion_Variants <- 
+    DF_Exclusion_Variants[!(DF_Exclusion_Variants$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  DF_Inclusion_NonHotspot_Rules <- 
+    DF_Inclusion_NonHotspot_Rules[!(DF_Inclusion_NonHotspot_Rules$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  DF_Exclusion_NonHotspot_Rules <- 
+    DF_Exclusion_NonHotspot_Rules[!(DF_Exclusion_NonHotspot_Rules$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  DF_IHC_Results <- 
+    DF_IHC_Results[!(DF_IHC_Results$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  DF_Comments <- DF_Comments[!(DF_Comments$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  DF_Histologic_Disease_Exclusion_Codes <- 
+    DF_Histologic_Disease_Exclusion_Codes[!(DF_Histologic_Disease_Exclusion_Codes$Arm_Name %in% NCI.ArmRemove.list),]
+  
+  remove(NCI.ArmRemove.list)
+}
+
 ## Write variables in global environment
 #----------------------------------------------
 assign("Inclusion_Variants", DF_Inclusion_Variants, envir = .GlobalEnv)
