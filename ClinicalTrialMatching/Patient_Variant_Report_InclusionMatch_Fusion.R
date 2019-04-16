@@ -3,12 +3,15 @@
 ## Search Output: individual patient file with stop point
 ## Match Output: "NCI_Fusion_Variant_Matched.tsv"
 
+# Code Fusion dataframe: lines 11-14
+
 if (isTRUE(NCI_match)) {
   
   ncol_InclusionVariants <- as.numeric(ncol(Inclusion_Variants))
-  ncol_Fusion = 9
+  ncol_Fusion = 10
   Fusion.colnames <- c("PatientID","Fusion_Detail","Gene","Break","var.type","var.anno",
-                       "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+                       "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus",
+                       "HistologicalDx")
   
   # Extract gene from NCI-MATCH
   genes.Inclusion_Variants <- sort(unique(Inclusion_Variants$Gene_Name))
@@ -383,10 +386,11 @@ if (isTRUE(NCI_match)) {
                     
                     ## Assess Disease Exclusion Codes
                     #----------------------------------------------
+                    # dx.patient == "NULL" indicates that histological dx is not available 
                     dx.patient = unique(DF_patient$HistologicalDx)
                     tumorsite.patient = unique(DF_patient$PrimaryTumorSite)
                     
-                    if (isTRUE(!is.na(dx.patient) & exclusion_continue & disease.code_FILTER)) {
+                    if (isTRUE(!is.null(dx.patient) & exclusion_continue & disease.code_FILTER)) {
                       
                       # Extract variants for Arm_No in Disease Exclusion Codes
                       DF_Disease_Exclude_Arm <- Disease_Exclusion_Codes[Disease_Exclusion_Codes$Arm_Name == arm_id,]
