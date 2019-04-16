@@ -3,13 +3,16 @@
 ## Search Output: individual patient file with stop point
 ## Match Output: "NCI_SNVIndel_NonHotspot_Matched.tsv"
 
+# Code SNVIndel dataframe: lines 11-15
+
 if (isTRUE(NCI_match)) {
   
   ncol_InclusionNonHotspot <- as.numeric(ncol(Inclusion_NonHotspot_Rules))
-  ncol_SNVIndel = 12
+  ncol_SNVIndel = 13
   SNVIndel.colnames <- c("PatientID","VariantHGVSGenomic","VariantLabel","VariantGene","VariantHGVSCoding",
                          "VariantHGVSProtein","var.type","var.anno","Exon_Number",
-                         "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+                         "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus",
+                         "HistologicalDx")
   
   # Extract gene from NCI-MATCH
   genes.Inclusion_NonHotspot <- sort(unique(Inclusion_NonHotspot_Rules$Gene_Name))
@@ -465,10 +468,11 @@ if (isTRUE(NCI_match)) {
                             
                             ## Assess Disease Exclusion Codes
                             #----------------------------------------------
+                            # dx.patient == "NULL" indicates that histological dx is not available 
                             dx.patient = unique(DF_patient$HistologicalDx)
                             tumorsite.patient = unique(DF_patient$PrimaryTumorSite)
                             
-                            if (isTRUE(!is.na(dx.patient) & exclusion_continue & disease.code_FILTER)) {
+                            if (isTRUE(!is.null(dx.patient) & exclusion_continue & disease.code_FILTER)) {
                               
                               # Extract variants for Arm_No in Disease Exclusion Codes
                               DF_Disease_Exclude_Arm <- Disease_Exclusion_Codes[Disease_Exclusion_Codes$Arm_Name == arm_id,]
