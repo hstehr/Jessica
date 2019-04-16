@@ -202,6 +202,7 @@ if (nrow(STAMP_DF_structured) == 0) {
   STAMP_DF_structured_anno$PrimaryTumorSite.Category <- "unknown"
   STAMP_DF_structured_anno$PrimaryTumorSite <- "unknown"
   STAMP_DF_structured_anno$VariantPathogenicityStatus <- "NULL"
+  STAMP_DF_structured_anno$HistologicalDx <- "NULL"
   
   remove(DF_del,DF_delins,DF_dup,DF_Frameshift,DF_ins,DF_intron,
          DF_remain,DF_SNV,DF_var,STAMP_DF_structured,colnames_generic,colnames_keep,
