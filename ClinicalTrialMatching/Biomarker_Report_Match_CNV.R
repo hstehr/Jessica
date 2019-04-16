@@ -3,12 +3,15 @@
 ## Search Output: individual patient file with stop point
 ## Match Output: "OnCore_Matched_CNV.tsv"
 
+# Code CNV dataframe: lines 11-14
+
 if (isTRUE(Internal_match)) {
   
   ncol_OnCore <- as.numeric(ncol(OnCore_Biomarker_Report))
-  ncol_CNV = 11
+  ncol_CNV = 12
   CNV.colnames <- c("PatientID","CNV_Gene","Locus","Tiles","mean.z","mcopies","var.anno","var.type",
-                    "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus")
+                    "PrimaryTumorSite.Category","PrimaryTumorSite","VariantPathogenicityStatus",
+                    "HistologicalDx")
   
   # Extract gene from OnCore_Biomarker_QC
   genes.OnCore_Biomarker <- sort(unique(OnCore_Biomarker_QC$Biomarker_GeneName))
