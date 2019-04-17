@@ -1,7 +1,7 @@
 Plot_Name	Folder	Tumor_Type	iframe
 site_count	STAMPEDE	all	2549
 test_volume	STAMPEDE	all	3322
-top_gene_count	STAMPEDE/Top_Gene_Count	all	2554
+top_gene_count	STAMPEDE/Top_Gene_Count	all	3324
 top_gene_count	STAMPEDE/Top_Gene_Count	adrenal	2580
 top_gene_count	STAMPEDE/Top_Gene_Count	ampulla of vater	2594
 top_gene_count	STAMPEDE/Top_Gene_Count	anus	2610
