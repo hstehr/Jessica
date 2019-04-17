@@ -1,4 +1,5 @@
 ## Generate data visualizations of STAMP database 
+rm(list=ls())
 
 # Load Libraries 
 #----------------------------------------------
@@ -13,11 +14,11 @@ saveDynamicPlots = TRUE
 ## Load file locations
 #----------------------------------------------
 data.root = "~/Documents/ClinicalDataScience_Fellowship/STAMP/"
-script.root = "~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/"
+script.root = "~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/PIPELINE_scripts/"
 
 STAMP.file = paste(data.root, "2018-10-18_syapse_export_all_variants_patientNameAndMrnRemoved.csv", sep="")
-stamp_reference_transcripts = paste(data.root, "Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt", sep="")
-exons_ensembl = paste(data.root, "Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt", sep="")
+stamp_reference_transcripts = paste(script.root, "Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt", sep="")
+exons_ensembl = paste(script.root, "Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt", sep="")
 aminoAcid_conversion = paste(data.root, "AminoAcid_Conversion.csv", sep="")
 
 outdir = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/TIFF/"
@@ -61,8 +62,8 @@ Syapse_Export_timestamp <-
                       sub(".*/", "", STAMP.file))), format= "%Y-%m-%d")
 
 # Specify output file
-out.ouput = paste(outdir,"/../",Syapse_Export_timestamp,"_Syapse.out.txt",sep="")
-err.output = paste(outdir,"/../",Syapse_Export_timestamp,"_Syapse.err.txt",sep="")
+out.ouput = paste(outdir,"../",Syapse_Export_timestamp,"_Syapse.out.txt",sep="")
+err.output = paste(outdir,"../",Syapse_Export_timestamp,"_Syapse.err.txt",sep="")
 
 ## Write output to file
 #----------------------------------------------
@@ -79,8 +80,8 @@ cat("Syapse Timestamp: ", Syapse_Export_timestamp, "\n",
 ## PIPELINE
 #----------------------------------------------
 # Clean up patient data from Syapse
-source("Syapse_Export_QC.R")
-source("Syapse_VariantAnnotate.R")
+source("../Syapse_Export_QC.R")
+source("../Syapse_VariantAnnotate.R")
 
 # Filter entries for complete cases
 #----------------------------------------------
@@ -178,7 +179,7 @@ site_count_fxn <- function (DF, cohort, outdir) {
   # HISTOGRAM
   #----------------------------------------------
   DF_tabulate$PrimaryTumorSite <- factor(DF_tabulate$PrimaryTumorSite, 
-                                         levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$No.Patients)])
+                             levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$No.Patients)])
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Patients)/10) * 10
@@ -213,13 +214,13 @@ site_count_fxn <- function (DF, cohort, outdir) {
     scale_y_continuous(name="Number of Individuals", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
     
     theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=25),
-          plot.subtitle = element_text(hjust=1, face="bold",size=20),
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text.y=element_text(size=20),
-          axis.text.x=element_text(size=15,angle = 90, hjust = 1),
-          axis.title=element_text(size=25,face="bold"))
-  
+          axis.text.y=element_text(size=14),
+          axis.text.x=element_text(size=14,angle = 45, hjust = 1),
+          axis.title=element_text(size=14,face="bold"))
+
   # Save to local computer
   file_id = paste("site_count_", cohort, sep="")
   
@@ -237,7 +238,12 @@ site_count_fxn <- function (DF, cohort, outdir) {
   
   # Save to cloud
   if (isTRUE(saveDynamicPlots)) {
-    p <- ggplotly(plot)
+    plot_dynamic_int <- ggplotly(plot)
+    
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
+    p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
@@ -246,8 +252,8 @@ site_count_fxn <- function (DF, cohort, outdir) {
 
 ## If less than 20 unique genes, output all genes
 ## If more than 20 unique genes 
-# > apply cutoff = round down value of 20th top gene to nearest 5
-# > if cutoff is less than n=2, remove genes with n=1
+  # > apply cutoff = round down value of 20th top gene to nearest 5
+  # > if cutoff is less than n=2, remove genes with n=1
 top_gene_count_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- DF[,c("PatientID","VariantGene")]
   
@@ -316,12 +322,12 @@ top_gene_count_fxn <- function (DF, cohort, outdir) {
     scale_y_continuous(name="Frequency of Mutations", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
     
     theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=25),
-          plot.subtitle = element_text(hjust=1, face="bold",size=20),
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text.y=element_text(size=20),
-          axis.text.x=element_text(size=20,angle = 90, hjust = 1),
-          axis.title=element_text(size=25,face="bold"))
+          axis.text.y=element_text(size=14),
+          axis.text.x=element_text(size=14,angle = 45, hjust = 1),
+          axis.title=element_text(size=14,face="bold"))
   
   # Save to local computer
   file_id = paste("top_gene_count_", cohort, sep="")
@@ -335,7 +341,12 @@ top_gene_count_fxn <- function (DF, cohort, outdir) {
   
   # Save to cloud
   if (isTRUE(saveDynamicPlots)) {
-    p <- ggplotly(plot)
+    plot_dynamic_int <- ggplotly(plot)
+    
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
+    p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/Top_Gene_Count/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
@@ -344,8 +355,8 @@ top_gene_count_fxn <- function (DF, cohort, outdir) {
 
 ## If all variants have n=1, exit function >> no plot generated
 ## If at least 1 variant have (n > 1) 
-# If all variants have (n < 10), output all variants with (n > 1)
-# If at least one variant have (n >= 10), output all variants with (n >= 10)
+  # If all variants have (n < 10), output all variants with (n > 1)
+  # If at least one variant have (n >= 10), output all variants with (n >= 10)
 top_variant_count_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- DF[,c("PatientID","VariantGene","VariantHGVSProtein")]
   
@@ -422,11 +433,11 @@ top_variant_count_fxn <- function (DF, cohort, outdir) {
       
       theme_bw() +
       theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-            plot.subtitle = element_text(hjust=1, face="bold",size=15),
+            plot.subtitle = element_text(hjust=1, face="bold",size=14),
             
-            axis.text.y=element_text(size=20),
-            axis.text.x=element_text(size=15,angle = 90, hjust = 1),
-            axis.title=element_text(size=20,face="bold"))
+            axis.text.y=element_text(size=14),
+            axis.text.x=element_text(size=14,angle = 45, hjust = 1),
+            axis.title=element_text(size=14,face="bold"))
     
     # Save to local computer
     file_id = paste("top_variant_count_", cohort, sep="")
@@ -440,7 +451,12 @@ top_variant_count_fxn <- function (DF, cohort, outdir) {
     
     # Save to cloud
     if (isTRUE(saveDynamicPlots)) {
-      p <- ggplotly(plot)
+      plot_dynamic_int <- ggplotly(plot)
+      
+      # Autoscale x-axis
+      plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+      
+      p <- ggplotly(plot_dynamic_int)
       filename_Full = paste("STAMPEDE/Top_Variant_Count/", file_id, sep="")
       api_create(p, filename = filename_Full, 
                  fileopt = "overwrite", sharing = "public")
@@ -547,15 +563,15 @@ gender_age_distribution_fxn <- function (DF, cohort, outdir) {
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-          plot.subtitle = element_text(hjust=1, face="bold",size=15),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
           legend.background = 
             element_rect(color = "black", fill = "white", size = 0.3, linetype = "solid"),
           legend.position = c(0.955, 0.88),
           legend.text=element_text(size=10),
           
-          axis.text=element_text(size=20),
-          axis.title=element_text(size=20,face="bold")) +
+          axis.text=element_text(size=14),
+          axis.title=element_text(size=14,face="bold")) +
     
     guides(fill=guide_legend(nrow=2,byrow=TRUE))
   
@@ -584,6 +600,9 @@ gender_age_distribution_fxn <- function (DF, cohort, outdir) {
         plot_dynamic_int$x$data[[i]]$text[[age_No]] <- paste(plot_dynamic_int$x$data[[i]]$text[[age_No]], text_add, sep="")
       }  
     }
+    
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
     
     p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/Gender_Age_Distribution/", file_id, sep="")
@@ -658,10 +677,10 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-          plot.subtitle = element_text(hjust=1, face="bold",size=15),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text=element_text(size=20),
-          axis.title=element_text(size=20,face="bold"))
+          axis.text=element_text(size=14),
+          axis.title=element_text(size=14,face="bold"))
   
   # Save to local computer
   file_id = paste("pt_mutation_count_allvariants_", cohort, sep="")
@@ -675,7 +694,12 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
   
   # Save to cloud
   if (isTRUE(saveDynamicPlots)) {
-    p <- ggplotly(plot)
+    plot_dynamic_int <- ggplotly(plot)
+    
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
+    p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/Patient_Mutation_Count/All_Variants/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
@@ -749,10 +773,10 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
       
       theme_bw() +
       theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-            plot.subtitle = element_text(hjust=1, face="bold",size=15),
+            plot.subtitle = element_text(hjust=1, face="bold",size=14),
             
-            axis.text=element_text(size=20),
-            axis.title=element_text(size=20,face="bold"))
+            axis.text=element_text(size=14),
+            axis.title=element_text(size=14,face="bold"))
     
     # Save to local computer
     file_id = paste("pt_mutation_count_pathovariants_", cohort, sep="")
@@ -766,7 +790,12 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     
     # Save to cloud
     if (isTRUE(saveDynamicPlots)) {
-      p <- ggplotly(plot)
+      plot_dynamic_int <- ggplotly(plot)
+      
+      # Autoscale x-axis
+      plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+      
+      p <- ggplotly(plot_dynamic_int)
       filename_Full = paste("STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants/", file_id, sep="")
       api_create(p, filename = filename_Full, 
                  fileopt = "overwrite", sharing = "public")
@@ -841,10 +870,10 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
       
       theme_bw() +
       theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-            plot.subtitle = element_text(hjust=1, face="bold",size=15),
+            plot.subtitle = element_text(hjust=1, face="bold",size=14),
             
-            axis.text=element_text(size=20),
-            axis.title=element_text(size=20,face="bold"))
+            axis.text=element_text(size=14),
+            axis.title=element_text(size=14,face="bold"))
     
     # Save to local computer
     file_id = paste("pt_mutation_count_VUS_", cohort, sep="")
@@ -858,7 +887,12 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     
     # Save to cloud
     if (isTRUE(saveDynamicPlots)) {
-      p <- ggplotly(plot)
+      plot_dynamic_int <- ggplotly(plot)
+      
+      # Autoscale x-axis
+      plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+      
+      p <- ggplotly(plot_dynamic_int)
       filename_Full = paste("STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants/", file_id, sep="")
       api_create(p, filename = filename_Full, 
                  fileopt = "overwrite", sharing = "public")
@@ -877,8 +911,8 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
   DF_tabulate <- DF_tabulate[order(DF_tabulate$Frequency, decreasing = TRUE),]
   
   specimen.missing <- setdiff(c("formalin-fixed paraffin embedded tissue (FFPE)",
-                                "bone marrow (BM)"),
-                              unique(DF_tabulate$Specimen_Type))
+                              "bone marrow (BM)"),
+                            unique(DF_tabulate$Specimen_Type))
   if (length(specimen.missing) > 0) {
     DF_tabulate <- rbind(DF_tabulate,
                          data.frame(Specimen_Type=specimen.missing,
@@ -886,8 +920,8 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
   }
   
   DF_tabulate$Specimen_Type <- factor(DF_tabulate$Specimen_Type,
-                                      levels = c("formalin-fixed paraffin embedded tissue (FFPE)",
-                                                 "bone marrow (BM)"))
+                                   levels = c("formalin-fixed paraffin embedded tissue (FFPE)",
+                                              "bone marrow (BM)"))
   DF_tabulate <- DF_tabulate[order(DF_tabulate$Specimen_Type),]
   
   Output.table <- tableGrob(DF_tabulate, rows = NULL, 
@@ -932,10 +966,10 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-          plot.subtitle = element_text(hjust=1, face="bold",size=15),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text=element_text(size=20),
-          axis.title=element_text(size=20,face="bold"),
+          axis.text=element_text(size=14),
+          axis.title=element_text(size=14,face="bold"),
           
           legend.position="bottom",
           legend.title=element_blank()) +
@@ -967,6 +1001,9 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
       }  
     }
     
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
     p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/Specimen_Type_Count/", file_id, sep="")
     api_create(p, filename = filename_Full, 
@@ -995,7 +1032,7 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
   }
   
   DF_tabulate <- DF_tabulate[order(DF_tabulate$Tumor.Purity, decreasing = FALSE),]
-  
+
   # HISTOGRAM
   #----------------------------------------------
   # Y-axis parameters
@@ -1024,11 +1061,11 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
     scale_y_continuous(name="Number of Specimen", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
     
     theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=25),
-          plot.subtitle = element_text(hjust=1, face="bold",size=20),
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text=element_text(size=25),
-          axis.title=element_text(size=25,face="bold"))
+          axis.text=element_text(size=14),
+          axis.title=element_text(size=14,face="bold"))
   
   # Save to local computer
   file_id = paste("tumor_purity_count_", cohort, sep="")
@@ -1042,7 +1079,12 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
   
   # Save to cloud
   if (isTRUE(saveDynamicPlots)) {
-    p <- ggplotly(plot)
+    plot_dynamic_int <- ggplotly(plot)
+    
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
+    p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/Tumor_Purity_Count/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
@@ -1118,12 +1160,12 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     scale_y_continuous(name="Frequency of Orders", breaks = seq(0,ymax,100)) + 
     
     theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=25),
-          plot.subtitle = element_text(hjust=1, face="bold",size=20),
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text.y=element_text(size=20),
-          axis.text.x=element_text(size=15,angle = 90, hjust = 1),
-          axis.title=element_text(size=25,face="bold"),
+          axis.text.y=element_text(size=14),
+          axis.text.x=element_text(size=14,angle = 45, hjust = 1),
+          axis.title=element_text(size=14,face="bold"),
           
           legend.position="none")
   
@@ -1140,12 +1182,12 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     scale_y_continuous(name="Frequency of Orders", breaks = seq(0,ymax,100)) + 
     
     theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=25),
-          plot.subtitle = element_text(hjust=1, face="bold",size=20),
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
-          axis.text.y=element_text(size=20),
-          axis.text.x=element_text(size=15,angle = 90, hjust = 1),
-          axis.title=element_text(size=25,face="bold"),
+          axis.text.y=element_text(size=14),
+          axis.text.x=element_text(size=14,angle = 45, hjust = 1),
+          axis.title=element_text(size=14,face="bold"),
           
           legend.position="none")
   
@@ -1169,16 +1211,21 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     
     plot_dynamic_int$x$data[[3]]$text <- 
       gsub("<br />No.Patients:[[:blank:]]+.*","",plot_dynamic_int$x$data[[3]]$text)
+
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
     
     p <- ggplotly(plot_dynamic_int)
     filename_Full = paste("STAMPEDE/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
-  }
+    }
 }
 
 # Across all primary tumor sites
 #----------------------------------------------
+# Plots whose x-axis labels need to be manually edited
+# site_count_fxn | test_volume_timeline_fxn | top_gene_count_fxn | top_variant_count_fxn
 site_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 top_gene_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 top_variant_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
@@ -1204,12 +1251,13 @@ for (row_No in 1:nrow(site.list)) {
 site.list$CohortName <- gsub("[[:blank:]]", "", site.list$CohortName)
 site.list <- site.list[order(site.list$PrimaryTumorSite),]
 
+# Plots whose x-axis labels need to be manually edited: 
+# top_gene_count_fxn | top_variant_count_fxn
 for (site_num in 1:nrow(site.list)) {
   cohort_id = site.list$CohortName[site_num]
   site_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite == site.list$PrimaryTumorSite[site_num]),]
   
-  print(paste(site_num,": ", cohort_id, sep=""))
-  
+  cat(paste(site_num,": ", cohort_id, sep=""),"\n")
   top_gene_count_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
   top_variant_count_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
   gender_age_distribution_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
@@ -1218,23 +1266,11 @@ for (site_num in 1:nrow(site.list)) {
   tumor_purity_count_fxn (DF = site_DF, cohort=cohort_id,outdir = outdir)
 }
 
-# sink()
+sink()
 
 # Delete temporary directory
 if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)} 
 
-# Plots whose x-axis labels need to be manually edited 
-# site_count_fxn
-# top_gene_count_fxn
-## If less than 20 unique genes, output all genes
-## If more than 20 unique genes 
-# > apply cutoff = round down value of 20th top gene to nearest 5
-# > if cutoff is less than n=2, remove genes with n=1
-# top_variant_count_fxn
-## If all variants have n=1, exit function >> no plot generated
-## If at least 1 variant have (n > 1) 
-# If all variants have (n < 10), output all variants with (n > 1)
-# If at least one variant have (n >= 10), output all variants with (n >= 10)
 
 # Generate tables
 #----------------------------------------------
@@ -1246,7 +1282,7 @@ write.table(Site_List,
             append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)
 
 GeneName_List <- data.frame(VariantGene = sort(unique(STAMP_DF$VariantGene)),
-                            stringsAsFactors = FALSE)
+                        stringsAsFactors = FALSE)
 
 write.table(GeneName_List, 
             file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_GeneName_List.csv",
@@ -1254,7 +1290,7 @@ write.table(GeneName_List,
 
 VariantLabel_List <- data.frame(VariantLabel = sort(unique(
   paste(STAMP_DF$VariantGene, " ", STAMP_DF$VariantHGVSProtein, " (", STAMP_DF$VariantHGVSCoding, ")",sep=""))),
-  stringsAsFactors = FALSE)
+                        stringsAsFactors = FALSE)
 
 write.table(VariantLabel_List, 
             file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_VariantLabel_List.csv",
@@ -1277,7 +1313,7 @@ DF_GeneCount <- data.frame(Plot_Name = "top_gene_count",
                            Tumor_Type = append("all", unlist(site.list$PrimaryTumorSite)),
                            iframe = NA,
                            stringsAsFactors = FALSE)
-DF_GeneCount$iframe[1] <- "2554"
+DF_GeneCount$iframe[1] <- "3324"
 
 
 DF_VariantCount <- data.frame(Plot_Name = "top_variant_count", 
