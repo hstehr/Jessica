@@ -63,12 +63,12 @@ Ophthalmology <- data.frame(Disease.Group.category = "Ophthalmology",
 Otolaryngology <- data.frame(Disease.Group.category = "Otolaryngology",
                  primaryTumorSite =  c("Esophagus","Larynx","Lip and Oral Cavity",
                                        "Nasal Cavity and Paranasal Sinuses","Nasopharynx","Neck",
-                                       "Pharynx","Salivary Glands","Thymus","Thyroid"),
+                                       "Pharynx","Salivary Glands","Thyroid"),
                  Disease.Group = c("Head & Neck Oncology"),
                  stringsAsFactors = FALSE)
 
 Pulmonology <- data.frame(Disease.Group.category = "Pulmonology",
-                 primaryTumorSite =  c("Lung","Pleura","Trachea"),
+                 primaryTumorSite =  c("Lung","Pleura","Thymus","Trachea"),
                  Disease.Group = c("Thoracic Oncology"),
                  stringsAsFactors = FALSE)
 
