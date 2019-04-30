@@ -1309,7 +1309,7 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
   }
 }
 
-test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
+test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height, PerSite) {
   DF_Fxn <- unique(DF[,c("PatientID","AssayReportDateReviewed")])
   # Convert to month/year
   DF_Fxn$AssayReportDateReviewed <- gsub("-[[:digit:]]{2}$","", DF_Fxn$AssayReportDateReviewed)
@@ -1319,6 +1319,18 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
   # Tabulate frequency
   DF_tabulate <- data.frame(DF_Fxn %>% group_by(AssayReportDateReviewed) %>% tally())
   colnames(DF_tabulate) <- c("AssayReportDateReviewed","No.Patients")
+  
+  months.missing <- setdiff(c("2016-08","2016-09","2016-10","2016-11","2016-12",
+                              "2017-01","2017-02","2017-03","2017-04","2017-05","2017-06",
+                              "2017-07","2017-08","2017-09","2017-10","2017-11","2017-12",
+                              "2018-01","2018-02","2018-03","2018-04","2018-05","2018-06",
+                              "2018-07","2018-08","2018-09","2018-10"), 
+                            unique(DF_tabulate$AssayReportDateReviewed))
+  if (length(months.missing) > 0) {
+    DF_tabulate <- rbind(DF_tabulate,
+                         data.frame(AssayReportDateReviewed=months.missing,No.Patients=0, stringsAsFactors = FALSE))
+  }
+  
   DF_tabulate <- DF_tabulate[order(DF_tabulate$AssayReportDateReviewed, decreasing = FALSE),]
   
   for (row_No in 1:nrow(DF_tabulate)) {
@@ -1344,11 +1356,27 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
   #----------------------------------------------
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$CumulativeCount)/10)*10
-  ymax_bar <- ceiling(max(DF_tabulate$No.Patients)/10)*10
+  if (isTRUE(ymax < 200)) {
+    if (isTRUE(ymax <= 20)) {
+      y_increment = 1
+    } else if (isTRUE(ymax <= 30)) {
+      y_increment = 2
+    } else if (isTRUE(ymax <= 100)) {
+      y_increment = 5
+    } else {
+      y_increment = 50
+    }
+  } else {y_increment = 100
+  }
   
   # Plot parameters
   height = 10
   width = 20
+  
+  # Subtitle parameters
+  if (isTRUE(sum(DF_tabulate$No.Patients) == 1)) {comment = "order"
+  } else {comment = "orders"
+  }
   
   # Reformat "AssayReportDateReviewed" 
   Month_Key <- data.frame(month=c("Jan","Feb","Mar","Apr","May","Jun","Jul",
@@ -1372,10 +1400,11 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     geom_line(aes(y=CumulativeCount, group=1), color="red") +
     
     labs(title = "Order Volume Distribution",
-         subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " orders", sep="")) +
+         subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " ", comment, sep="")) +
     
     xlab("") +
-    scale_y_continuous(name="Frequency of Orders", breaks = seq(0,ymax,100)) + 
+    scale_y_continuous(name="Frequency of Orders", breaks = seq(0,ceiling(ymax/y_increment)*y_increment,y_increment), 
+                       limits=c(0,ymax)) + 
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
@@ -1397,7 +1426,8 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
          subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " orders", sep="")) +
     
     xlab("") +
-    scale_y_continuous(name="Frequency of Orders", breaks = seq(0,ymax,100)) + 
+    scale_y_continuous(name="Frequency of Orders", breaks = seq(0,ceiling(ymax/y_increment)*y_increment,y_increment), 
+                       limits=c(0,ymax)) + 
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
@@ -1434,7 +1464,129 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     plot_dynamic_int$x$layout$xaxis$autorange = TRUE
     
     p <- ggplotly(plot_dynamic_int)
-    filename_Full = paste("STAMPEDE/", file_id, sep="")
+    
+    if (isTRUE(PerSite)) {
+      filename_Full = paste("STAMPEDE/PerTumor_OrderVolume/", file_id, sep="")
+    } else {
+      filename_Full = paste("STAMPEDE/", file_id, sep="")  
+    }
+    
+    api_create(p, filename = filename_Full, 
+               fileopt = "overwrite", sharing = "public")
+  }
+}
+
+variant_type_distribution_fxn <- function (DF, cohort, outdir) {
+  DF_Fxn <- unique(DF[,c("PatientID","var.type")])
+  
+  DF_Fxn$VariantType <- NA
+  for (row_No in 1:nrow(DF_Fxn)) {
+    if (isTRUE(DF_Fxn$var.type[row_No] == "SNV")) {
+      DF_Fxn$VariantType[row_No] <- "SNV"
+    } else if (isTRUE(DF_Fxn$var.type[row_No] %in% 
+                      c("Frameshift_Deletion","Frameshift_Delins","Frameshift_Duplication","Frameshift_Insertion"))) {
+      DF_Fxn$VariantType[row_No] <- "Frameshift Indel"
+    } else if (isTRUE(DF_Fxn$var.type[row_No] %in% 
+                      c("Deletion","Delins","Duplication","Insertion"))) {
+      DF_Fxn$VariantType[row_No] <- "In-Frame Indel"
+    }
+  }
+  DF_Fxn <- DF_Fxn[,c("PatientID","VariantType")]
+  
+  # TABLE
+  #----------------------------------------------
+  # Tabulate frequency = age of patient
+  DF_tabulate_full <- data.frame(DF_Fxn %>% group_by(VariantType) %>% tally())
+  colnames(DF_tabulate_full) <- c("VariantType","No.Entries")
+  
+  vartype.missing <- setdiff(c("SNV","In-Frame Indel","Frameshift Indel"),
+                             unique(DF_tabulate_full$VariantType))
+  if (length(vartype.missing) > 0) {
+    DF_tabulate_full <- rbind(DF_tabulate_full,
+                         data.frame(VariantType=vartype.missing,No.Entries=0, stringsAsFactors = FALSE))
+  }
+  DF_tabulate_full$VariantType <- factor(DF_tabulate_full$VariantType,
+                                         levels = c("SNV","In-Frame Indel","Frameshift Indel"))
+  DF_tabulate_full <- DF_tabulate_full[order(DF_tabulate_full$VariantType, decreasing = FALSE),]
+  
+  Output.table <- tableGrob(DF_tabulate_full, rows = NULL,
+                            theme = ttheme_default(core=list(fg_params=list(hjust=0, x=0.1)),
+                                                   rowhead=list(fg_params=list(hjust=0, x=0)),
+                                                   base_size = 10))
+  Output.table <- gtable_add_grob(Output.table,
+                                  grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
+                                  t = 2, b = nrow(Output.table), l = 1, r = ncol(Output.table))
+  Output.table <- gtable_add_grob(Output.table,
+                                  grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
+                                  t = 1, l = 1, r = ncol(Output.table))
+  
+  # HISTOGRAM
+  #----------------------------------------------
+  # Y-axis parameters
+  ymax <- ceiling(max(DF_tabulate_full$No.Entries)/10)*10
+  if (isTRUE(ymax < 200)) {
+    if (isTRUE(ymax <= 20)) {
+      y_increment = 1
+    } else if (isTRUE(ymax <= 30)) {
+      y_increment = 2
+    } else if (isTRUE(ymax <= 100)) {
+      y_increment = 5
+    } else {
+      y_increment = 25
+    }
+  } else {y_increment = 50
+  }
+  
+  # Plot parameters
+  height = 7.5
+  width = 10
+  
+  # Subtitle parameters
+  if (isTRUE(sum(DF_tabulate_full$No.Entries) == 1)) {comment = "entry"
+  } else {comment = "entries"
+  }
+  
+  plot <- ggplot(DF_tabulate_full, aes(x=VariantType, y=No.Entries)) +
+    geom_bar(stat="identity") +
+    
+    labs(title = "Variant Type Distribution",
+         subtitle = paste("N = ", sum(DF_tabulate_full$No.Entries), " ", comment, sep="")) +
+    
+    xlab("Variant Types") +
+    scale_y_continuous(name="Number of Entries", breaks = seq(0,ceiling(ymax/y_increment)*y_increment,y_increment), 
+                       limits=c(0,ymax)) + 
+    
+    theme_bw() +
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
+          
+          legend.background = 
+            element_rect(color = "black", fill = "white", size = 0.3, linetype = "solid"),
+          legend.position = c(0.955, 0.88),
+          legend.text=element_text(size=10),
+          
+          axis.text=element_text(size=14),
+          axis.title=element_text(size=14,face="bold"))
+  
+  # Save to local computer
+  file_id = paste("var_type_distribution_", cohort, sep="")
+  
+  if (isTRUE(saveStaticPlots)) {
+    tiff(filename = paste(outdir, file_id,".tiff", sep=""),
+         width = width, height = height, units = "in", res = 350)
+    grid.arrange(plot, Output.table, heights = c(2, 0.4), ncol = 1, nrow = 2)
+    dev.off()
+  }
+  
+# Save to cloud
+  if (isTRUE(saveDynamicPlots)) {
+    plot_dynamic_int <- plotly_build(plot)
+    
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
+    p <- ggplotly(plot_dynamic_int)
+    filename_Full = paste("STAMPEDE/Var_Type_Distribution/", file_id, sep="")
     api_create(p, filename = filename_Full, 
                fileopt = "overwrite", sharing = "public")
   }
@@ -1458,7 +1610,7 @@ gender_age_distribution_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 pt_mutation_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 specimen_type_stacked_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 tumor_purity_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
-test_volume_timeline_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
+test_volume_timeline_fxn (DF = STAMP_DF, cohort="all", outdir = outdir, PerSite = FALSE)
 
 # Per unique primary tumor site
 #----------------------------------------------
@@ -1471,13 +1623,15 @@ for (row_No in 1:nrow(site.list)) {
   s <- strsplit(site.list$CohortName[row_No], " ")[[1]] 
   site.list$CohortName[row_No] <- 
     paste(toupper(substring(s, 1,1)), substring(s, 2), sep="", collapse=" ")
+  
+  remove(s)
 }
 
 site.list$CohortName <- gsub("[[:blank:]]", "", site.list$CohortName)
 site.list <- site.list[order(site.list$PrimaryTumorSite),]
 
 # Plots whose x-axis labels need to be manually edited: 
-# top_gene_count_fxn | top_variant_count_fxn
+# top_gene_count_fxn | top_variant_count_fxn | test_volume_timeline_fxn
 for (site_num in 1:nrow(site.list)) {
   cohort_id = site.list$CohortName[site_num]
   site_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite == site.list$PrimaryTumorSite[site_num]),]
@@ -1489,6 +1643,7 @@ for (site_num in 1:nrow(site.list)) {
   pt_mutation_count_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
   specimen_type_stacked_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir)
   tumor_purity_count_fxn (DF = site_DF, cohort=cohort_id,outdir = outdir)
+  test_volume_timeline_fxn (DF = site_DF, cohort=cohort_id, outdir = outdir, PerSite = TRUE)
   
   remove(cohort_id,site_DF)
 }
@@ -1504,9 +1659,10 @@ cat("\n","\n",paste("Outdirectory: ", outdir, sep=""),"\n")
 # Across all genes
 #----------------------------------------------
 # Plots whose x-axis labels need to be manually edited
-# gene_count_fxn | top_site_count_fxn
+# gene_count_fxn | top_site_count_fxn | variant_type_distribution_fxn
 gene_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 top_site_count_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
+variant_type_distribution_fxn (DF = STAMP_DF, cohort="all", outdir = outdir)
 
 # Per unique gene
 #----------------------------------------------
@@ -1515,7 +1671,7 @@ gene.list <- data.frame(Gene=unique(STAMP_DF$VariantGene), stringsAsFactors = FA
 gene.list <- gene.list[order(gene.list$Gene),]
 
 # Plots whose x-axis labels need to be manually edited: 
-# top_site_count_fxn | top_variant_count_fxn
+# top_site_count_fxn | top_variant_count_fxn | variant_type_distribution_fxn
 for (gene_num in 1:length(gene.list)) {
   gene_id = gene.list[gene_num]
   gene_DF <- STAMP_DF[which(STAMP_DF$VariantGene == gene_id),]
@@ -1523,7 +1679,8 @@ for (gene_num in 1:length(gene.list)) {
   cat(paste(gene_num,": ", gene_id, sep=""),"\n")
   top_site_count_fxn (DF = gene_DF, cohort=gene_id, outdir = outdir)
   top_variant_count_fxn (DF = gene_DF, cohort=gene_id, outdir = outdir)
-  
+  variant_type_distribution_fxn (DF = gene_DF, cohort=gene_id, outdir = outdir)
+ 
   remove(gene_id,gene_DF)
 }
 remove(gene_num)
@@ -1566,11 +1723,15 @@ for (row_No in 1:nrow(Site_List)) {
   remove(site_ID)
 }
 
-write.table(Site_List, file=paste(outdir,"STAMPEDE_PrimaryTumorSite_List.csv",sep=""),
+write.table(Site_List, file=paste(outdir,"list_cancers.csv",sep=""),
             append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)
 
 # TABLE: Gene_No.Occurrences
 #----------------------------------------------
+Gene_Summary <- read.csv(file = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_GeneName_Description.csv", 
+                         header = FALSE, stringsAsFactors = FALSE, sep = ",")
+colnames(Gene_Summary) <- c("VariantGene","Summary")
+
 GeneName_List <- data.frame(VariantGene = sort(unique(STAMP_DF$VariantGene)),
                             stringsAsFactors = FALSE)
 GeneName_List$No.Occurrence <- NA
@@ -1582,10 +1743,12 @@ for (row_No in 1:nrow(GeneName_List)) {
 }
 remove(row_No)
 
-write.table(GeneName_List, file=paste(outdir,"STAMPEDE_GeneName_List.csv",sep=""),
+GeneName_List <- left_join(GeneName_List, Gene_Summary, by = "VariantGene")
+
+write.table(GeneName_List, file=paste(outdir,"list_genes.csv",sep=""),
             append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)
 
-remove(Site_List,GeneName_List)
+remove(Site_List,GeneName_List,Gene_Summary)
 
 #################################
 ## iFRAME CODE TABLE
@@ -1661,10 +1824,31 @@ DF_lollipop <- data.frame(Plot_Name = "gene_lollipop",
                           Label = gene.uniqlist,
                           iframe = NA,
                           stringsAsFactors = FALSE)
-for (row_No in 1:nrow(DF_lollipop)) { DF_lollipop$iframe[row_No] <- seq(3789,4037,2)[row_No] }
+for (row_No in 1:nrow(DF_lollipop)) {DF_lollipop$iframe[row_No] <- seq(3789,4037,2)[row_No] }
 
-DF_PerGene <- rbind(DF_PerGene,DF_lollipop)
-remove(DF_SiteCount,DF_VariantCount_Gene,DF_lollipop)
+DF_VariantType_Gene <- data.frame(Plot_Name = "var_type_distribution", 
+                                  Folder = paste(Folder_root,"/Var_Type_Distribution",sep=""),
+                                  Label = c("all", gene.uniqlist),
+                                  iframe = NA,
+                                  stringsAsFactors = FALSE)
+end_No = which(gene.uniqlist == "ALK")
+end_No_2 = which(gene.uniqlist == "AR")
+for (row_No in 1:nrow(DF_VariantType_Gene)) {
+  if (isTRUE(DF_VariantType_Gene$Label[row_No] == "all")) {
+    DF_VariantType_Gene$iframe[row_No] <- "4245"
+  } else if (isTRUE(row_No <= end_No +1)) {
+    DF_VariantType_Gene$iframe[row_No] <- seq(4247,4251,2)[row_No -1]
+  } else if (isTRUE(DF_VariantType_Gene$Label[row_No] == "APC")) {
+    DF_VariantType_Gene$iframe[row_No] <- "4253"
+  } else if (isTRUE(DF_VariantType_Gene$Label[row_No] == "AR")) {
+    DF_VariantType_Gene$iframe[row_No] <- "4256"
+  } else {
+    DF_VariantType_Gene$iframe[row_No] <- seq(4259,4497,2)[row_No -end_No_2 -1]  
+  }
+}
+  
+DF_PerGene <- rbind(DF_PerGene,DF_lollipop,DF_VariantType_Gene)
+remove(DF_SiteCount,DF_VariantCount_Gene,DF_lollipop,DF_VariantType_Gene)
 
 # Per PrimaryTumorSite
 #----------------------------------------------
@@ -1791,16 +1975,35 @@ for (row_No in 1:nrow(DF_iframe)) {
   DF_TumorPurity$iframe[row_No] <- as.numeric(DF_iframe$iframe_Purity[row_No])
 }
 
+DF_Tumor_TestVolume <- data.frame(Plot_Name = "test_volume", 
+                             Folder = paste(Folder_root,"/PerTumor_OrderVolume",sep=""),
+                             Label = unlist(site.list$PrimaryTumorSite),
+                             iframe = NA,
+                             stringsAsFactors = FALSE)
+for (row_No in 1:nrow(DF_Tumor_TestVolume)) {DF_Tumor_TestVolume$iframe[row_No] <- seq(4144,4242,2)[row_No] }
+
 DF_iframe_FULL <- rbind(DF_misc,DF_GeneCount,DF_VariantCount,DF_GenderAge,
                         DF_Mutation.all,DF_Mutation.patho,DF_Mutation.VUS,
-                        DF_SpecimenCount,DF_TumorPurity,DF_PerGene)
+                        DF_SpecimenCount,DF_TumorPurity,DF_PerGene,DF_Tumor_TestVolume)
+
+DF_tumor <- DF_iframe_FULL[which(DF_iframe_FULL$Label %in% unlist(site.list$PrimaryTumorSite)),]
+DF_tumor <- DF_tumor[order(DF_tumor$Label, decreasing = FALSE),]
+
+DF_gene <- DF_iframe_FULL[which(DF_iframe_FULL$Label %in% gene.list),]
+DF_gene <- DF_gene[order(DF_gene$Label, decreasing = FALSE),]
+
+DF_all <- DF_iframe_FULL[which(DF_iframe_FULL$Label == "all"),]
+DF_all <- DF_all[order(DF_all$Folder, decreasing = FALSE),]
+
+DF_iframe_FULL_ordered <- rbind(DF_all,DF_tumor,DF_gene)
 
 ## Write to local computer
 #----------------------------------------------
-write.table(DF_iframe_FULL, 
-            file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_plotly_iframe.csv",
+write.table(DF_iframe_FULL_ordered, 
+            file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/site_mappings.csv",
             append = FALSE, sep = ",", row.names = FALSE, col.names = TRUE, quote = FALSE)
 
 remove(DF_misc,DF_GeneCount,DF_VariantCount,DF_GenderAge,DF_Mutation.all,DF_Mutation.patho,
-       DF_Mutation.VUS,DF_SpecimenCount,DF_TumorPurity,DF_PerGene,DF_iframe)
-remove(DF_iframe_FULL,site.list,Folder_root,gene.list,gene.uniqlist,row_No,site_missing,gene_missing)
+       DF_Mutation.VUS,DF_SpecimenCount,DF_TumorPurity,DF_PerGene,DF_iframe,DF_Tumor_TestVolume,
+       DF_iframe_FULL,site.list,Folder_root,gene.list,gene.uniqlist,row_No,site_missing,gene_missing,
+       end_No,end_No_2,DF_all,DF_tumor,DF_gene)
