@@ -107,10 +107,10 @@ sink(file = err.output, append = FALSE, split = FALSE)
 options(max.print=999999)
 sink()
 
-# ## Write output to file
-# #----------------------------------------------
-# sink(file = out.ouput, append = FALSE, split = FALSE)
-# options(max.print=999999)
+## Write output to file
+#----------------------------------------------
+sink(file = out.ouput, append = FALSE, split = FALSE)
+options(max.print=999999)
 
 ## Print parameters to output
 #----------------------------------------------
