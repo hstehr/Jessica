@@ -136,3 +136,8 @@ Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id 
 ```
 source("STAMPEDE_Visualizations/STAMPEDE_Visualization_PIPELINE.R")
 ```
+
+# Retrospective analysis of STAMP entries from Syapse export
+```
+source("SyapseExport_RetrospectiveAnalysis/ClinicalTrial_Matching_PIPELINE.R")
+```
