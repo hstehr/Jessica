@@ -97,7 +97,7 @@ for (Arm_No in arm_start:arm_end) {
   
   row_end = (which(DF[[2]] == "Exclusion Variants")) -1
   
-  if (isTRUE(row_end > 2)) {
+  if (isTRUE(row_end >= 2)) {
     if (isTRUE(which(DF[[2]] == "Exclusion Non-Hotspot Rules") > 0)) {
       row_int_end = (which(DF[[2]] == "Exclusion Non-Hotspot Rules")) -1
       row_int_start = row_int_end +3
@@ -174,6 +174,7 @@ for (Arm_No in arm_start:arm_end) {
 ## Remove rows that are all empty or where column 2 == c("none", "None")
 DF_Inclusion_NonHotspot_Rules <- 
   DF_Inclusion_NonHotspot_Rules[rowSums(is.na(DF_Inclusion_NonHotspot_Rules)) != ncol(DF_Inclusion_NonHotspot_Rules),]
+DF_Inclusion_NonHotspot_Rules <- DF_Inclusion_NonHotspot_Rules[!is.na(DF_Inclusion_NonHotspot_Rules$Gene_Name),]
 
 DF_Exclusion_NonHotspot_Rules <- 
   DF_Exclusion_NonHotspot_Rules[rowSums(is.na(DF_Exclusion_NonHotspot_Rules)) != 
