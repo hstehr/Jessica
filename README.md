@@ -132,12 +132,12 @@ Fusion_file=paste(data_root,"/reports/LastNameFirstName_PatientID.fusions.filter
 Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id $STAMP_file $CNV_file $Fusion_file $OnCore_file $NCI_file $NCI_ArmRemove $script_root $outdir $stamp_reference_file $exons_ensembl_file $histoDx_key
 ```
 
-# Visualization Graphics for STAMPEDE 
+## Visualization Graphics for STAMPEDE 
 ```
 source("STAMPEDE_Visualizations/STAMPEDE_Visualization_PIPELINE.R")
 ```
 
-# Retrospective analysis of STAMP entries from Syapse export
+## Retrospective analysis of STAMP entries from Syapse export
 ```
 source("SyapseExport_RetrospectiveAnalysis/ClinicalTrial_Matching_PIPELINE.R")
 ```
