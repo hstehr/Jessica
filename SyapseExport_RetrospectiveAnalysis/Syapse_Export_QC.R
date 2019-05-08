@@ -406,5 +406,4 @@ assign("STAMP_DF", DF_Full, envir = .GlobalEnv)
 write.table(DF_Full, file = paste(tempdir, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
-remove(phgvs.noeffect, phgvs.sys.label, row.change, x,assay_list,assay_id,assay_num,patient_list,
-       patient_id,id_num,created_list,date_NA,row_id,i,colnames_generic,colnames_extract,DF_Full,curr_year,row_No)
+remove(phgvs.noeffect, phgvs.sys.label, row.change, x,patient_list,colnames_generic,colnames_extract,DF_Full,curr_year,row_No)
