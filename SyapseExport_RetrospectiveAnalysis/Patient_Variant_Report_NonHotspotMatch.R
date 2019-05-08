@@ -128,7 +128,7 @@ if (isTRUE(NCI_match)) {
                   if (isTRUE((exon_id %in% exon.trial | isTRUE("TRUE" %in% is.na(exon.trial))) & 
                              nrow(DF_Gene_Patient_NonHotspot) > 0)) {
                     
-                    ## Assess Pathogenicity Status
+                    ## Iterate through each genomic_id of genomic.list
                     #----------------------------------------------
                     genomic.list <- sort(unique(DF_patient$VariantHGVSGenomic[which(DF_patient$VariantGene == gene_id &
                                                                                       DF_patient$var.type == var.type_id &
@@ -136,6 +136,8 @@ if (isTRUE(NCI_match)) {
                     for (genomic_num in 1:length(genomic.list)) {
                       genomic_id <- genomic.list[genomic_num]
                       
+                      ## Assess Pathogenicity Status
+                      #----------------------------------------------
                       pathogenicity_gate <- NA
                       
                       if (isTRUE(pathogenic_FILTER)) {
