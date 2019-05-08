@@ -242,23 +242,19 @@ if (isTRUE(NCI_match)) {
                             # Identify overlapping classifications 
                             CTEP.CATEGORY <- 
                               DF_Disease_Exclude_patient$CTEP.CATEGORY[which(DF_Disease_Exclude_patient$CTEP.CATEGORY %in% tolower(DF_Disease_Exclude_Arm$CTEP.CATEGORY))]
-                            CTEP.CATEGORY <- 
-                              CTEP.CATEGORY[which(!is.na(CTEP.CATEGORY))]
+                            CTEP.CATEGORY <- CTEP.CATEGORY[which(!is.na(CTEP.CATEGORY))]
                             
                             CTEP.SUBCATEGORY <- 
                               DF_Disease_Exclude_patient$CTEP.SUBCATEGORY[which(DF_Disease_Exclude_patient$CTEP.SUBCATEGORY %in% tolower(DF_Disease_Exclude_Arm$CTEP.SUBCATEGORY))]
-                            CTEP.SUBCATEGORY <- 
-                              CTEP.SUBCATEGORY[which(!is.na(CTEP.SUBCATEGORY))]
+                            CTEP.SUBCATEGORY <- CTEP.SUBCATEGORY[which(!is.na(CTEP.SUBCATEGORY))]
                             
                             CTEP.TERM <- 
                               DF_Disease_Exclude_patient$CTEP.TERM[which(DF_Disease_Exclude_patient$CTEP.TERM %in% tolower(DF_Disease_Exclude_Arm$CTEP.TERM))]
-                            CTEP.TERM <- 
-                              CTEP.TERM[which(!is.na(CTEP.TERM))]
+                            CTEP.TERM <- CTEP.TERM[which(!is.na(CTEP.TERM))]
                             
                             SHORT.NAME <- 
                               DF_Disease_Exclude_patient$SHORT.NAME[which(DF_Disease_Exclude_patient$SHORT.NAME %in% tolower(DF_Disease_Exclude_Arm$SHORT.NAME))]
-                            SHORT.NAME <- 
-                              SHORT.NAME[which(!is.na(SHORT.NAME))]
+                            SHORT.NAME <- SHORT.NAME[which(!is.na(SHORT.NAME))]
                             
                             histologicaldx.match <- 
                               gsub("(, )+", ", ", paste(CTEP.CATEGORY, CTEP.SUBCATEGORY, CTEP.TERM, SHORT.NAME,sep=", "))
