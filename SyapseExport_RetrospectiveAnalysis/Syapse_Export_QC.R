@@ -263,7 +263,7 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
 ## Manual edit END
 ###################################
 
-## Remove duplicates of entries based on multiple unique sys.date_created.1
+## Remove duplicates of entries based on multiple unique sys.date_created
 ## Include cases of smpl.amendedString == "AMENDED"
 #----------------------------------------------
 DF_Full_AMENDED <- data.frame()
@@ -284,12 +284,16 @@ for (id_num in 1:length(patient_list)) {
       DF_Full_AMENDED_pre <- DF_Full[which(DF_Full$sys.uniqueId == patient_id & DF_Full$smpl.assayName == assay_id),]
       DF_Full_AMENDED_pre <- DF_Full_AMENDED_pre[DF_Full_AMENDED_pre$sys.date_created == max(created_list),]
       
+      remove(created_list)
+      
     } else {
       DF_Full_AMENDED_pre <- DF_Full[which(DF_Full$sys.uniqueId == patient_id & DF_Full$smpl.assayName == assay_id),]
     }
     
     DF_Full_AMENDED <- rbind(DF_Full_AMENDED, DF_Full_AMENDED_pre)
+    remove(assay_id,assay_num)
   }
+  remove(patient_id,assay_list,id_num)
 }
 
 # Overwrite existing dataframe
@@ -302,7 +306,10 @@ for (i in 1:length(date_NA)) {
   row_id = date_NA[i]
   patient_id = DF_Full$sys.uniqueId[row_id]
   DF_Full$smpl.dateReceived[row_id] <- unique(DF_Full$sys.date_created[DF_Full$sys.uniqueId == patient_id])
+  
+  remove(i,row_id,patient_id)
 }
+remove(date_NA)
 
 ## Remove entries with missing information
 #----------------------------------------------
