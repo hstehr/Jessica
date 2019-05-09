@@ -13,8 +13,8 @@ acute myeloid leukemia and related neoplasms:acute myeloid leukemia with recurre
 acute myeloid leukemia and related neoplasms:myeloid sarcoma,hematologic and lymphatic neoplasm,Hematopoietic Neoplasm/Leukemia,,,
 acute myeloid leukemia and related neoplasms:therapy-related myeloid neoplasms,hematologic and lymphatic neoplasm,Hematopoietic Neoplasm/Leukemia,,,
 adenocarcinoma,ampulla of vater,Gastrointestinal Neoplasm,,,
-adenocarcinoma,colon and rectum,,,Colorectal Cancer,
 adenocarcinoma,colon and rectum,Colorectal Cancer,,Adenocarcinoma - colon,
+adenocarcinoma,colon and rectum,,,Colorectal Cancer,
 adenocarcinoma,esophagus,Gastrointestinal Neoplasm,Gastroesophageal Cancer,Adenocarcinoma of the esophagus,Adenocarcinoma - esophagus
 adenocarcinoma,lung,"Lung, Mediastinal and Pleural Neoplasm",Non-Small Cell Lung Cancer,"Non-small cell lung cancer, NOS",Lung adenocarcinoma
 adenocarcinoma,lung,,,Non-small cell lung cancer,
@@ -72,10 +72,10 @@ carcinoma:hepatocellular carcinoma,hepatocellular (liver),Gastrointestinal Neopl
 carcinoma:mucinous (colloid) adenocarcinoma (greater than 50% mucinous),appendix,Gastrointestinal Neoplasm,,,
 carcinoma:mucoepidermoid carcinoma,salivary glands,.,,,
 carcinoma:other carcinoma (specify),appendix,Gastrointestinal Neoplasm,,,
-carcinoma:papillary carcinoma,thyroid,,,Thyroid Cancer,Papillary thyroid carcinoma
 carcinoma:papillary carcinoma,thyroid,Endocrine Neoplasm,,,
-"carcinoma:papillary carcinoma:classic (usual, conventional)",thyroid,,,Thyroid Cancer,Papillary thyroid carcinoma
+carcinoma:papillary carcinoma,thyroid,,,Thyroid Cancer,Papillary thyroid carcinoma
 "carcinoma:papillary carcinoma:classic (usual, conventional)",thyroid,Endocrine Neoplasm,,,
+"carcinoma:papillary carcinoma:classic (usual, conventional)",thyroid,,,Thyroid Cancer,Papillary thyroid carcinoma
 "carcinoma:papillary carcinoma:follicular variant, infiltrative",thyroid,Endocrine Neoplasm,,,
 carcinoma:papillary renal cell carcinoma,kidney,Kidney Neoplasm,Renal Cell Carcinoma,Papillary renal cell carcinoma,Papillary renal cell carcinoma
 carcinoma:sebaceous adenocarcinoma,salivary glands,.,,,
@@ -112,8 +112,8 @@ follicular lymphoma,lymph node,Hematopoietic Neoplasm/Lymphoma,Non-Hodgkin Lymph
 germ cell tumor:teratoma,testis,.,,,
 germ cell tumors:mixed malignant germ cell tumors (specify types),ovary,.,,,
 giant cell neoplasm,larynx,.,,,
-gist (gastrointestinal stromal tumor):mixed gist,stomach,,,Non-Rhabdomyosarcoma Soft Tissue Sarcoma,Gastrointestinal stromal tumor
 gist (gastrointestinal stromal tumor):mixed gist,stomach,Gastrointestinal Neoplasm,,,
+gist (gastrointestinal stromal tumor):mixed gist,stomach,,,Non-Rhabdomyosarcoma Soft Tissue Sarcoma,Gastrointestinal stromal tumor
 gist (gastrointestinal stromal tumor):other gist (specify),small intestine,Gastrointestinal Neoplasm,,,
 hepatoblastoma,liver,Gastrointestinal Neoplasm,,,
 histiocytic and dendritic cell neoplasms:histiocytic sarcoma,hematologic and lymphatic neoplasm,.,,,
@@ -129,8 +129,8 @@ invasive carcinoma:squamous cell carcinoma (scc),penis,.,,,
 junctional nevus?,foreskin,Skin Neoplasm,,,
 juvenile granulosa cell tumor,ovary,.,,,
 large cell neuroendocrine carcinoma,lung,"Lung, Mediastinal and Pleural Neoplasm",Neuroendocrine Cancer,,
-malignant melanoma,skin,,,Melanoma,Melanoma
 malignant melanoma,skin,Skin Neoplasm,Melanoma,,
+malignant melanoma,skin,,,Melanoma,Melanoma
 malignant melanoma:acral lentiginous melanoma,skin,Skin Neoplasm,Melanoma,,
 "malignant mesothelioma, biphasic",peritoneum,.,,,
 mature b-cell neoplasms,hematologic and lymphatic neoplasm,Hematopoietic Neoplasm/Lymphoma,Non-Hodgkin Lymphoma,,
@@ -147,8 +147,8 @@ mature b-cell neoplasms:plasma cell neoplasms:monoclonal gammopathy of undetermi
 mature t- and nk-cell neoplasms:t-cell large granular lymphocytic leukemia,hematologic and lymphatic neoplasm,Hematopoietic Neoplasm/Lymphoma,Non-Hodgkin Lymphoma,,
 mature t- and nk-cell neoplasms:t-cell prolymphocytic leukemia,hematologic and lymphatic neoplasm,Hematopoietic Neoplasm/Lymphoma,Non-Hodgkin Lymphoma,,
 medullary tumors:neuroblastoma,adrenal,Endocrine Neoplasm,,,
-melanoma,uvea,,,Melanoma,Uveal Melanoma
 melanoma,uvea,.,,Uveal Melanoma,
+melanoma,uvea,,,Melanoma,Uveal Melanoma
 merkel cell carcinoma,skin,Skin Neoplasm,,,
 miscellaneous tumors:ewing sarcoma,bone,.,,,
 mpn,bone marrow,Hematopoietic Neoplasm/Leukemia,,,
@@ -240,8 +240,8 @@ skeletal muscle tumors:malignant:pleomorphic rhabdomyosarcoma,soft tissue,Soft T
 spindle cell carcinoma,lung,"Lung, Mediastinal and Pleural Neoplasm",Non-Small Cell Lung Cancer,"Non-small cell lung cancer, NOS","Non-small cell lung cancer, NOS"
 sqaumous cell carcinoma,cervix,.,,,
 squamous cell carcinoma,lip and oral cavity,.,,,
-squamous cell carcinoma,lung,,,Non-Small Cell Lung Cancer,
 squamous cell carcinoma,lung,"Lung, Mediastinal and Pleural Neoplasm",Non-Small Cell Lung Cancer,,Squamous cell lung carcinoma
+squamous cell carcinoma,lung,,,Non-Small Cell Lung Cancer,
 squamous cell carcinoma (scc),skin,Skin Neoplasm,,,
 thymic carcinoma,thymus,"Lung, Mediastinal and Pleural Neoplasm",,,
 thymoma,thymus,"Lung, Mediastinal and Pleural Neoplasm",,,

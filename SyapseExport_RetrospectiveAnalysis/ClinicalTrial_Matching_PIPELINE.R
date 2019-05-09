@@ -18,28 +18,29 @@ data.root = args[1]
 STAMP.file = args[2]
 # 3. Location of OnCore Report (Stanford Internal Clinical Trials).
 OnCore.file = args[3]
-# 4. Location of Patient Variant Report (NCI-MATCH Clinical Trials).
-NCI.file = args[4]
-# 5. Names of NCI-MATCH Arms to remove
-NCI.ArmRemove = args[5]
-# 6. Directory of pipeline scripts.
-script.root = args[6]
-# 7. File location of OUTPUT directory. 
-outdir.root = args[7]
-# 8. Location of stamp_reference_transcripts.
-stamp_reference_transcripts = args[8]
-# 9. Location of most recent exons_ensembl.
-exons_ensembl = args[9]
-# 10. File location of disease exclusion key file.
-histoDx.key = args[10]
+# 4. Names of OnCore Arms to remove
+OnCore.ArmRemove = args[4]
+# 5. Location of Patient Variant Report (NCI-MATCH Clinical Trials).
+NCI.file = args[5]
+# 6. Names of NCI-MATCH Arms to remove
+NCI.ArmRemove = args[6]
+# 7. Directory of pipeline scripts.
+script.root = args[7]
+# 8. File location of OUTPUT directory. 
+outdir.root = args[8]
+# 9. Location of stamp_reference_transcripts.
+stamp_reference_transcripts = args[9]
+# 10. Location of most recent exons_ensembl.
+exons_ensembl = args[10]
+# 11. File location of disease exclusion key file.
+histoDx.key = args[11]
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
 } else {Internal_match = TRUE}
 
 if (isTRUE(NCI.file == "FALSE")) {NCI_match = FALSE  
-} else {NCI_match = TRUE
-}
+} else {NCI_match = TRUE}
 
 ## Directories
 #----------------------------------------------
@@ -49,7 +50,7 @@ tempdir = paste(outdir.root,"/../temp/",sep="")
 if (!dir.exists(tempdir)){dir.create(tempdir)} 
 
 # Specify output file
-out.ouput = paste(outdir,Sys.Date(),".out",sep="")
+out.output = paste(outdir,Sys.Date(),".out",sep="")
 err.output = paste(outdir,Sys.Date(),".err",sep="")
 
 ## Load files and specify timestamps
@@ -83,8 +84,8 @@ source("DiseaseGroupCategories.R")
 source("HistologicalDx_CTEP_Match.R")
 
 ## Default filters 
-static.plots_FILTER = TRUE # Generate static visual graphics
-adult.group_FILTER = TRUE # Adult = age >= 18+yo)
+static.plots_FILTER = FALSE # Generate static visual graphics
+adult.group_FILTER = FALSE # Adult = age >= 18+yo)
 pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
 
 ## Customizeable filters
@@ -109,7 +110,7 @@ sink()
 
 ## Write output to file
 #----------------------------------------------
-sink(file = out.ouput, append = FALSE, split = FALSE)
+sink(file = out.output, append = FALSE, split = FALSE)
 options(max.print=999999)
 
 ## Print parameters to output
@@ -151,7 +152,7 @@ if (isTRUE(Internal_match & NCI_match)) {
   
   sink()
   
-  sink(file = out.ouput, append = TRUE, split = FALSE)
+  sink(file = out.output, append = TRUE, split = FALSE)
   options(max.print=999999)
   
 }
