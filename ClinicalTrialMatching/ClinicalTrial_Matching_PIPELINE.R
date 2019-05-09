@@ -24,32 +24,31 @@ STAMP.file = args[3]
 CNV.file = args[4]
 # 5. File location of Fusion entries.
 Fusion.file = args[5]
-# 6. File location of OnCore Report (Stanford Internal Clinical Trials). To turn off matching, set args == FALSE.
+# 6. File location of OnCore Report (Stanford OnCore Clinical Trials). To turn off matching, set args == FALSE.
 OnCore.file = args[6]
-# 7. File location of Patient Variant Report (NCI-MATCH Clinical Trials). To turn off matching, set args == FALSE.
-NCI.file = args[7]
-# 8. Names of NCI-MATCH Arms to remove
-NCI.ArmRemove = args[8]
-# 9. Directory location of pipeline scripts.
-script.root = args[9]
-# 10. File location of OUTPUT directory. 
-outdir.root = args[10]
-# 11. File location of stamp_reference_transcripts file.
-stamp_reference.file = args[11]
-# 12. File location of exons_ensembl file.
-exons_ensembl.file = args[12]
-# 13. File location of disease exclusion key file.
-histoDx.key = args[13]
+# 7. Names of OnCore Arms to remove
+OnCore.ArmRemove = args[7]
+# 8. File location of Patient Variant Report (NCI-MATCH Clinical Trials). To turn off matching, set args == FALSE.
+NCI.file = args[8]
+# 9. Names of NCI-MATCH Arms to remove
+NCI.ArmRemove = args[9]
+# 10. Directory location of pipeline scripts.
+script.root = args[10]
+# 11. File location of OUTPUT directory. 
+outdir.root = args[11]
+# 12. File location of stamp_reference_transcripts file.
+stamp_reference.file = args[12]
+# 13. File location of exons_ensembl file.
+exons_ensembl.file = args[13]
+# 14. File location of disease exclusion key file.
+histoDx.key = args[14]
 
 ## Customize trial output
-if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
-} else {Internal_match = TRUE}
+if (isTRUE(OnCore.file == "FALSE")) {Internal_match <- as.logical("FALSE")
+} else {Internal_match <- as.logical("TRUE")}
 
-if (isTRUE(NCI.file == "FALSE")) {
-  NCI_match = FALSE  
-} else {
-  NCI_match = TRUE
-}
+if (isTRUE(NCI.file == "FALSE")) {NCI_match <- as.logical("FALSE")
+} else {NCI_match <- as.logical("TRUE")}
 
 ## Directories
 #----------------------------------------------
@@ -59,7 +58,7 @@ tempdir = paste(outdir.root,"/../temp/",sep="")
 if (!dir.exists(tempdir)){dir.create(tempdir)} 
 
 # Specify output file
-out.ouput = paste(outdir,patient.id,".out",sep="")
+out.output = paste(outdir,patient.id,".out",sep="")
 err.output = paste(outdir,patient.id,".err",sep="")
 
 ## Load files and specify timestamps
@@ -98,15 +97,19 @@ setwd(script.root)
 source("DiseaseGroupCategories.R")
 source("HistologicalDx_CTEP_Match.R")
 
-## Default filters 
+## Filter Parameters
+#----------------------------------------------
+## Customizeable filters
 adult.group_FILTER = FALSE # Adult = age >= 18+yo)
+pathogenic_FILTER = FALSE
 pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
 
-## Customizeable filters
-pathogenic_FILTER = FALSE
+## OnCore-specific customizeable filters
 disease.group_FILTER = FALSE
-disease.site_FILTER = FALSE # Dependent on disease.group_FILTER == TRUE
-disease.code_FILTER = FALSE 
+disease.site_FILTER = FALSE     # Dependent on disease.group_FILTER == TRUE
+
+## NCI-MATCH-specific customizeable filters
+disease.code_FILTER = FALSE
 
 ## Filters APPLIED
 if (isTRUE(adult.group_FILTER)) {ageName <- "AdultGroupON"} else {ageName <- "AdultGroupOFF"}
@@ -124,14 +127,14 @@ sink()
 
 ## Write output to file
 #----------------------------------------------
-sink(file = out.ouput, append = FALSE, split = FALSE)
+sink(file = out.output, append = FALSE, split = FALSE)
 options(max.print=999999)
 
 ## Print parameters to output
 #----------------------------------------------
 if (isTRUE(Internal_match & NCI_match)) {
   cat("Patient ID:", patient.id, "\n", "\n",
-      "Stanford Internal Trial Timestamp: ", OnCore_Biomarker_Report_timestamp, "\n",
+      "Stanford OnCore Trial Timestamp: ", OnCore_Biomarker_Report_timestamp, "\n",
       "\t", "FILTERs: disease group matched: ", disease.group_FILTER, "; disease site matched: ", disease.site_FILTER, "\n",
       "NCI-MATCH Trial Timestamp: ", Patient_Variant_Report_timestamp, "\n",
       "\t", "FILTERs: disease code matched: ", disease.code_FILTER, "\n",
@@ -142,7 +145,7 @@ if (isTRUE(Internal_match & NCI_match)) {
   
 } else if (isTRUE(Internal_match)) {
   cat("Patient ID:", patient.id, "\n", "\n",
-      "Stanford Internal Trial Timestamp: ", OnCore_Biomarker_Report_timestamp, "\n",
+      "Stanford OnCore Trial Timestamp: ", OnCore_Biomarker_Report_timestamp, "\n",
       "\t", "FILTERs: disease group matched: ", disease.group_FILTER, "; disease site matched: ", disease.site_FILTER, "\n",
       "FILTERs: adult patients (age >= 18yo): ",adult.group_FILTER, "; pathogenic variants: ", pathogenic_FILTER, "\n", "\n",
       "Outdirectory: ", data.root, "\n",
@@ -166,7 +169,7 @@ if (isTRUE(Internal_match & NCI_match)) {
   
   sink()
   
-  sink(file = out.ouput, append = TRUE, split = FALSE)
+  sink(file = out.output, append = TRUE, split = FALSE)
   options(max.print=999999)
   
 }

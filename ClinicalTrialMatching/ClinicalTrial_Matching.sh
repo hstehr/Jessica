@@ -1,13 +1,17 @@
 #!/bin/bash
 
 # Directories
-data_root="/Users/STAMP_v2.4_reports"
-script_root="/Users/PIPELINE_scripts"
+data_root="/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/STAMP_v2.4_reports"
+script_root="/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/PIPELINE_scripts"
 outdir=${data_root}/trials
 
-# Clinical trials: to turn off matching, set args == "FALSE"
+# OnCore trials: to turn off matching, set args == "FALSE"
 OnCore=${script_root}/Biomarker_Report_2019-03.csv
-NCI=${script_root}/PATIENT_VARIANT_REPORT_TEMPLATE_2019-03-25.xlsx
+# Remove OnCore.No: to indicate none, set args == "NULL"
+OnCore_ArmRemove="ECOG-ACRIN-EAY131"
+
+# NCI-MATCH trials: to turn off matching, set args == "FALSE"
+NCI=${script_root}/PATIENT_VARIANT_REPORT_TEMPLATE_2019-04-08.xlsx
 # Remove NCI-MATCH ARMS: to indicate none, set args == "NULL"
 NCI_ArmRemove="ARM-F,ARM-G,ARM-K1,ARM-M,ARM-S2,ARM-Z1C,ARM-Z1F"
 
@@ -28,7 +32,7 @@ do
 
  	Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root \
  	$patient $data_root/reports/$STAMP $data_root/reports/$CNV $data_root/reports/$Fusion \
- 	$OnCore $NCI $NCI_ArmRemove \
+ 	$OnCore $OnCore_ArmRemove $NCI $NCI_ArmRemove \
  	$script_root $outdir \
  	$stamp_reference $exons_ensembl $histoDx_key
 

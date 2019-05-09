@@ -6,7 +6,7 @@
 # Code SNVIndel dataframe: lines 11-15
 
 if (isTRUE(Internal_match)) {
-  cat(paste("Timestamp of Internal clinical trial matching START: ", Sys.time(), sep=""),"\n","\n")
+  cat(paste("Timestamp of Stanford OnCore clinical trial matching START: ", Sys.time(), sep=""),"\n","\n")
   
   ncol_OnCore <- as.numeric(ncol(OnCore_Biomarker_Report))
   ncol_SNVIndel = 13

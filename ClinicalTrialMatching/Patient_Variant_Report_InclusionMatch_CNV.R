@@ -306,118 +306,6 @@ if (isTRUE(NCI_match)) {
                         }
                         remove(DF_Exclude_Arm)
                         
-                        # ## Assess Exclusion NonHotspots
-                        # #----------------------------------------------
-                        # if (isTRUE(exclusion_continue)) {
-                        #   
-                        #   # Extract variants for Arm_No in Exclusion_NonHotspot_Rules
-                        #   DF_Exclude_Arm <- 
-                        #     Exclusion_NonHotspot_Rules[Exclusion_NonHotspot_Rules$Arm_Name == arm_id,]
-                        #   
-                        #   if (nrow(DF_Exclude_Arm) > 0) {
-                        #     
-                        #     # All variant gene-exon for Arm_No in Exclusion_NonHotspot_Rules
-                        #     var.exclude <- unique(data.frame(
-                        #       Gene_Name=DF_Exclude_Arm$Gene_Name, 
-                        #       Exon=DF_Exclude_Arm$Exon,
-                        #       Function=gsub("NA","",paste(DF_Exclude_Arm$Function, tolower(DF_Exclude_Arm$oncominevariantclass))),
-                        #       stringsAsFactors = FALSE))
-                        #     
-                        #     # Translate terminology to common syntax
-                        #     for (row_No in 1:nrow(var.exclude)) {
-                        #       var.exclude$var.type[row_No] <- 
-                        #         gsub("nonframeshiftDeletion", "Deletion,Delins", var.exclude$Function[row_No])
-                        #       var.exclude$var.type[row_No] <- 
-                        #         gsub("nonframeshiftInsertion", "Insertion,Delins", var.exclude$Function[row_No])
-                        #     }
-                        #     # Strip var.type into components
-                        #     var.exclude <- cSplit(var.exclude, "var.type", ",", 
-                        #                           stripWhite = TRUE, type.convert="as.character",
-                        #                           drop = FALSE)
-                        #     ## Convert to long format 
-                        #     var.exclude <- melt(var.exclude, id.vars=c("Gene_Name","Exon","Function"))
-                        #     var.exclude <- var.exclude[which(var.exclude$variable != "var.type" & !is.na(var.exclude$value)), 
-                        #                                c("Gene_Name","Exon","Function","value")]
-                        #     
-                        #     var.exclude.list.pre <- sort(unique(paste(var.exclude$Gene_Name, " ", var.exclude$Exon, " (", 
-                        #                                               var.exclude$value, ")", sep="")))
-                        #     
-                        #     ## Assess Exclusion NonHotspots: SNVs
-                        #     #----------------------------------------------
-                        #     if (isTRUE(exclusion_SNV_continue)) {
-                        #       
-                        #       # All variant gene-exon for patient in DF_patient
-                        #       var.patient <- unique(data.frame(CNV_Gene=DF_patient_SNVIndel$VariantGene,
-                        #                                        Exon_Number=DF_patient_SNVIndel$Exon_Number,
-                        #                                        var.type=DF_patient_SNVIndel$var.type, stringsAsFactors = FALSE))
-                        #       
-                        #       var.patient.list <- sort(unique(paste(var.patient$CNV_Gene, " ", var.patient$Exon_Number, " (",
-                        #                                             var.patient$var.type, ")", sep="")))
-                        #       
-                        #       # Identify overlapping variants
-                        #       var.exclude.list <- var.exclude.list.pre[which(var.exclude.list.pre %in% var.patient.list)]
-                        #       
-                        #       ## Match Exclusion NonHotspots
-                        #       if (length(var.exclude.list) > 0) {
-                        #         
-                        #         # Update Match status with exclusion
-                        #         exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
-                        #                                    paste(sub("/.*", "", var.exclude.list), collapse = " & "), 
-                        #                                    " mutation", sep="")
-                        #         DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
-                        #         
-                        #         cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
-                        #         
-                        #         # Remove excluded ARM_No from DF_Gene_Patient_Variant
-                        #         DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
-                        #         
-                        #         DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
-                        #         
-                        #         # Checkpoint
-                        #         exclusion_continue <- as.logical("FALSE")
-                        #       }
-                        #       remove(var.exclude.list)
-                        #     }
-                        #     
-                        #     # Assess Exclusion NonHotspots: CNVs
-                        #     #----------------------------------------------
-                        #     if (isTRUE(exclusion_continue)) {
-                        #       
-                        #       # Translate terminology to common syntax
-                        #       var.exclude.list.pre <- gsub("[[:blank:]]NA","",var.exclude.list.pre)
-                        #       var.exclude.list.pre <- gsub("deleterious","deletion",var.exclude.list.pre)
-                        #       
-                        #       var.patient.CNV.list <- 
-                        #         sort(unique(paste(DF_patient$CNV_Gene, " (", DF_patient$var.anno, ")", sep="")))
-                        #       
-                        #       var.exclude.CNV.list <- var.exclude.list.pre[which(var.exclude.list.pre %in% var.patient.CNV.list)]
-                        #       
-                        #       ## Match Exclusion NonHotspots
-                        #       if (length(var.exclude.CNV.list) > 0) {
-                        #         
-                        #         # Update Match status with exclusion
-                        #         exclusion_comment <- paste("DISQUALIFIED from ", arm_id, " due to ", 
-                        #                                    paste(sub("/.*", "", var.exclude.CNV.list), collapse = " & "), 
-                        #                                    " CNV", sep="")
-                        #         DF_patient$NCI_CNV_Variant_Status[pt_rowNo] <- exclusion_comment
-                        #         
-                        #         cat(paste(patient_id, ": ", exclusion_comment, sep=""),"\n","\n")
-                        #         
-                        #         # Remove excluded ARM_No from DF_Gene_Patient_Variant
-                        #         DF_Gene_Patient_Variant <- DF_Gene_Patient_Variant[DF_Gene_Patient_Variant$Arm_Name != arm_id,]
-                        #         
-                        #         DF_Output_Patient_CNV_Variant_int <- DF_Output_Patient_CNV_Variant_int[DF_Output_Patient_CNV_Variant_int$Arm_Name != arm_id,]
-                        #         
-                        #         # Checkpoint
-                        #         exclusion_continue <- as.logical("FALSE")
-                        #       }
-                        #       remove(var.exclude.CNV.list)
-                        #     }
-                        #     if (isTRUE(exists("var.exclude.list.pre"))){remove(var.exclude.list.pre)}
-                        #     remove(DF_Exclude_Arm,row_No)
-                        #   }
-                        # }
-                        
                         ## Assess Disease Exclusion Codes
                         #----------------------------------------------
                         # dx.patient == "NULL" indicates that histological dx is not available 
@@ -433,21 +321,28 @@ if (isTRUE(NCI_match)) {
                                                            HistologicalDxCategory$primaryTumorSite == tumorsite.patient),]
                           
                           # Identify overlapping classifications 
-                          CTEP.CATEGORY <- DF_Disease_Exclude_patient$CTEP.CATEGORY[which(DF_Disease_Exclude_patient$CTEP.CATEGORY %in% tolower(DF_Disease_Exclude_Arm$CTEP.CATEGORY))]
+                          CTEP.CATEGORY <- 
+                            DF_Disease_Exclude_patient$CTEP.CATEGORY[which(DF_Disease_Exclude_patient$CTEP.CATEGORY %in% tolower(DF_Disease_Exclude_Arm$CTEP.CATEGORY))]
                           CTEP.CATEGORY <- CTEP.CATEGORY[which(!is.na(CTEP.CATEGORY))]
                           
-                          CTEP.SUBCATEGORY <- DF_Disease_Exclude_patient$CTEP.SUBCATEGORY[which(DF_Disease_Exclude_patient$CTEP.SUBCATEGORY %in% tolower(DF_Disease_Exclude_Arm$CTEP.SUBCATEGORY))]
+                          CTEP.SUBCATEGORY <- 
+                            DF_Disease_Exclude_patient$CTEP.SUBCATEGORY[which(DF_Disease_Exclude_patient$CTEP.SUBCATEGORY %in% tolower(DF_Disease_Exclude_Arm$CTEP.SUBCATEGORY))]
                           CTEP.SUBCATEGORY <- CTEP.SUBCATEGORY[which(!is.na(CTEP.SUBCATEGORY))]
                           
-                          CTEP.TERM <- DF_Disease_Exclude_patient$CTEP.TERM[which(DF_Disease_Exclude_patient$CTEP.TERM %in% tolower(DF_Disease_Exclude_Arm$CTEP.TERM))]
+                          CTEP.TERM <- 
+                            DF_Disease_Exclude_patient$CTEP.TERM[which(DF_Disease_Exclude_patient$CTEP.TERM %in% tolower(DF_Disease_Exclude_Arm$CTEP.TERM))]
                           CTEP.TERM <- CTEP.TERM[which(!is.na(CTEP.TERM))]
                           
-                          SHORT.NAME <- DF_Disease_Exclude_patient$SHORT.NAME[which(DF_Disease_Exclude_patient$SHORT.NAME %in% tolower(DF_Disease_Exclude_Arm$SHORT.NAME))]
+                          SHORT.NAME <- 
+                            DF_Disease_Exclude_patient$SHORT.NAME[which(DF_Disease_Exclude_patient$SHORT.NAME %in% tolower(DF_Disease_Exclude_Arm$SHORT.NAME))]
                           SHORT.NAME <- SHORT.NAME[which(!is.na(SHORT.NAME))]
                           
-                          histologicaldx.match <- gsub("(, )+", ", ", paste(CTEP.CATEGORY, CTEP.SUBCATEGORY, CTEP.TERM, SHORT.NAME,sep=", "))
-                          histologicaldx.match <- gsub("^, ", "", histologicaldx.match)
-                          histologicaldx.match <- gsub(",[[:blank:]]*$", "", histologicaldx.match)
+                          histologicaldx.match <- 
+                            gsub("(, )+", ", ", paste(CTEP.CATEGORY, CTEP.SUBCATEGORY, CTEP.TERM, SHORT.NAME,sep=", "))
+                          histologicaldx.match <- 
+                            gsub("^, ", "", histologicaldx.match)
+                          histologicaldx.match <- 
+                            gsub(",[[:blank:]]*$", "", histologicaldx.match)
                           
                           ## Match Disease Exclusion Codes
                           #----------------------------------------------

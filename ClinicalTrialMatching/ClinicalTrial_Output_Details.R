@@ -1,7 +1,5 @@
 ## GENERATE detailed match results per patient
 
-cat(paste("Timestamp of algorithm matching output START: ", Sys.time(), sep=""),"\n","\n")
-
 # Iterate through each patient_id of patient.list
 for (patient_num in 1:length(patient.list)) {
   patient_id <- patient.list[patient_num]
@@ -93,12 +91,12 @@ for (patient_num in 1:length(patient.list)) {
   
   # Output patient bio
   cat(paste(patient_id, " may qualify for the following clinical trial(s) due to mutations identified in STAMP assay.", sep=""),"\n")
-  cat("Feature matching algorithm applied to following clinical trials: Stanford Internal and NCI-MATCH","\n","\n")
+  cat("Feature matching algorithm applied to following clinical trials: Stanford OnCore and NCI-MATCH","\n","\n")
   
   if (isTRUE(Internal_match | NCI_match)) {
     if (isTRUE(continue_SNVIndel)) {
-      cat("[Stanford Internal] Order of matching (SNV Indels): biomarker (gene > condition > detail).","\n")
-      cat("[Stanford Internal] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n","\n")
+      cat("[Stanford OnCore] Order of matching (SNV Indels): biomarker (gene > condition > detail).","\n")
+      cat("[Stanford OnCore] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n","\n")
       
       cat("[NCI-MATCH Inclusion Variants] Order of matching (SNV Indels): Gene > Variant Type > Genomic Region.","\n")
       cat("[NCI-MATCH Nonhotspot Rules] Order of matching (SNV Indels): Gene > function/oncominevariantclass > Exon No.","\n")
@@ -111,8 +109,8 @@ for (patient_num in 1:length(patient.list)) {
     cat("\n","\n")
     
     if (isTRUE(continue_CNV)) {
-      cat("[Stanford Internal] Order of matching (copy number variations): biomarker (gene > condition).","\n")
-      cat("[Stanford Internal] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n","\n")
+      cat("[Stanford OnCore] Order of matching (copy number variations): biomarker (gene > condition).","\n")
+      cat("[Stanford OnCore] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n","\n")
       
       cat("[NCI-MATCH Inclusion Variants] Order of matching (copy number variations): Gene > Variant Type (ie. amplification, deletion).","\n")
       cat("[NCI-MATCH Nonhotspot Rules] Order of matching (copy number variations): Gene > function/oncominevariantclass.","\n")
@@ -125,8 +123,8 @@ for (patient_num in 1:length(patient.list)) {
     cat("\n","\n")
     
     if (isTRUE(continue_Fusion)) {
-      cat("[Stanford Internal] Order of matching (fusions): biomarker (gene > condition).","\n")
-      cat("[Stanford Internal] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n","\n")
+      cat("[Stanford OnCore] Order of matching (fusions): biomarker (gene > condition).","\n")
+      cat("[Stanford OnCore] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n","\n")
       
       cat("[NCI-MATCH Inclusion Variants] Order of matching (fusions): Gene > Variant Type (ie. amplification, deletion).","\n")
       cat("[NCI-MATCH] Trial criteria indicated by age group, variant pathogenicity, nonhotspot rules, IHC results, comments, and disease exclusions need to be manually assessed.","\n","\n")

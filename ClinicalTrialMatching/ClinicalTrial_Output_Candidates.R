@@ -300,13 +300,18 @@ patient.list.matched <- unique(c(patient.oncore.matched,patient.nci.matched))
 #---------------------------------------------- 
 if (isTRUE(length(patient.list.matched) > 0)) {
   
-  for (patient_num  in 1:length(patient.list.matched)) {
+  for (patient_num in 1:length(patient.list.matched)) {
     patient_id <- patient.list.matched[patient_num]
     
     # Extract candidate trials based on patient_id
     #----------------------------------------------
-    if (length(patient.oncore.matched) > 0) {Output_OnCore_FINAL <- Output_OnCore_FINAL[which(Output_OnCore_FINAL$PatientID == patient_id), ]}
-    if (length(patient.nci.matched) > 0) {Output_NCI_FINAL <- Output_NCI_FINAL[which(Output_NCI_FINAL$PatientID == patient_id), ]}
+    if (length(patient.oncore.matched) > 0) {
+      Output_OnCore_FINAL_Patient <- Output_OnCore_FINAL[which(Output_OnCore_FINAL$PatientID == patient_id), ]
+    }
+    
+    if (length(patient.nci.matched) > 0) {
+      Output_NCI_FINAL_Patient <- Output_NCI_FINAL[which(Output_NCI_FINAL$PatientID == patient_id), ]
+    }
     
     ## Write output to file (detailed match results per variant)
     #----------------------------------------------
@@ -320,10 +325,10 @@ if (isTRUE(length(patient.list.matched) > 0)) {
     
     # Output trial INFO from Matched_Internal
     #----------------------------------------------
-    if (isTRUE(Internal_match & nrow(Output_OnCore_FINAL) > 0 )) {
+    if (isTRUE(Internal_match & nrow(Output_OnCore_FINAL_Patient) > 0 )) {
       
       # Extract list of matched OnCore.No
-      OnCoreNo.list <- sort(unique(Output_OnCore_FINAL$OnCore.No))
+      OnCoreNo.list <- sort(unique(Output_OnCore_FINAL_Patient$OnCore.No))
       
       # Iterate through each matched trial_id per patient
       #----------------------------------------------
@@ -332,7 +337,7 @@ if (isTRUE(length(patient.list.matched) > 0)) {
         
         # Extract trial INFO based on trial_id match in Matched_Internal
         DF_candidate_trial <- 
-          unique(Output_OnCore_FINAL[which(Output_OnCore_FINAL$OnCore.No == trial_id), ])
+          unique(Output_OnCore_FINAL_Patient[which(Output_OnCore_FINAL_Patient$OnCore.No == trial_id), ])
         
         # Remove trailing whitespace
         DF_candidate_trial$Biomarker.Description <- gsub("\n$", "", DF_candidate_trial$Biomarker.Description)
@@ -374,16 +379,16 @@ if (isTRUE(length(patient.list.matched) > 0)) {
         
         remove(trial_id,DF_candidate_trial,Output.patient,entry_num)
       }
-      remove(Output_OnCore_FINAL,OnCoreNo.list)
+      remove(Output_OnCore_FINAL,OnCoreNo.list,Output_OnCore_FINAL_Patient)
       
     } else {num_internal = 0}
     
     # Output trial INFO from Matched_NCI.Variants
     #----------------------------------------------
-    if (isTRUE(NCI_match & nrow(Output_NCI_FINAL) > 0)) {
+    if (isTRUE(NCI_match & nrow(Output_NCI_FINAL_Patient) > 0)) {
       
       # Extract list of matched Arm_No
-      NCIArm.Variant.list <- sort(unique(Output_NCI_FINAL$Arm_Name))
+      NCIArm.Variant.list <- sort(unique(Output_NCI_FINAL_Patient$Arm_Name))
       
       # Iterate through each matched trial_id per patient
       #----------------------------------------------
@@ -392,7 +397,7 @@ if (isTRUE(length(patient.list.matched) > 0)) {
         
         # Extract trial INFO based on trial_id match in Matched_NCI.Variants
         DF_candidate_trial <- 
-          unique(Output_NCI_FINAL[which(Output_NCI_FINAL$Arm_Name == trial_id), ])
+          unique(Output_NCI_FINAL_Patient[which(Output_NCI_FINAL_Patient$Arm_Name == trial_id), ])
         
         # Output notification
         #----------------------------------------------
@@ -553,12 +558,12 @@ if (isTRUE(length(patient.list.matched) > 0)) {
                IHC_Output,Disease_Exclusion_Output)
         if (isTRUE(exists("Output.trial"))){remove(Output.trial)}
       }
-      remove(Output_NCI_FINAL,NCIArm.Variant.list,num_variant)
+      remove(Output_NCI_FINAL,NCIArm.Variant.list,num_variant,Output_NCI_FINAL_Patient)
     }
     
     cat("NOTES:","\n")
     if (isTRUE(Internal_match)) {
-      cat("[Stanford Internal Trials] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n")
+      cat("[Stanford OnCore Trials] Trial criteria indicated by age group, variant pathogenicity, disease group, disease site and comments need to be manually assessed.","\n")
     }
     if (isTRUE(NCI_match)) {
       cat("[NCI-MATCH Trials] Trial criteria indicated by age group, variant pathogenicity, exclusion nonhotspot rules, IHC results, comments, and disease exclusions need to be manually assessed.","\n")

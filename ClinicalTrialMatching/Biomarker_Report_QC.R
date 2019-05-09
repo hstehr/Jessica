@@ -6,6 +6,18 @@
 cat(paste("Timestamp of OnCore_Biomarker_Report processing START: ", Sys.time(), sep=""),"\n","\n")
 OnCore_Biomarker_QC <- OnCore_Biomarker_Report
 
+## Remove arms as indicated by args. Empty arg == "NULL"
+#----------------------------------------------
+if (isTRUE(OnCore.ArmRemove != "NULL")) {
+  OnCore.ArmRemove.list = unlist(strsplit(OnCore.ArmRemove, ","))
+  
+  # Remove OnCore.No from dataframes
+  OnCore_Biomarker_QC <- 
+    OnCore_Biomarker_QC[!(OnCore_Biomarker_QC$OnCore.No %in% OnCore.ArmRemove.list),]
+  
+  remove(OnCore.ArmRemove.list)
+}
+
 #################################
 ## CONFIRMATION
 #################################

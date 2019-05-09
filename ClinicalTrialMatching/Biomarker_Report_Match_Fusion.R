@@ -311,6 +311,4 @@ if (isTRUE(Internal_match)) {
               append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
   
   remove(genes.OnCore_Biomarker,ncol_OnCore,ncol_Fusion,Fusion.colnames,DF_Output_Fusion_OnCore)
-  
-  cat(paste("Timestamp of Internal clinical trial matching FINISH: ", Sys.time(), sep=""),"\n","\n")
 }
