@@ -148,7 +148,11 @@ Lollipop_Plot <- function(variant_type, assay,
     
     plot_dynamic_int <- plotly_build(plot_dynamic)
     
+    # Autoscale x-axis
+    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+    
     for (elem_No in 1:length(plot_dynamic_int$x$data)) {
+      
       # Customize name of traces
       if (isTRUE(grepl(",1)", plot_dynamic_int$x$data[[elem_No]]$name))) {
         plot_dynamic_int$x$data[[elem_No]]$name <- 
@@ -160,8 +164,22 @@ Lollipop_Plot <- function(variant_type, assay,
       # Customize hover text of domains 
       elem_No_sub <- which(grepl("domain.start", plot_dynamic_int$x$data[[elem_No]]$text))
       if (length(elem_No_sub) > 0) {
+        
         plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub] <- 
           gsub(text_remove, "", plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub])
+        
+        plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub] <- 
+          gsub("domain.start", "Domain start position", plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub])
+        
+        plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub] <- 
+          gsub(">domain.end", ">Domain end position", plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub])
+        
+        plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub] <- 
+          gsub(">domain", ">Domain name", plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub])
+        
+        # Remove underscore from domain name abbreviations
+        plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub] <- 
+          gsub("_", " ", plot_dynamic_int$x$data[[elem_No]]$text[elem_No_sub])
       }
       
       # Customize hover text of variants 
@@ -191,7 +209,7 @@ Mutation_Pipeline <- function (gene.list, DF, assay, outdir) {
   #----------------------------------------------
   for (gene_num in 1:length(gene.list)) {
     gene_id = gene.list[gene_num]
-
+    
     # Extract gene information
     #----------------------------------------------
     row_id = which(Domains$Name == gene_id)
@@ -338,7 +356,7 @@ STAMPv2_Annotation <-
 
 # Generate individual DF per worksheet in excel file
 invisible(capture.output(lapply(names(STAMPv2_Annotation), 
-                                                 function(x) assign(x, STAMPv2_Annotation[[x]], envir = .GlobalEnv))))
+                                function(x) assign(x, STAMPv2_Annotation[[x]], envir = .GlobalEnv))))
 
 # Re-format protein domain INFO 
 colnames(Domains) <- unlist(Domains[2,])
