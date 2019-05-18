@@ -84,8 +84,8 @@ source("DiseaseGroupCategories.R")
 source("HistologicalDx_CTEP_Match.R")
 
 ## Default filters 
-static.plots_FILTER = FALSE # Generate static visual graphics
-adult.group_FILTER = FALSE # Adult = age >= 18+yo)
+static.plots_FILTER = TRUE # Generate static visual graphics
+adult.group_FILTER = TRUE # Adult = age >= 18+yo)
 pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
 
 ## Customizeable filters
@@ -108,10 +108,10 @@ sink(file = err.output, append = FALSE, split = FALSE)
 options(max.print=999999)
 sink()
 
-## Write output to file
-#----------------------------------------------
-sink(file = out.output, append = FALSE, split = FALSE)
-options(max.print=999999)
+# ## Write output to file
+# #----------------------------------------------
+# sink(file = out.output, append = FALSE, split = FALSE)
+# options(max.print=999999)
 
 ## Print parameters to output
 #----------------------------------------------
@@ -244,6 +244,9 @@ STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable
 # Filter for adults
 if (isTRUE(adult.group_FILTER)) {STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]}
 
+# # Filter lung primary tumor site
+# STAMP_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite != "lung"),]
+
 #----------------------------------------------
 ## Pipeline resumes
 #----------------------------------------------
@@ -275,4 +278,4 @@ if (length(patient.list) > 0) {
 sink()
 
 # Delete temporary directory
-if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)} 
+if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)}
