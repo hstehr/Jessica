@@ -319,6 +319,7 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,pancr
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,pancreas,5041
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,pancreas,2994
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,pancreas,2996
+top_fusion_count,STAMPEDE/Top_Fusion_Count,pancreas,5372
 top_variant_count,STAMPEDE/Top_Variant_Count,penis,4893
 top_gene_count,STAMPEDE/Top_Gene_Count,penis,3002
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,penis,3004
@@ -330,6 +331,17 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,penis
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,penis,5043
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,penis,3008
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,penis,3010
+top_variant_count,STAMPEDE/Top_Variant_Count,perihilar bile ducts,5376
+top_gene_count,STAMPEDE/Top_Gene_Count,perihilar bile ducts,3016
+gender_age_distribution,STAMPEDE/Gender_Age_Distribution,perihilar bile ducts,3018
+hist_dx_distribution,STAMPEDE/Hist_Dx_distribution,perihilar bile ducts,5378
+test_volume,STAMPEDE/PerTumor_OrderVolume,perihilar bile ducts,4204
+tumor_purity_count,STAMPEDE/Tumor_Purity_Count,perihilar bile ducts,3028
+specimen_type_count,STAMPEDE/Specimen_Type_Count,perihilar bile ducts,3026
+pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,perihilar bile ducts,3020
+pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,perihilar bile ducts,5374
+pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,perihilar bile ducts,3022
+pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,perihilar bile ducts,3024
 top_variant_count,STAMPEDE/Top_Variant_Count,peritoneum,3032
 top_gene_count,STAMPEDE/Top_Gene_Count,peritoneum,3030
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,peritoneum,3034
@@ -341,6 +353,7 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,perit
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,peritoneum,5045
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,peritoneum,3038
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,peritoneum,3040
+top_fusion_count,STAMPEDE/Top_Fusion_Count,peritoneum,5380
 top_variant_count,STAMPEDE/Top_Variant_Count,pharynx,4895
 top_gene_count,STAMPEDE/Top_Gene_Count,pharynx,3046
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,pharynx,3048
@@ -407,6 +420,7 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,skin,
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,skin,5057
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,skin,3126
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,skin,3128
+top_fusion_count,STAMPEDE/Top_Fusion_Count,skin,5382
 top_variant_count,STAMPEDE/Top_Variant_Count,small intestine,3136
 top_gene_count,STAMPEDE/Top_Gene_Count,small intestine,3134
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,small intestine,3138
@@ -418,6 +432,7 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,small
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,small intestine,5059
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,small intestine,3142
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,small intestine,3144
+top_fusion_count,STAMPEDE/Top_Fusion_Count,small intestine,5384
 top_variant_count,STAMPEDE/Top_Variant_Count,soft tissue,3152
 top_gene_count,STAMPEDE/Top_Gene_Count,soft tissue,3150
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,soft tissue,3154
@@ -441,6 +456,7 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,stoma
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,stomach,5063
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,stomach,3174
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,stomach,3176
+top_fusion_count,STAMPEDE/Top_Fusion_Count,stomach,5386
 top_variant_count,STAMPEDE/Top_Variant_Count,testes,4903
 top_gene_count,STAMPEDE/Top_Gene_Count,testes,3182
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,testes,3184
@@ -495,6 +511,7 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,urina
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,urinary bladder,5073
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,urinary bladder,3258
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,urinary bladder,3260
+top_fusion_count,STAMPEDE/Top_Fusion_Count,urinary bladder,5394
 top_variant_count,STAMPEDE/Top_Variant_Count,uterus,4911
 top_gene_count,STAMPEDE/Top_Gene_Count,uterus,3266
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,uterus,3268
@@ -546,6 +563,10 @@ top_variant_count,STAMPEDE/Top_Variant_Count,ALK,3343
 gene_lollipop,STAMPEDE/Gene_Lollipop,ALK,3793
 var_type_distribution,STAMPEDE/Var_Type_Distribution,ALK,4251
 top_fusion_count,STAMPEDE/Top_Fusion_Count,ALK,5110
+top_site_count,STAMPEDE/Top_Site_Count,AMOTL2,5406
+top_variant_count,STAMPEDE/Top_Variant_Count,AMOTL2,5402
+var_type_distribution,STAMPEDE/Var_Type_Distribution,AMOTL2,5404
+top_fusion_count,STAMPEDE/Top_Fusion_Count,AMOTL2,5400
 top_site_count,STAMPEDE/Top_Site_Count,APC,3345
 top_variant_count,STAMPEDE/Top_Variant_Count,APC,3347
 gene_lollipop,STAMPEDE/Gene_Lollipop,APC,3795
@@ -845,6 +866,10 @@ top_site_count,STAMPEDE/Top_Site_Count,JAK3,3553
 top_variant_count,STAMPEDE/Top_Variant_Count,JAK3,3555
 gene_lollipop,STAMPEDE/Gene_Lollipop,JAK3,3909
 var_type_distribution,STAMPEDE/Var_Type_Distribution,JAK3,4369
+top_site_count,STAMPEDE/Top_Site_Count,KANK1,5414
+top_variant_count,STAMPEDE/Top_Variant_Count,KANK1,5410
+var_type_distribution,STAMPEDE/Var_Type_Distribution,KANK1,5412
+top_fusion_count,STAMPEDE/Top_Fusion_Count,KANK1,5408
 top_site_count,STAMPEDE/Top_Site_Count,KCNT2,4944
 top_variant_count,STAMPEDE/Top_Variant_Count,KCNT2,4946
 gene_lollipop,STAMPEDE/Gene_Lollipop,KCNT2,4982
@@ -873,6 +898,10 @@ top_site_count,STAMPEDE/Top_Site_Count,KRAS,3569
 top_variant_count,STAMPEDE/Top_Variant_Count,KRAS,3571
 gene_lollipop,STAMPEDE/Gene_Lollipop,KRAS,3917
 var_type_distribution,STAMPEDE/Var_Type_Distribution,KRAS,4377
+top_site_count,STAMPEDE/Top_Site_Count,LINC01510,5422
+top_variant_count,STAMPEDE/Top_Variant_Count,LINC01510,5418
+var_type_distribution,STAMPEDE/Var_Type_Distribution,LINC01510,5420
+top_fusion_count,STAMPEDE/Top_Fusion_Count,LINC01510,5416
 top_site_count,STAMPEDE/Top_Site_Count,MAP2K1,3573
 top_variant_count,STAMPEDE/Top_Variant_Count,MAP2K1,3575
 gene_lollipop,STAMPEDE/Gene_Lollipop,MAP2K1,3919
@@ -897,6 +926,11 @@ top_site_count,STAMPEDE/Top_Site_Count,MET,3591
 top_variant_count,STAMPEDE/Top_Variant_Count,MET,3593
 gene_lollipop,STAMPEDE/Gene_Lollipop,MET,3929
 var_type_distribution,STAMPEDE/Var_Type_Distribution,MET,4389
+top_fusion_count,STAMPEDE/Top_Fusion_Count,MET,5396
+top_site_count,STAMPEDE/Top_Site_Count,MKI67,5430
+top_variant_count,STAMPEDE/Top_Variant_Count,MKI67,5426
+var_type_distribution,STAMPEDE/Var_Type_Distribution,MKI67,5428
+top_fusion_count,STAMPEDE/Top_Fusion_Count,MKI67,5424
 top_site_count,STAMPEDE/Top_Site_Count,MLH1,3595
 top_variant_count,STAMPEDE/Top_Variant_Count,MLH1,3597
 gene_lollipop,STAMPEDE/Gene_Lollipop,MLH1,3931
@@ -925,6 +959,10 @@ top_site_count,STAMPEDE/Top_Site_Count,MYD88,3619
 top_variant_count,STAMPEDE/Top_Variant_Count,MYD88,3621
 gene_lollipop,STAMPEDE/Gene_Lollipop,MYD88,3943
 var_type_distribution,STAMPEDE/Var_Type_Distribution,MYD88,4403
+top_site_count,STAMPEDE/Top_Site_Count,NCOA4,5438
+top_variant_count,STAMPEDE/Top_Variant_Count,NCOA4,5434
+var_type_distribution,STAMPEDE/Var_Type_Distribution,NCOA4,5436
+top_fusion_count,STAMPEDE/Top_Fusion_Count,NCOA4,5432
 top_site_count,STAMPEDE/Top_Site_Count,NF1,3623
 top_variant_count,STAMPEDE/Top_Variant_Count,NF1,3625
 gene_lollipop,STAMPEDE/Gene_Lollipop,NF1,3945
@@ -937,9 +975,6 @@ top_site_count,STAMPEDE/Top_Site_Count,NFE2L2,3631
 top_variant_count,STAMPEDE/Top_Variant_Count,NFE2L2,3633
 gene_lollipop,STAMPEDE/Gene_Lollipop,NFE2L2,3949
 var_type_distribution,STAMPEDE/Var_Type_Distribution,NFE2L2,4409
-top_site_count,STAMPEDE/Top_Site_Count,NKX2,5331
-top_variant_count,STAMPEDE/Top_Variant_Count,NKX2,5327
-var_type_distribution,STAMPEDE/Var_Type_Distribution,NKX2,5327
 top_site_count,STAMPEDE/Top_Site_Count,NKX2-1,3635
 top_variant_count,STAMPEDE/Top_Variant_Count,NKX2-1,3637
 gene_lollipop,STAMPEDE/Gene_Lollipop,NKX2-1,3951
@@ -1037,6 +1072,10 @@ top_site_count,STAMPEDE/Top_Site_Count,RB1,3705
 top_variant_count,STAMPEDE/Top_Variant_Count,RB1,3707
 gene_lollipop,STAMPEDE/Gene_Lollipop,RB1,3991
 var_type_distribution,STAMPEDE/Var_Type_Distribution,RB1,4451
+top_site_count,STAMPEDE/Top_Site_Count,RBPMS,5446
+top_variant_count,STAMPEDE/Top_Variant_Count,RBPMS,5442
+var_type_distribution,STAMPEDE/Var_Type_Distribution,RBPMS,5444
+top_fusion_count,STAMPEDE/Top_Fusion_Count,RBPMS,5440
 top_site_count,STAMPEDE/Top_Site_Count,RET,3709
 top_variant_count,STAMPEDE/Top_Variant_Count,RET,3711
 gene_lollipop,STAMPEDE/Gene_Lollipop,RET,3993
@@ -1091,6 +1130,10 @@ top_site_count,STAMPEDE/Top_Site_Count,SMO,3737
 top_variant_count,STAMPEDE/Top_Variant_Count,SMO,3739
 gene_lollipop,STAMPEDE/Gene_Lollipop,SMO,4011
 var_type_distribution,STAMPEDE/Var_Type_Distribution,SMO,4471
+top_site_count,STAMPEDE/Top_Site_Count,SND1,5454
+top_variant_count,STAMPEDE/Top_Variant_Count,SND1,5450
+var_type_distribution,STAMPEDE/Var_Type_Distribution,SND1,5452
+top_fusion_count,STAMPEDE/Top_Fusion_Count,SND1,5448
 top_site_count,STAMPEDE/Top_Site_Count,SOX2,3741
 top_variant_count,STAMPEDE/Top_Variant_Count,SOX2,4511
 gene_lollipop,STAMPEDE/Gene_Lollipop,SOX2,4013
@@ -1119,6 +1162,10 @@ top_site_count,STAMPEDE/Top_Site_Count,TBC1D9,5317
 top_variant_count,STAMPEDE/Top_Variant_Count,TBC1D9,5313
 var_type_distribution,STAMPEDE/Var_Type_Distribution,TBC1D9,5313
 top_fusion_count,STAMPEDE/Top_Fusion_Count,TBC1D9,5311
+top_site_count,STAMPEDE/Top_Site_Count,TFG,5462
+top_variant_count,STAMPEDE/Top_Variant_Count,TFG,5458
+var_type_distribution,STAMPEDE/Var_Type_Distribution,TFG,5460
+top_fusion_count,STAMPEDE/Top_Fusion_Count,TFG,5456
 top_site_count,STAMPEDE/Top_Site_Count,TP53,3755
 top_variant_count,STAMPEDE/Top_Variant_Count,TP53,3757
 gene_lollipop,STAMPEDE/Gene_Lollipop,TP53,4023
@@ -1132,6 +1179,10 @@ top_site_count,STAMPEDE/Top_Site_Count,TPM3,5325
 top_variant_count,STAMPEDE/Top_Variant_Count,TPM3,5321
 var_type_distribution,STAMPEDE/Var_Type_Distribution,TPM3,5321
 top_fusion_count,STAMPEDE/Top_Fusion_Count,TPM3,5319
+top_site_count,STAMPEDE/Top_Site_Count,TPM4,5470
+top_variant_count,STAMPEDE/Top_Variant_Count,TPM4,5466
+var_type_distribution,STAMPEDE/Var_Type_Distribution,TPM4,5468
+top_fusion_count,STAMPEDE/Top_Fusion_Count,TPM4,5464
 top_site_count,STAMPEDE/Top_Site_Count,TSC1,3763
 top_variant_count,STAMPEDE/Top_Variant_Count,TSC1,3765
 gene_lollipop,STAMPEDE/Gene_Lollipop,TSC1,4027

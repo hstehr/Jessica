@@ -6,8 +6,8 @@ back,1
 bone,12
 breast,42
 cervix,2
-cns (brain/spinal cord),104
-colon and rectum,85
+cns (brain/spinal cord),105
+colon and rectum,86
 esophagus,13
 foreskin,1
 gallbladder,10
@@ -17,30 +17,31 @@ kidney,10
 larynx,1
 lip and oral cavity,5
 liver,10
-lung,774
+lung,779
 lymph node,3
 mesenteric mass,1
 nasopharynx,3
 neck,4
 ocular tumors,2
 ovary,14
-pancreas,63
+pancreas,64
 penis,1
-peritoneum,1
+perihilar bile ducts,5
+peritoneum,2
 pharynx,2
-pleura,6
+pleura,7
 prostate gland,6
 salivary glands,5
 scalp,2
-skin,58
-small intestine,11
+skin,62
+small intestine,12
 soft tissue,36
-stomach,33
+stomach,34
 testes,1
 thymus,6
 thyroid,18
 trachea,1
-urinary bladder,6
+urinary bladder,7
 uterus,3
 uvea,6
 vulva,1

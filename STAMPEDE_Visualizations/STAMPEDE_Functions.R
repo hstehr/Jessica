@@ -1707,7 +1707,28 @@ site_count_fxn <- function (DF, cohort, outdir) {
   } else {comment = "test orders"
   }
   
-  plot <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=Percent.Orders, fill=PrimaryTumorSite)) +
+  plot_jpeg <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=Percent.Orders, fill=PrimaryTumorSite)) +
+    geom_bar(stat="identity") +
+    
+    labs(title = "Primary Tumor Sites",
+         subtitle = paste("N = ", sum(DF_tabulate$No.Orders), " ", comment, sep="")) +
+    
+    xlab("Primary Tumor Site") + 
+    scale_y_continuous(name="Percent of Test Orders", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
+    
+    theme_bw() +
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=30),
+          plot.subtitle = element_text(hjust=1, face="bold",size=25),
+          
+          axis.text.y=element_text(size=20),
+          axis.text.x=element_text(size=20,angle = 45, hjust = 1),
+          axis.title=element_text(size=20,face="bold"),
+          
+          legend.position = "none") +
+    
+    scale_fill_manual(values = custom.hues.60)
+  
+  plot_interactive <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=Percent.Orders, fill=PrimaryTumorSite)) +
     geom_bar(stat="identity") +
     
     labs(title = "Primary Tumor Sites",
@@ -1739,14 +1760,14 @@ site_count_fxn <- function (DF, cohort, outdir) {
     
     tiff(filename = paste(outdir, file_id,"_graph.tiff", sep=""),
          width = width.plot, height = height.plot, units = "in", res = 350)
-    grid.arrange(plot)
+    grid.arrange(plot_jpeg)
     dev.off()    
   }
   
   # Save to cloud
   if (isTRUE(saveDynamicPlots)) {
     
-    plot_dynamic_int <- ggplotly(plot)
+    plot_dynamic_int <- ggplotly(plot_interactive)
     
     # Autoscale x-axis
     plot_dynamic_int$x$layout$xaxis$autorange = TRUE
@@ -1780,6 +1801,7 @@ site_count_fxn <- function (DF, cohort, outdir) {
 # > if cutoff is less than n=2, remove sites with n=1
 top_site_count_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- unique(DF[,c("PatientID","PrimaryTumorSite")])
+  No.TotalOrders = length(unique(DF_Fxn$PatientID))
   
   # TABLE
   #----------------------------------------------
@@ -1787,6 +1809,8 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   DF_tabulate <- data.frame(DF_Fxn %>% group_by(PrimaryTumorSite) %>% tally())
   colnames(DF_tabulate) <- c("PrimaryTumorSite","No.Orders")
   DF_tabulate <- DF_tabulate[order(DF_tabulate$No.Orders, decreasing = TRUE),]
+  
+  DF_tabulate$Percent.Orders <- as.numeric(round(100 * DF_tabulate$No.Orders/No.TotalOrders, 2))
   
   if (isTRUE(nrow(DF_tabulate) > 20)) {
     cutoff = 5*floor(DF_tabulate$No.Orders[[20]]/5) 
@@ -1812,10 +1836,10 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   # HISTOGRAM
   #----------------------------------------------
   DF_tabulate$PrimaryTumorSite <- factor(DF_tabulate$PrimaryTumorSite, 
-                                         levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$No.Orders)])
+                                         levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$Percent.Orders)])
   
   # Y-axis parameters
-  ymax <- ceiling(max(DF_tabulate$No.Orders)/10) * 10
+  ymax <- ceiling(max(DF_tabulate$Percent.Orders)/10) * 10
   if (isTRUE(ymax < 1000)) {
     if (isTRUE(ymax <= 20)) {y_increment = 1
     } else if (isTRUE(ymax <= 30)) {y_increment = 2
@@ -1836,18 +1860,39 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   }
   
   # Subtitle parameters
-  if (isTRUE(sum(DF_tabulate$No.Orders) == 1)) {comment = "entry"
-  } else {comment = "entries"
+  if (isTRUE(sum(DF_tabulate$No.Orders) == 1)) {comment = "test order"
+  } else {comment = "test orders"
   }
   
-  plot <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=No.Orders, fill=PrimaryTumorSite)) +
+  plot_jpeg <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=Percent.Orders, fill=PrimaryTumorSite)) +
     geom_bar(stat="identity") +
     
     labs(title = "Top Primary Tumor Sites",
-         subtitle = paste("N = ", sum(DF_tabulate$No.Orders), " / ", nrow(DF), " total STAMP ", comment, sep="")) +
+         subtitle = paste("N = ", sum(DF_tabulate$No.Orders), " / ", nrow(DF_Fxn), " ", comment, sep="")) +
     
     xlab("Primary Tumor Site") +
-    scale_y_continuous(name="Number of Test Orders", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
+    scale_y_continuous(name="Percent of Test Orders", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
+    
+    theme_bw() +
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=30),
+          plot.subtitle = element_text(hjust=1, face="bold",size=25),
+          
+          axis.text.y=element_text(size=20),
+          axis.text.x=element_text(size=20,angle = 45, hjust = 1),
+          axis.title=element_text(size=20,face="bold"),
+          
+          legend.position = "none") +
+    
+    scale_fill_manual(values = custom.hues.30)
+  
+  plot_interactive <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=Percent.Orders, fill=PrimaryTumorSite)) +
+    geom_bar(stat="identity") +
+    
+    labs(title = "Top Primary Tumor Sites",
+         subtitle = paste("N = ", sum(DF_tabulate$No.Orders), " / ", nrow(DF_Fxn), " ", comment, sep="")) +
+    
+    xlab("Primary Tumor Site") +
+    scale_y_continuous(name="Percent of Test Orders", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
     
     theme_bw() +
     theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
@@ -1867,13 +1912,13 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   if (isTRUE(saveStaticPlots)) {
     tiff(filename = paste(outdir, file_id,".tiff", sep=""),
          width = width, height = height, units = "in", res = 350)
-    grid.arrange(plot, Output.table, widths = c(2, 0.5), ncol = 2, nrow = 1)
+    grid.arrange(plot_jpeg, Output.table, widths = c(2, 0.5), ncol = 2, nrow = 1)
     dev.off()
   }
   
   # Save to cloud
   if (isTRUE(saveDynamicPlots)) {
-    plot_dynamic_int <- ggplotly(plot)
+    plot_dynamic_int <- ggplotly(plot_interactive)
     
     # Autoscale x-axis
     plot_dynamic_int$x$layout$xaxis$autorange = TRUE
@@ -1890,6 +1935,9 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
       
       plot_dynamic_int$x$data[[elem_No]]$text <- 
         gsub("PrimaryTumorSite", "Primary Tumor Site", plot_dynamic_int$x$data[[elem_No]]$text)
+      
+      plot_dynamic_int$x$data[[elem_No]]$text <- 
+        gsub("$","%",gsub("Percent.Orders", "Percent of Total Orders", plot_dynamic_int$x$data[[elem_No]]$text))
     }
     
     p <- ggplotly(plot_dynamic_int)
