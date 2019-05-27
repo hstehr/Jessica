@@ -45,7 +45,7 @@ Wifi connection is required.
 ### Source Code
 #### Source code location
 > https://github.com/SHCMolPathLab/Jessica
-> Box Sync link
+> https://stanfordmedicine.box.com/s/m15thsbokgqjvxlciso5wwi393uomaw9 
 
 #### Source code modifications 
 Customize parameters for deployment i.e. plotly login information, location of files directories and reference files.
