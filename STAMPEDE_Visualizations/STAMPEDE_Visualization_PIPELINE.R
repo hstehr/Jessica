@@ -100,6 +100,9 @@ source("HistologicalDx_CTEP_Match.R")
 #################################
 setwd(script.dir)
 
+## STAMP database non-QC PIPELINE
+source("TestOrder_QC.R")
+
 ## STAMP database QC PIPELINE
 source("SNVIndel_QC.R")
 
@@ -157,7 +160,7 @@ cat("\n",paste("Outdirectory: ", outdir, sep=""))
 
 outdir.lollipop = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/TIFF_Lollipop/"
 if (!dir.exists(outdir.lollipop)){dir.create(outdir.lollipop)} 
-cat("\n",paste("Outdirectory (lollipop plots): ", outdir.lollipop, sep=""),"\n")
+cat("\n",paste("Outdirectory (lollipop plots): ", outdir.lollipop, sep=""),"\n","\n")
 
 source("STAMPEDE_PerGene.R")
 

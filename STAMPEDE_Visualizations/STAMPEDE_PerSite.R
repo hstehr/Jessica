@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 # Specify key table
 #----------------------------------------------
 site.list <- data.frame(PrimaryTumorSite=unique(STAMP_DF$PrimaryTumorSite), stringsAsFactors = FALSE)
@@ -21,6 +24,8 @@ if (!is.null(sites.addition.Fusion)) {
                            data.frame(PrimaryTumorSite=sites.addition.Fusion,
                                       CohortName=gsub(" ","",sites.addition.Fusion)))
 }
+
+assign("site.list.total", site.list.total, envir = .GlobalEnv)
 
 # Iterate through each unique primary tumor site
 #----------------------------------------------

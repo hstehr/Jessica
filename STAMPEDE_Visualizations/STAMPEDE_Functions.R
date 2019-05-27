@@ -2341,8 +2341,12 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
   }
 }
 
+# Missing histological info <NA> marked as "Not Applicable"
 histologicaldx_distribution_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- unique(DF[,c("PatientID","HistologicalDx")])
+  
+  DF_Fxn$HistologicalDx[is.na(DF_Fxn$HistologicalDx)] <- "Not Applicable"
+  
   # TABLE
   #----------------------------------------------
   # Tabulate frequency = age of patient
@@ -2832,7 +2836,7 @@ Lollipop_Plot <- function(variant_type, assay,
 }
 
 # Assume dataset does not contain benign mutations
-SNV_lollipop_fxn <- function (DF, gene_id,assay, outdir, width, height) {
+SNV_lollipop_fxn <- function (DF, gene_id, assay, outdir, width, height) {
   
   # Extract gene information
   #----------------------------------------------
@@ -2901,6 +2905,9 @@ SNV_lollipop_fxn <- function (DF, gene_id,assay, outdir, width, height) {
   
   data_var_FULL$var.pos <- as.numeric(data_var_FULL$var.pos)
   data_var_FULL$var.freq <- as.numeric(data_var_FULL$var.freq)
+  
+  assign("DF_gene_INFO", DF_gene_INFO, envir = .GlobalEnv)
+  assign("data_var_FULL", data_var_FULL, envir = .GlobalEnv)
   
   # Generate plots for each pathogenicity status
   #----------------------------------------------

@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 # SNV/Indel info
 #----------------------------------------------
 pt_mutation_count_fxn (DF = STAMP_DF, cohort=cohort_id, outdir = outdir)

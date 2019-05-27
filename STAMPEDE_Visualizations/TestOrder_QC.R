@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 #################################
 ## STAMP database QC PIPELINE: use to map test order volumne
 #################################

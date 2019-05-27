@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 # Specify key table
 #----------------------------------------------
 snv.list <- data.frame(gene=sort(unique(STAMP_DF$VariantGene)), stringsAsFactors = FALSE)
@@ -10,6 +13,8 @@ if (!is.null(genes.addition.Fusion)) {
 if (!is.null(genes.addition.CNV)) {
   gene.list.total <- append(gene.list.total,genes.addition.CNV)
 }
+
+assign("gene.list.total", gene.list.total, envir = .GlobalEnv)
 
 # Check for missing gene INFO (SNV/Indels)
 #----------------------------------------------
@@ -24,11 +29,11 @@ if (nrow(Temp_DF) > 0) {
 
 Temp_DF <- anti_join(snv.list, domain.DF, by = "gene")
 if (nrow(Temp_DF) > 0) {
-  cat(paste("Transcripts with missing domain information:", sep=""), "\n")
+  cat(paste("Transcripts with missing domain information:", sep=""), "\n","\n")
   print(anti_join(snv.list, domain.DF, by = "gene"))
-} else {cat(paste("All SNV/Indel transcripts have annotated domain information.", sep=""), "\n")}
+} else {cat(paste("All SNV/Indel transcripts have annotated domain information.", sep=""), "\n","\n")}
 
-remove(Tiles,Changes,Temp_DF,gene.DF,domain.DF)
+remove(Temp_DF,gene.DF,domain.DF)
 
 # Iterate through each unique gene
 #----------------------------------------------
@@ -79,4 +84,4 @@ for (gene_num in 1:length(gene.list.total)) {
   remove(gene_id,col_extract,gene_DF,gene_Fusion,gene_CNV)
 }
 
-remove(gene_num,genes.addition.Fusion,genes.addition.CNV,gene.list)
+remove(gene_num,genes.addition.Fusion,genes.addition.CNV)
