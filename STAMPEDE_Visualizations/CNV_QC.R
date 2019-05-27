@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 #################################
 ## STAMP CNV database QC PIPELINE
 #################################
@@ -29,6 +32,47 @@ STAMP_CNV <- left_join(STAMP_CNV,
 #                                by = "PatientID")
 # CNV.diff_No <- length(which(is.na(STAMP_CNV_missing$PrimaryTumorSite)))
 # cat(paste("Number of CNV entries missing age: ",CNV.diff_No,sep=""))
+
+# Filter for entries with histological dx
+#----------------------------------------------
+STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$HistologicalDx), ]
+# sort(unique(STAMP_CNV$HistologicalDx))
+
+# Filter for entries with primary tumor site
+#----------------------------------------------
+STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$PrimaryTumorSite),]
+STAMP_CNV <- STAMP_CNV[!(STAMP_CNV$PrimaryTumorSite %in% c("unknown","none","other primary site")),]
+
+# Collapse similar primary tumor site
+STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite %in% c("colon","colon and rectum"))] <- "colon and rectum"
+STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite %in% c("testes","testis"))] <- "testes"
+
+# Abbreviate for visualization
+STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite == "central nervous system (brain/spinal cord)")] <- "cns (brain/spinal cord)"
+STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite == "hematologic and lymphatic neoplasm")] <- "hematologic and lymphoid"
+# sort(unique(STAMP_CNV$PrimaryTumorSite))
+
+# Filter entries for complete cases = percent tumor
+#----------------------------------------------
+STAMP_CNV <- STAMP_CNV[which(!is.na(STAMP_CNV$smpl.percentTumor)),]
+STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$smpl.percentTumor),]
+# sort(unique(STAMP_CNV$smpl.percentTumor))
+
+# Filter entries for complete cases = specimen type
+#----------------------------------------------
+STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$smpl.specimenType != "other"),]
+STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$smpl.specimenType),]
+# sort(unique(STAMP_CNV$smpl.specimenType))
+
+# Collapse similar gene names
+#----------------------------------------------
+STAMP_CNV$CNV_Gene[which(tolower(STAMP_CNV$CNV_Gene) %in% c("nkx2", "nkx2-1"))] <- "NKX2-1"
+# sort(unique(STAMP_CNV$CNV_Gene))
+
+# # Filter for adults
+# #----------------------------------------------
+# STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$PatientAge >= 18),]
+# sort(as.numeric(unique(STAMP_CNV$PatientAge)))
 
 # Examine number of missing fields
 #----------------------------------------------

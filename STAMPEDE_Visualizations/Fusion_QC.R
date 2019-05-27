@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 #################################
 ## STAMP Fusion database QC PIPELINE
 #################################
@@ -88,12 +91,11 @@ STAMP_Fusion$sys.label[which(STAMP_Fusion$sys.label == "COILED-COIL DOMAIN-CONTA
 
 STAMP_Fusion$smpl.fusionGene1[which(STAMP_Fusion$smpl.fusionGene1 == "TRK-FUSED GENE; TFG")] <- "TFG"
 STAMP_Fusion$smpl.fusionGene1[which(STAMP_Fusion$smpl.fusionGene1 == "COILED-COIL DOMAIN-CONTAINING PROTEIN 6; CCDC6")] <- "CCDC6"
-# sort(unique(STAMP_Fusion$smpl.fusionGene1))
-# sort(unique(STAMP_Fusion$smpl.fusionGene2))
+# sort(unique(append(STAMP_Fusion$smpl.fusionGene1, STAMP_Fusion$smpl.fusionGene2)))
 
-# # Filter for entries with histological dx
-# #----------------------------------------------
-# STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.histologicalDiagnosis), ]
+# Filter for entries with histological dx
+#----------------------------------------------
+STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.histologicalDiagnosis), ]
 # STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$smpl.histologicalDiagnosis != "none"), ]
 # sort(unique(STAMP_Fusion$smpl.histologicalDiagnosis))
 
@@ -104,16 +106,18 @@ STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$smpl.assayName == "STAMP - Solid
 
 # Filter for entries with primary tumor site
 #----------------------------------------------
+STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.primaryTumorSite),]
+STAMP_Fusion <- STAMP_Fusion[!(STAMP_Fusion$smpl.primaryTumorSite %in% c("unknown","none","other primary site")), ]
+
 # Collapse similar primary tumor site
 STAMP_Fusion$smpl.primaryTumorSite[which(STAMP_Fusion$smpl.primaryTumorSite %in% c("colon","colon and rectum"))] <- "colon and rectum"
+STAMP_Fusion$smpl.primaryTumorSite[which(STAMP_Fusion$smpl.primaryTumorSite %in% c("liver","hepatocellular (liver)"))] <- "liver"
 
 # Abbreviate for STAMPEDE display
 STAMP_Fusion$smpl.primaryTumorSite[which(STAMP_Fusion$smpl.primaryTumorSite == "central nervous system (brain/spinal cord)")] <- "cns (brain/spinal cord)"
 STAMP_Fusion$smpl.primaryTumorSite[which(STAMP_Fusion$smpl.primaryTumorSite == "hematologic and lymphatic neoplasm")] <- "hematologic and lymphoid"
-STAMP_Fusion$smpl.primaryTumorSite[which(STAMP_Fusion$smpl.primaryTumorSite == "hepatocellular (liver)")] <- "liver"
 
 STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.primaryTumorSite), ]
-STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$smpl.primaryTumorSite != "none"), ]
 # sort(unique(STAMP_Fusion$smpl.primaryTumorSite))
 
 # Filter entries for complete cases = percent tumor
@@ -137,6 +141,7 @@ STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.specimenType),]
 # # Filter for adults = 19 entries removed 
 # #----------------------------------------------
 # STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$Age >= 18),]
+# sort(as.numeric(unique(STAMP_Fusion$Age)))
 
 # Rename columns
 #----------------------------------------------
@@ -203,4 +208,3 @@ cat(paste("POST-Filter counts: ",nrow(STAMP_Fusion), " total entries and ",
 assign("STAMP_Fusion", STAMP_Fusion, envir = .GlobalEnv)
 write.table(STAMP_Fusion, file = paste(tempdir, Fusion_Export_timestamp, "_Fusion_Export_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
-

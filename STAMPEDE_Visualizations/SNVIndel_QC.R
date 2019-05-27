@@ -1,3 +1,6 @@
+sink(file = out.output, append = TRUE, split = FALSE)
+options(max.print=999999)
+
 #################################
 ## STAMP database QC PIPELINE
 #################################
@@ -48,9 +51,9 @@ source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis_20190507/Syapse_V
 
 cat(paste("POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
-# # Filter for entries with histological dx
-# #----------------------------------------------
-# STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$HistologicalDx), ]
+# Filter for entries with histological dx
+#----------------------------------------------
+STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$HistologicalDx), ]
 # STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other"), ]
 # STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other (specify)"), ]
 # STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy (specify)"), ]
@@ -60,18 +63,17 @@ cat(paste("POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(uniqu
 
 # Filter for entries with primary tumor site
 #----------------------------------------------
+STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$PrimaryTumorSite),]
+STAMP_DF <- STAMP_DF[!(STAMP_DF$PrimaryTumorSite %in% c("unknown","none","other primary site")), ]
+
 # Collapse similar primary tumor site
 STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite %in% c("colon","colon and rectum"))] <- "colon and rectum"
-STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite %in% c("liver","hepatocellular (liver)"))] <- "liver and hepatocellular (liver)"
+STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite %in% c("liver","hepatocellular (liver)"))] <- "liver"
 STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite %in% c("testes","testis"))] <- "testes"
-
-STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$PrimaryTumorSite),]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite != "unknown"), ]
 
 # Abbreviate for visualization
 STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite == "central nervous system (brain/spinal cord)")] <- "cns (brain/spinal cord)"
 STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite == "hematologic and lymphatic neoplasm")] <- "hematologic and lymphoid"
-STAMP_DF$PrimaryTumorSite[which(STAMP_DF$PrimaryTumorSite == "liver and hepatocellular (liver)")] <- "liver"
 # sort(unique(STAMP_DF$PrimaryTumorSite))
 
 # Filter entries for complete cases = percent tumor
@@ -96,14 +98,21 @@ STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$smpl.specimenType),]
 # Filter for STAMP v2
 #----------------------------------------------
 STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)"), ]
+# sort(unique(STAMP_DF$AssayName))
 
 # # Filter for adults
 # #----------------------------------------------
 # STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]
+# sort(as.numeric(unique(STAMP_DF$PatientAge)))
 
-# Filter for entries with proper HGVS protein nomenclature
+# Filter for entries with proper HGVS nomenclature
 #----------------------------------------------
+# Format HGVS protein nomenclature
 STAMP_DF <- STAMP_DF[which(grepl("^p.[[:alpha:]]{3}[[:digit:]]+.*", STAMP_DF$VariantHGVSProtein)),]
+
+# Collapse similar gene names
+STAMP_DF$VariantGene[which(tolower(STAMP_DF$VariantGene) %in% c("nkx2", "nkx2-1"))] <- "NKX2-1"
+# sort(unique(STAMP_DF$VariantGene))
 
 # Remove benign mutations 
 #----------------------------------------------
