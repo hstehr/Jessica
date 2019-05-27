@@ -46,8 +46,8 @@ remove(STAMP_DF_old,column_common,DF_TumorSite)
 
 # Clean up patient data from Syapse
 #----------------------------------------------
-source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis_20190507/Syapse_Export_QC.R",sep=""))
-source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis_20190507/Syapse_VariantAnnotate.R",sep=""))
+source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_Export_QC.R",sep=""))
+source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_VariantAnnotate.R",sep=""))
 
 cat(paste("POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
