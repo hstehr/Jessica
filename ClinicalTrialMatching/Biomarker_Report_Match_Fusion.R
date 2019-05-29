@@ -116,7 +116,7 @@ if (isTRUE(Internal_match)) {
                 
                 ## Apply disease.group_FILTER
                 # Account for missing primary tumor site information
-                ## PrimaryTumorSite.Category != "unknown" is equivalent to disease.group_FILTER = "FALSE"
+                ## PrimaryTumorSite.Category == "unknown" is equivalent to disease.group_FILTER = "FALSE"
                 if (isTRUE(disease.group_FILTER & Disease.category.patient != "unknown")) {
                   
                   ## Iterate through each element of Disease.category.trial
@@ -171,7 +171,7 @@ if (isTRUE(Internal_match)) {
                     
                     ## Apply disease.site_FILTER
                     # Account for missing primary tumor site information
-                    ## PrimaryTumorSite.Category != "unknown" is equivalent to disease.site_FILTER = "FALSE"
+                    ## PrimaryTumorSite.Category == "unknown" is equivalent to disease.site_FILTER = "FALSE"
                     if (isTRUE(disease.group_FILTER & disease.site_FILTER & Disease.category.patient != "unknown")) {
                       
                       ## Iterate through each element of Disease.Site.trial
