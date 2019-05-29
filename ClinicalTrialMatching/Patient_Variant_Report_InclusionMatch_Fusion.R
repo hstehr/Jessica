@@ -277,6 +277,7 @@ if (isTRUE(NCI_match)) {
                     dx.patient = unique(DF_patient$HistologicalDx)
                     tumorsite.patient = unique(DF_patient$PrimaryTumorSite)
                     
+                    ## HistologicalDx == "NULL" is equivalent to disease.site_FILTER = "FALSE"
                     if (isTRUE(!is.null(dx.patient) & exclusion_continue & disease.code_FILTER)) {
                       
                       # Extract variants for Arm_No in Disease Exclusion Codes
