@@ -1,43 +1,13 @@
-#!/usr/bin/env Rscript
-
-library(plyr)
-library(dplyr)
-library(Biobase)
-library(eeptools)
-library(splitstackshape)
-library(reshape)
-library(rio)
-library(stringr)
-library(openxlsx)
-library(tidyr)
-
-args = commandArgs(trailingOnly=TRUE)
-# 1. Directory to save output to.
-data.root = args[1]
-# 2. Location of STAMP entries (syapse export).
-STAMP.file = args[2]
-# 3. Location of OnCore Report (Stanford Internal Clinical Trials).
-OnCore.file = args[3]
-# 4. Names of OnCore Arms to remove
-OnCore.ArmRemove = args[4]
-# 5. Location of Patient Variant Report (NCI-MATCH Clinical Trials).
-NCI.file = args[5]
-# 6. Names of NCI-MATCH Arms to remove
-NCI.ArmRemove = args[6]
-# 7. Directory of pipeline scripts.
-script.root = args[7]
-# 8. File location of OUTPUT directory. 
-outdir.root = args[8]
-# 9. Location of stamp_reference_transcripts.
-stamp_reference_transcripts = args[9]
-# 10. Location of most recent exons_ensembl.
-exons_ensembl = args[10]
-# 11. File location of disease exclusion key file.
-histoDx.key = args[11]
-# 12-14. Filters
-adult_FILTER = args[12]
-pathogenic_FILTER = args[13]
-disease_FILTER = args[14]
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
+suppressMessages(library(Biobase))
+suppressMessages(library(eeptools))
+suppressMessages(library(splitstackshape))
+suppressMessages(library(reshape))
+suppressMessages(library(rio))
+suppressMessages(library(stringr))
+suppressMessages(library(openxlsx))
+suppressMessages(library(tidyr))
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
@@ -50,7 +20,7 @@ if (isTRUE(NCI.file == "FALSE")) {NCI_match = FALSE
 #----------------------------------------------
 outdir = paste(outdir.root,"/",sep="")
 if (!dir.exists(outdir)){dir.create(outdir)} 
-tempdir = paste(outdir.root,"/../temp/",sep="")
+tempdir = paste(outdir.root,"/temp/",sep="")
 if (!dir.exists(tempdir)){dir.create(tempdir)} 
 
 # Specify output file
@@ -86,13 +56,15 @@ setwd(script.root)
 ## Disease Ontology 
 source("DiseaseGroupCategories.R")
 source("HistologicalDx_CTEP_Match.R")
+source("CustomPalettes.R")
 
 ## Default filters 
 static.plots_FILTER = TRUE # Generate static visual graphics
+adult.group_FILTER = as.logical(adult_FILTER) # Adult = age >= 18+yo)
 pathogenic_accepted <- c("Pathogenic", "Likely Pathogenic")
+benign_removed <- c("Likely Benign")
 
 ## Customizeable filters
-adult.group_FILTER = as.logical(adult_FILTER) # Adult = age >= 18+yo)
 pathogenic_FILTER = as.logical(pathogenic_FILTER)
 disease.group_FILTER = as.logical(disease_FILTER)
 disease.site_FILTER = as.logical(disease_FILTER) # Dependent on disease.group_FILTER == TRUE
@@ -112,10 +84,10 @@ sink(file = err.output, append = FALSE, split = FALSE)
 options(max.print=999999)
 sink()
 
-## Write output to file
-#----------------------------------------------
-sink(file = out.output, append = FALSE, split = FALSE)
-options(max.print=999999)
+# ## Write output to file
+# #----------------------------------------------
+# sink(file = out.output, append = FALSE, split = FALSE)
+# options(max.print=999999)
 
 ## Print parameters to output
 #----------------------------------------------
@@ -193,63 +165,36 @@ STAMP_DF <- rbind(STAMP_DF[,column_common],STAMP_DF_old[,column_common])
 remove(STAMP_DF_old,column_common,DF_TumorSite)
 
 # Clean up patient data from Syapse
+#----------------------------------------------
 source("Syapse_Export_QC.R") # Includes manual edits for Syapse export
 source("Syapse_VariantAnnotate.R")
 
 cat("STAMP - Solid Tumor Actionable Mutation Panels","\n")
 cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")
 
-# #----------------------------------------------
-# ## Algorithm testing on retrospective SNV/Indel data
-# #----------------------------------------------
-# DF = STAMP_DF
-# cohort = "all"
-# source("Syapse_Visualizations.R")
-# 
-# if (isTRUE(adult.group_FILTER)) {STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]}
-# cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")
-
-# #----------------------------------------------
-# ## # Replication of Appendix A MATCH Designated Lab Application: SNV/Indels
-# #----------------------------------------------
-# # Filter patients from 2017-07-01 to 2017-12-31, inclusive
-# STAMP_DF$AssayReportDateReviewed <- as.Date(STAMP_DF$AssayReportDateReviewed, format = "%Y-%m-%d")
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayReportDateReviewed >= "2017-07-01" &
-#                              STAMP_DF$AssayReportDateReviewed <= "2017-12-31"),]
-# cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")
-# 
-# DF = STAMP_DF
-# cohort = "all"
-# source("Syapse_Visualizations.R")
-
 #----------------------------------------------
-## Algorithm testing on retrospective SNV/Indel data
+## # Replication of Appendix A MATCH Designated Lab Application: SNV/Indels
 #----------------------------------------------
-# Filter for entries with histological dx
-STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$HistologicalDx), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other"), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy"), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy (specify)"), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy:malignancy, type cannot be determined"), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "non-classifiable"), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other (specify)"), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other/non-classifiable:other(s) (specify)"), ]
-# sort(unique(STAMP_DF$HistologicalDx))
-
-# Filter for entries with primary tumor site
-# sort(unique(STAMP_DF$PrimaryTumorSite))
-STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$PrimaryTumorSite), ]
-STAMP_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite != "unknown"), ]
-# sort(unique(STAMP_DF$PrimaryTumorSite))
+# Filter patients from 2017-07-01 to 2017-12-31, inclusive
+STAMP_DF$AssayReportDateReviewed <- as.Date(STAMP_DF$AssayReportDateReviewed, format = "%Y-%m-%d")
+STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayReportDateReviewed >= "2017-07-01" &
+                             STAMP_DF$AssayReportDateReviewed <= "2017-12-31"),]
 
 # Filter for STAMP v2
+#----------------------------------------------
 STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)"), ]
+# sort(unique(STAMP_DF$AssayName))
 
-# Filter for adults
-if (isTRUE(adult.group_FILTER)) {STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]}
+# Remove benign mutations 
+#----------------------------------------------
+STAMP_DF <- STAMP_DF[!(STAMP_DF$VariantPathogenicityStatus %in% benign_removed), ]
+# sort(unique(STAMP_DF$VariantPathogenicityStatus))
 
-# # Filter lung primary tumor site
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$PrimaryTumorSite != "lung"),]
+cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")
+
+DF = STAMP_DF
+cohort = "all"
+source("Syapse_Visualizations.R")
 
 #----------------------------------------------
 ## Pipeline resumes
@@ -279,7 +224,4 @@ if (length(patient.list) > 0) {
   
 }
 
-sink()
-
-# Delete temporary directory
-if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)}
+closeAllConnections() 

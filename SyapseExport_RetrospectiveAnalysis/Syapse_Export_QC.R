@@ -313,13 +313,13 @@ remove(date_NA)
 
 ## Remove entries with missing information
 #----------------------------------------------
-## Remove entries without gender = 31 entries
+## Remove entries without gender
 DF_Full <- DF_Full[which(!is.na(DF_Full$smpl.gender) & DF_Full$smpl.gender != "Unknown"),]
 
-# Remove patients without DOB = 11 entries
+# Remove patients without DOB
 DF_Full <- DF_Full[!is.na(DF_Full$base.dob),]
 
-# Remove patients without pathogenicity = 3 entries
+# Remove patients without pathogenicity
 DF_Full <- DF_Full[!is.na(DF_Full$smpl.pathogenicityStatus),]
 
 ## Structure patient DOB and input current age

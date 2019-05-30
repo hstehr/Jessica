@@ -22,4 +22,9 @@ stamp_reference_transcripts="/Users/jessicachen/Documents/ClinicalDataScience_Fe
 exons_ensembl="/Users/jessicachen/Documents/ClinicalDataScience_Fellowship/STAMP/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt"
 histoDx_key="~/Desktop/Version4b_RetrospectiveAnalysis_20190502/HistologicalDx_CTEP.csv"
 
-Rscript ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP $OnCore $OnCore_ArmRemove $NCI $NCI_ArmRemove $script_root $outdir $stamp_reference_transcripts $exons_ensembl $histoDx_key
+# Filters 
+adult_FILTER = "TRUE"
+pathogenic_FILTER = "TRUE"
+disease_FILTER = "TRUE"
+
+Rscript ClinicalTrial_Matching_PIPELINE.R $data_root $STAMP $OnCore $OnCore_ArmRemove $NCI $NCI_ArmRemove $script_root $outdir $stamp_reference_transcripts $exons_ensembl $histoDx_key $adult_FILTER $pathogenic_FILTER $disease_FILTER

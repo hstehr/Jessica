@@ -125,6 +125,17 @@ if (isTRUE(NCI_match)) {
 }
 
 y_max = ceiling(max(max_list)/100) * 100
+if (isTRUE(y_max < 1000)) {
+  if (isTRUE(y_max <= 20)) {y_increment = 1
+  } else if (isTRUE(y_max <= 30)) {y_increment = 2
+  } else if (isTRUE(y_max <= 100)) {y_increment = 5
+  } else if (isTRUE(y_max <= 200)) {y_increment = 10
+  } else if (isTRUE(y_max <= 500)) {y_increment = 50
+  } else if (isTRUE(y_max <= 1000)) {y_increment = 100
+  } else {y_increment = 10
+  }
+} else {y_increment = 250
+}
 
 ## FUNCTION: save histogram plot in local computer
 plot_Trial_Count <- function(DF, trialColumn, fileName_pre, plotTitle, y_max) {
@@ -136,39 +147,66 @@ plot_Trial_Count <- function(DF, trialColumn, fileName_pre, plotTitle, y_max) {
   } else { image_width = x_max +3
   }
   
-  tiff(filename = paste(outdir, fileName_pre, "_", Sys.Date(), ".tiff", sep=""),
-       width = image_width, height = 7, units = "in", res = 150)
+  # TABLE
+  #----------------------------------------------
+  # Tabulate frequency
+  DF$Tabulate <- DF[[trialColumn]]
   
-  plot <- ggplot(DF, aes(x = DF[[trialColumn]])) +
-    geom_histogram(bins = x_max +1, col="gray") +
+  DF_tabulate <- data.frame(DF %>% group_by(Tabulate) %>% tally())
+  colnames(DF_tabulate) <- c("No.Trials","No.Orders")
+  
+  NoTrial.missing <- setdiff(seq(0,x_max), unique(DF_tabulate$No.Trials))
+  if (length(NoTrial.missing) > 0) {
+    DF_tabulate <- rbind(DF_tabulate,
+                              data.frame(No.Trials=NoTrial.missing,No.Orders=0, stringsAsFactors = FALSE))
+  }
+  DF_tabulate$No.Trials <- factor(DF_tabulate$No.Trials,
+                                             levels=c(seq(0,x_max,1)))
+  DF_tabulate$No.Orders <- as.numeric(DF_tabulate$No.Orders)
+  
+  # Specify palette 
+  x_rows = nrow(DF_tabulate)
+  custom.palette = get(paste("custom.hues.",x_rows,sep=""))
+  
+  plot <- ggplot(DF_tabulate, aes(x=No.Trials, y=No.Orders, fill=No.Trials)) +
+    geom_bar(stat="identity") +
+    geom_text(aes(label=No.Orders), vjust=-0.75, size=4.0)+
     
-    geom_text(stat='count', aes(label=..count..), vjust=-1) +
     labs(title = plotTitle,
-         subtitle = paste("N = ", total_matched, " / ", nrow(DF), " samples matched", sep="")) +
+         subtitle = paste("Match rate: ",format(round(as.numeric(100*total_matched/nrow(DF)),1),nsmall = 1), "% (n = ", 
+                          total_matched, "/", nrow(DF), ")", sep="")) +
     
-    scale_x_continuous(name="No. Clinical Trials", breaks = seq(0, x_max, 1)) +
-    scale_y_continuous(name="No. Samples", limits = c(0,y_max), breaks = seq(0,y_max, by = 100)) + 
+    scale_x_discrete(name="No. Clinical Trials Matched") +
+    scale_y_continuous(name="No. Test Orders", breaks = seq(0,ceiling(y_max/y_increment)*y_increment,y_increment), 
+                       limits=c(0,y_max)) +
     
-    theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=12),
+    theme_classic() +
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=18),
           plot.subtitle = element_text(hjust=1, face="bold",size=12),
           legend.text=element_text(size=10),
-          axis.text=element_text(size=15), 
-          axis.title=element_text(size=15,face="bold"))
+          axis.text=element_text(size=12,face="bold"), 
+          axis.title=element_text(size=12,face="bold"),
+          
+          legend.position="none") +
+    
+    scale_fill_manual(values = custom.palette)
   
+  tiff(filename = paste(outdir, "/", fileName_pre, "_", Sys.Date(), ".tiff", sep=""),
+       width = image_width, height = 7, units = "in", res = 350)
   print(plot)
   dev.off()
 }
 
 plot_Trial_Count(DF = Trial_Count, 
                  y_max = y_max,
-                 trialColumn = "No.Total.Trials", 
-                 fileName_pre = plot_filename, 
+                 trialColumn = "No.Total.Trials",
+                 fileName_pre = plot_filename,
                  plotTitle = plotTitle_label) 
 
 if (isTRUE(Internal_match)) {
   if (isTRUE(exists("DF_Output_OnCore_Biomarker"))) {
-    plot_Trial_Count(DF = Trial_Count, y_max = y_max,
+    plot_Trial_Count(DF = Trial_Count, 
+                     y_max = y_max,
                      trialColumn = "No.Internal.Trials", 
                      fileName_pre = paste("OnCore_MatchDistribution_", OnCore_Biomarker_Report_timestamp, "_", 
                                           groupName,siteName, "_", pathoName, "_",  ageName, sep=""), 
@@ -177,23 +215,17 @@ if (isTRUE(Internal_match)) {
 }
 
 if (isTRUE(NCI_match)) {
-  if (isTRUE(exists("DF_Output_Patient_Variant") & nrow(DF_Output_Patient_Variant) > 0)) {
-    plot_Trial_Count(DF = Trial_Count, y_max = y_max,
-                     trialColumn = "No.NCI.Trials", 
-                     fileName_pre = paste("MATCH_Variant_MatchDistribution_",
-                                          Patient_Variant_Report_timestamp, "_", 
-                                          dxName, "_", pathoName, "_",  ageName, sep=""), 
-                     plotTitle = "NCI-MATCH Trial Matching (Variants)") 
+  for (row_No in 1:nrow(Trial_Count)) {
+    Trial_Count$No.NCI.Total[row_No] <- 
+      as.numeric(Trial_Count$No.NCI.Trials[row_No] + Trial_Count$No.NCI.NonHotspot[row_No])
   }
   
-  if (isTRUE(exists("DF_Output_Patient_NonHotspot")) & nrow(DF_Output_Patient_NonHotspot) > 0) {
-    plot_Trial_Count(DF = Trial_Count, y_max = y_max,
-                     trialColumn = "No.NCI.NonHotspot", 
-                     fileName_pre = paste("MATCH_NonHotspot_MatchDistribution_",
-                                          Patient_Variant_Report_timestamp, "_", 
-                                          dxName, "_", pathoName, "_",  ageName, sep=""), 
-                     plotTitle = "NCI-MATCH Trial Matching (NonHotspot)") 
-  }
+  plot_Trial_Count(DF = Trial_Count, y_max = y_max,
+                   trialColumn = "No.NCI.Total", 
+                   fileName_pre = paste("MATCH_Total_MatchDistribution_",
+                                        Patient_Variant_Report_timestamp, "_", 
+                                        dxName, "_", pathoName, "_",  ageName, sep=""), 
+                   plotTitle = "NCI-MATCH Trial Matching") 
 }
 
 if (isTRUE(exists("DF_NCI_Matched_Dup"))) {remove(DF_NCI_Matched_Dup)}
