@@ -42,6 +42,71 @@ install.packages("jsonlite")
 #### Remote dependencies 
 Wifi connection is required.
 
+### Input Files
+#### Copy Number Variant (CNV)
+*Manually curated by Henning Stehr
+
+| FIELD NAME  | EXAMPLE VALUE |
+| ------------- | ------------- |
+| sys.uniqueId  | TRF-XXXX  |
+| Gene  | NKX2  |
+| Variant  | AMP  |
+
+#### Single Number Variation (SNV) / Insertions and Deletions (Indels)
+*Exported from Syapse
+
+| FIELD NAME	| EXAMPLE VALUE |
+| ------------- | ------------- |
+| sys.uniqueId | TRF-XXXX |
+| base.dob | MM/DD/YY |
+| smpl.gender | Female |
+| smpl.histologicalDiagnosis | Squamous cell carcinoma |
+| smpl.primaryTumorSite | Lung |
+| smpl.specimenType | formalin-fixed paraffin embedded tissue (FFPE) |
+| smpl.percentTumor | 40 |
+| smpl.assayName | STAMP - Solid Tumor Actionable Mutation Panel (130 genes) |
+| smpl.hasOrderingPhysician | LAST_NAME, FIRST_NAME (PHYS-XXX) |
+| sys.date_changed | YYYY-MM-DD 00:36:15.863000+00:00 |
+| sys.date_created | YYYY-MM-DD 16:40:47.334000+00:00 |
+| smpl.reportDateReviewed | YYYY-MM-DD |
+| smpl.dateReceived | YYYY-MM-DD |
+| smpl.amendedString | NA |
+| smpl.amendmentReason | NA |
+| sys.label | TP53 c.743G>A (p.Arg248Gln) |
+| base.gene | TP53 |
+| smpl.pathogenicityStatus | Pathogenic |
+| smpl.hgvsCoding | c.743G>A |
+| smpl.hgvsProtein | p.Arg248Gln |
+| smpl.transcript | NM_000546.5 |
+| smpl.genomicDescription | chr17:g.7577538C>T |
+| base.chromosome | chr17 |
+| smpl.hgvsGenomic | g.7577538C>T |
+| smpl.chromosomePositionStart | 7577538 |
+
+#### Fusion
+*Exported from Syapse
+
+| FIELD NAME	| EXAMPLE VALUE |
+| ------------- | ------------- |
+| sys.uniqueId | TRF-XXXX |
+| smpl.gender | Male |
+| base.dob | YYYY-MM-DD |
+| smpl.histologicalDiagnosis | Adenocarcinoma |
+| smpl.primaryTumorSite | lung |
+| smpl.specimenType | formalin-fixed paraffin embedded tissue (FFPE) |
+| smpl.percentTumor | 70 |
+| smpl.assayName | STAMP - Solid Tumor Actionable Mutation Panel (130 genes) |
+| smpl.hasOrderingPhysician | LAST_NAME, FIRST_NAME (PHYS-XX) |
+| sys.date_changed | YYYY-MM-DD 16:08:06.236000+00:00 |
+| sys.date_created | YYYY-MM-DD 17:43:04.335000+00:00 |
+| smpl.reportDateReviewed | YYYY-MM-DD |
+| smpl.dateReceived | YYYY-MM-DD |
+| smpl.amendedString | None |
+| smpl.amendmentReason | None |
+| sys.label | SND1-BRAF |
+| smpl.fusionGene1 | SND1 |
+| smpl.fusionGene2 | BRAF |
+
 ### Source Code
 #### Source code location
 > https://github.com/SHCMolPathLab/Jessica
@@ -79,7 +144,21 @@ R script extracts total gene and primary tumor site counts for website.
 Count_SiteGene.R
 ```
 
-R script generates iframe codes for website - this is done via manual curation.
+### Extraction of iframe codes
+iframe code per plot is found on “Share” component of Plotly file. 
+
+Example
+iframe code to embed for plot (https://plot.ly/~jwrchen/3328/#/)
+```
+<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~jwrchen/3322.embed"></iframe>
+```
+
+R script generates iframe codes for STAMPEDE website – each iteration requires manual curation.
 ```
 iframe_codes.R
+```
+
+Comma-delimited file containing directory and iframe code of generated plots - this is done via manual curation.
+```
+mappings.csv
 ```
