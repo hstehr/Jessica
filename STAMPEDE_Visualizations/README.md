@@ -147,11 +147,6 @@ Count_SiteGene.R
 ### Extraction of iframe codes
 iframe code per plot is found on “Share” component of Plotly file. 
 
-Example
-iframe code to embed for plot (https://plot.ly/~jwrchen/3328/#/)
-```
-<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~jwrchen/3322.embed"></iframe>
-```
 
 R script generates iframe codes for STAMPEDE website – each iteration requires manual curation.
 ```
@@ -161,4 +156,10 @@ iframe_codes.R
 Comma-delimited file containing directory and iframe code of generated plots - this is done via manual curation.
 ```
 mappings.csv
+```
+
+#### Example
+iframe code to embed for plot (https://plot.ly/~jwrchen/3328/#/)
+```
+<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plot.ly/~jwrchen/3322.embed"></iframe>
 ```
