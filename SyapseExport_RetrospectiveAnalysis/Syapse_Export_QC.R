@@ -73,7 +73,7 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   
   # Change to same capitalization scheme for consistency
   #----------------------------------------------
-  row.change = which(DF_Full$smpl.hgvsProtein == "PROMOTER")
+  row.change = which(tolower(DF_Full$smpl.hgvsProtein) == "promoter")
   DF_Full$smpl.hgvsProtein[row.change] <- "Promoter"
   phgvs.noeffect <- which(DF_Full$smpl.hgvsProtein == "Promoter")
   phgvs.sys.label <- unique(DF_Full[phgvs.noeffect, "sys.label"])
@@ -285,6 +285,9 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   DF_Full$smpl.genomicDescription[row.change] <- NA
   DF_Full$smpl.hgvsGenomic[row.change] <- NA
   
+  row.change = which(grepl("^chr[[:digit:]]+:",DF_Full$smpl.hgvsGenomic) == TRUE) 
+  DF_Full$smpl.hgvsGenomic[row.change] <- gsub("^chr[[:digit:]]+:","",DF_Full$smpl.hgvsGenomic[row.change])
+
   # VariantHGVSGenomic correction
   #----------------------------------------------
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "PTCH1 c.3947A>G (p.Tyr1316Cys)")] <-"g.98209591T>C"
@@ -297,19 +300,8 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "IDH2 c.419G>T (p.Arg140Leu)")] <- "g.90631934C>A"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "TET2 c.2645_2646delinsAA (p.Cys882Ter)")] <- "g.106157744_106157745delinsAA"
   
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr3:g.37067129C>A")] <- "g.37067129C>A"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr4:g.153249384 _153249385delinsGAC")] <- "g.153249384_153249385delinsGAC"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.140453136_140453137delinsTT")] <- "g.140453136_140453137delinsTT"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.116411885_116411899del")] <- "g.116411885_116411899del"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.2562_2563insGGACACCCC")] <- "g.2562_2563insGGACACCCC"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr12:g.25398280_25398286delinsACGACCC")] <- "g.25398280_25398286delinsACGACCC"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr15:g.90631934C>T")] <- "g.90631934C>T"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.7579406delGinsAC")] <- "g.7579406delGinsAC"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.7579371_7579372dupTG")] <- "g.7579371_7579372dupTG"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.29527590C>T")] <- "g.29527590C>T"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == ":g.10602467 _10602472dup")] <- "g.10602467_10602472dup"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "g.10191479")] <- "g.10191479C>G"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.55230489_55240217del")] <- "g.55230489_55240217del"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "NC_000016.9:g.68842671_68842677dup")] <- "g.68842671_68842677dup"
   
   row.change = which(is.na(DF_Full$smpl.genomicDescription))

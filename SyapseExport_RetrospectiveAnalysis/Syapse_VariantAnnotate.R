@@ -246,11 +246,6 @@ DF_intron$VariantHGVSProtein[row.change] <- DF_intron$VariantHGVSCoding[row.chan
 
 # Merge all entries 
 #----------------------------------------------
-# which(is.na(DF_Map$VariantHGVSProtein))
-# which(is.na(DF_NAprotein$VariantHGVSProtein))
-# which(is.na(DF_upstream$VariantHGVSProtein))
-# which(is.na(DF_intron$VariantHGVSProtein))
-
 DF_Full <- rbind(DF_Map, DF_NAprotein, DF_intron, DF_upstream)
 
 # Classification of variants for clinical trial matching (var.anno)
@@ -342,6 +337,7 @@ for (row_No in 1:nrow(DF_Full)) {
 
 cat(paste("No. of genes without annotated exon information: ",
     length(sort(unique(DF_Full$VariantGene[is.na(DF_Full$Exon_Number)]))), sep=""),"\n")
+print(sort(unique(DF_Full$VariantGene[is.na(DF_Full$Exon_Number)])))
 
 ## Remove entries with missing information
 #----------------------------------------------
