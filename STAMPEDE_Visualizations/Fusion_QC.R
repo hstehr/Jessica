@@ -93,10 +93,7 @@ STAMP_Fusion$smpl.fusionGene1[which(STAMP_Fusion$smpl.fusionGene1 == "TRK-FUSED 
 STAMP_Fusion$smpl.fusionGene1[which(STAMP_Fusion$smpl.fusionGene1 == "COILED-COIL DOMAIN-CONTAINING PROTEIN 6; CCDC6")] <- "CCDC6"
 # sort(unique(append(STAMP_Fusion$smpl.fusionGene1, STAMP_Fusion$smpl.fusionGene2)))
 
-# Filter for entries with histological dx
-#----------------------------------------------
-STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.histologicalDiagnosis), ]
-# STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$smpl.histologicalDiagnosis != "none"), ]
+# 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
 # sort(unique(STAMP_Fusion$smpl.histologicalDiagnosis))
 
 # Filter entries from STAMP - Solid Tumor Actionable Mutation Panel
@@ -138,7 +135,7 @@ STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$smpl.specimenType != "other"),]
 STAMP_Fusion <- STAMP_Fusion[complete.cases(STAMP_Fusion$smpl.specimenType),]
 # sort(unique(STAMP_Fusion$smpl.specimenType))
 
-# # Filter for adults = 19 entries removed 
+# # Filter for adults
 # #----------------------------------------------
 # STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$Age >= 18),]
 # sort(as.numeric(unique(STAMP_Fusion$Age)))

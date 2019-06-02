@@ -54,6 +54,9 @@ GeneName_List <- left_join(GeneName_List, unique(Gene_Summary[,]), by = "Variant
 
 GeneName_List <- GeneName_List[order(GeneName_List$VariantGene, decreasing = FALSE),]
 
+cat("Genes without descriptions associated:","\n")
+print(GeneName_List$VariantGene[is.na(GeneName_List$Summary)])
+
 write.table(GeneName_List, 
             file="~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/list_genes.csv",
             append = FALSE, sep = ",", row.names = FALSE, col.names = FALSE, quote = FALSE)

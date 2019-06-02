@@ -509,7 +509,7 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
   plot <- ggplot(DF_tabulate, aes(x=Mutation.Count, y=No.Orders, fill=Mutation.Count)) +
     geom_bar(stat="identity") +
     
-    labs(title = "Mutation Distribution",
+    labs(title = "Mutation Count",
          subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " ", comment1, "; ",
                           nrow(DF_Fxn), " STAMP ", comment2, sep="")) +
     
@@ -660,7 +660,7 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
                                           fill=Pathogenicity.Status)) +
     geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
     
-    labs(title = "Mutation Distribution",
+    labs(title = "Mutation Count",
          subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " ", comment1, "; ",
                           nrow(DF_Fxn), " STAMP ", comment2, sep="")) +
     
@@ -792,7 +792,7 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     plot <- ggplot(DF_tabulate, aes(x=Mutation.Count, y=No.Orders, fill=Mutation.Count)) +
       geom_bar(stat="identity") +
       
-      labs(title = "Mutation Distribution (Pathogenic)",
+      labs(title = "Mutation Count (Pathogenic)",
            subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " ", comment1, "; ",
                             nrow(DF_Fxn), " STAMP ", comment2, sep="")) +
       
@@ -910,7 +910,7 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     plot <- ggplot(DF_tabulate, aes(x=Mutation.Count, y=No.Orders, fill=Mutation.Count)) +
       geom_bar(stat="identity") +
       
-      labs(title = "Mutation Distribution (VUS)",
+      labs(title = "Mutation Count (VUS)",
            subtitle = paste("N = ", length(unique(DF_Fxn$PatientID)), " ", comment1, "; ",
                             nrow(DF_Fxn), " STAMP ", comment2, sep="")) +
       
@@ -2685,6 +2685,7 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height, PerSite
 #----------------------------------------------
 Lollipop_Plot <- function(variant_type, assay,
                           static_plot = TRUE, dynamic_plot = FALSE,
+                          promoter_plot = FALSE,
                           loc.freq.max = max(as.numeric(data_var_FULL$var.freq))) {
   # Following variable must exist in global environment: data_var_FULL, DF_gene_INFO
   
@@ -2723,14 +2724,20 @@ Lollipop_Plot <- function(variant_type, assay,
   text_remove <- paste("/>y_legend_dynamic: ", y_legend_dynamic, "<br ", sep="")
   
   # Specify x-axis parameters = x_tick
-  if (as.numeric(unique(DF_gene_INFO$gene.end)) <= 800) {
-    x_tick = 25
-  } else if (as.numeric(unique(DF_gene_INFO$gene.end)) <= 1400) {
-    x_tick = 50
-  } else if (as.numeric(unique(DF_gene_INFO$gene.end)) <= 2400) {
-    x_tick = 100
-  } else if (as.numeric(unique(DF_gene_INFO$gene.end)) > 2400) {
-    x_tick = 200
+  if (isTRUE(promoter_plot)) {
+    x_tick = 25 
+    x_end_promoter = floor(min(data_var_FULL$var.pos)/10)*10
+    
+  } else {
+    if (as.numeric(unique(DF_gene_INFO$gene.end)) <= 800) {
+      x_tick = 25
+    } else if (as.numeric(unique(DF_gene_INFO$gene.end)) <= 1400) {
+      x_tick = 50
+    } else if (as.numeric(unique(DF_gene_INFO$gene.end)) <= 2400) {
+      x_tick = 100
+    } else if (as.numeric(unique(DF_gene_INFO$gene.end)) > 2400) {
+      x_tick = 200
+    }
   }
   
   if (isTRUE(static_plot)) {
@@ -2745,89 +2752,174 @@ Lollipop_Plot <- function(variant_type, assay,
       point_color = "darkgreen"
     }
     
-    plot_static <- 
-      ggplot(data = data_var_FULL[which(data_var_FULL$pathogenicity.status %in% variant_type),]) +
+    if (isTRUE(promoter_plot)) {
+      plot_static <- 
+        ggplot(data = data_var_FULL[which(data_var_FULL$pathogenicity.status %in% variant_type),]) +
+        
+        # Add points to indicate freq of mutation at each var.pos
+        geom_segment(aes(x = var.pos, xend = var.pos, y = 0, yend = var.freq), 
+                     color = "gray88", alpha=0.8) +
+        geom_point(aes(x = var.pos, y = var.freq),
+                   color = point_color, size=2.5, shape=16, alpha=0.8) +
+        
+        # Plot length of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = 0, 
+                                              y = y_legend, yend = y_legend), 
+                     color = "gray88", size=6) +
+        
+        # Add domains of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = domain.start, 
+                                              y = y_legend, yend = y_legend, 
+                                              color = domain), size = 6) +
+        
+        # Labels
+        ylab("No. Mutations") +
+        labs(title = paste(variant_type, " variants (n=",
+                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == variant_type]),
+                           ")", sep="")) +
+        
+        # Scaling
+        scale_fill_brewer(palette="Set2") +
+        scale_x_continuous(breaks=seq(x_end_promoter, 0, x_tick)) +
+        scale_y_continuous(breaks=seq(0, yaxis_max, y_tick), limits=c(y_legend, yaxis_max)) +
+        
+        # Theme
+        theme_light() +
+        theme(legend.position = "bottom",
+              panel.grid.minor = element_blank(),
+              panel.grid.major = element_blank(),
+              axis.title.x=element_blank(),
+              plot.title = element_text(hjust=0, vjust=0, face="bold", size=14)
+        )
       
-      # Add points to indicate freq of mutation at each var.pos
-      geom_segment(aes(x = var.pos, xend = var.pos, y = 0, yend = var.freq), 
-                   color = "gray88", alpha=0.8) +
-      geom_point(aes(x = var.pos, y = var.freq),
-                 color = point_color, size=2.5, shape=16, alpha=0.8) +
-      
-      # Plot length of transcript
-      geom_segment(data = DF_gene_INFO, aes(x = 1, xend = unique(DF_gene_INFO$gene.end), 
-                                            y = y_legend, yend = y_legend), 
-                   color = "gray88", size=6) +
-      
-      # Add domains of transcript
-      geom_segment(data = DF_gene_INFO, aes(x = domain.start, xend = domain.end, 
-                                            y = y_legend, yend = y_legend, 
-                                            color = domain), size = 6) +
-      
-      # Labels
-      ylab("No. Mutations") +
-      labs(title = paste(variant_type, " variants (n=",
-                         sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == variant_type]),
-                         ")", sep="")) +
-      
-      # Scaling
-      scale_fill_brewer(palette="Set2") +
-      scale_x_continuous(breaks=seq(0, unique(DF_gene_INFO$gene.end), x_tick)) +
-      scale_y_continuous(breaks=seq(0, yaxis_max, y_tick), limits=c(y_legend, yaxis_max)) +
-      
-      # Theme
-      theme_light() +
-      theme(legend.position = "bottom",
-            panel.grid.minor = element_blank(),
-            panel.grid.major = element_blank(),
-            axis.title.x=element_blank(),
-            plot.title = element_text(hjust=0, vjust=0, face="bold", size=14)
-      )
+    } else {
+      plot_static <- 
+        ggplot(data = data_var_FULL[which(data_var_FULL$pathogenicity.status %in% variant_type),]) +
+        
+        # Add points to indicate freq of mutation at each var.pos
+        geom_segment(aes(x = var.pos, xend = var.pos, y = 0, yend = var.freq), 
+                     color = "gray88", alpha=0.8) +
+        geom_point(aes(x = var.pos, y = var.freq),
+                   color = point_color, size=2.5, shape=16, alpha=0.8) +
+        
+        # Plot length of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = 1, xend = unique(DF_gene_INFO$gene.end), 
+                                              y = y_legend, yend = y_legend), 
+                     color = "gray88", size=6) +
+        
+        # Add domains of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = domain.start, xend = domain.end, 
+                                              y = y_legend, yend = y_legend, 
+                                              color = domain), size = 6) +
+        
+        # Labels
+        ylab("No. Mutations") +
+        labs(title = paste(variant_type, " variants (n=",
+                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == variant_type]),
+                           ")", sep="")) +
+        
+        # Scaling
+        scale_fill_brewer(palette="Set2") +
+        scale_x_continuous(breaks=seq(0, unique(DF_gene_INFO$gene.end), x_tick)) +
+        scale_y_continuous(breaks=seq(0, yaxis_max, y_tick), limits=c(y_legend, yaxis_max)) +
+        
+        # Theme
+        theme_light() +
+        theme(legend.position = "bottom",
+              panel.grid.minor = element_blank(),
+              panel.grid.major = element_blank(),
+              axis.title.x=element_blank(),
+              plot.title = element_text(hjust=0, vjust=0, face="bold", size=14)
+        )
+    }
     
     assign("plot_static", plot_static, envir = .GlobalEnv)
   }
   
   if (isTRUE(dynamic_plot)) {
     
-    plot_dynamic <- 
-      ggplot(data = data_var_FULL) +
-      # Add points to indicate freq of mutation at each var.pos
-      geom_segment(aes(x = var.pos, xend = var.pos, y = 0, yend = var.freq, color = pathogenicity.status), 
-                   alpha=0.8) +
-      geom_point(aes(x = var.pos, y = var.freq,
-                     color = pathogenicity.status), size=2.5, shape=16, alpha=0.8) +
+    if (isTRUE(promoter_plot)) {
+      plot_dynamic <- 
+        ggplot(data = data_var_FULL) +
+        # Add points to indicate freq of mutation at each var.pos
+        geom_segment(aes(x = var.pos, xend = var.pos, y = 0, yend = var.freq, color = pathogenicity.status), 
+                     alpha=0.8) +
+        geom_point(aes(x = var.pos, y = var.freq,
+                       color = pathogenicity.status), size=2.5, shape=16, alpha=0.8) +
+        
+        # Plot length of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = 0, 
+                                              y = y_legend_dynamic, yend = y_legend_dynamic), 
+                     color = "gray88", size=6) +
+        # Add domains of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = domain.start,
+                                              y = y_legend_dynamic, yend = y_legend_dynamic, 
+                                              color = domain), size = 6) +
+        
+        # Labels
+        ylab("No. Mutations") +
+        xlab(paste("Variant Position (", unique(DF_gene_INFO$symbol), ")", sep="")) +
+        labs(title = paste(unique(DF_gene_INFO$symbol), " variants from ", 
+                           assay, " (n=",
+                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == "All Variants"]),
+                           " total)", sep="")) +
+        
+        # Scaling
+        scale_fill_brewer(palette="Set2") +
+        scale_x_continuous(breaks=seq(x_end_promoter, 0, x_tick)) +
+        scale_y_continuous(breaks=seq(0, yaxis_max, y_tick), limits=c(y_legend_dynamic, yaxis_max)) +
+        
+        # Theme
+        theme_light() +
+        theme(legend.position = "bottom",
+              legend.title=element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.grid.major = element_blank(),
+              axis.title.x=element_blank(),
+              plot.title = element_text(hjust=0.5, vjust=0, face="bold", size=14)
+        )
       
-      # Plot length of transcript
-      geom_segment(data = DF_gene_INFO, aes(x = 1, xend = unique(DF_gene_INFO$gene.end), 
-                                            y = y_legend_dynamic, yend = y_legend_dynamic), 
-                   color = "gray88", size=6) +
-      # Add domains of transcript
-      geom_segment(data = DF_gene_INFO, aes(x = domain.start, xend = domain.end, 
-                                            y = y_legend_dynamic, yend = y_legend_dynamic, 
-                                            color = domain), size = 6) +
-      
-      # Labels
-      ylab("No. Mutations") +
-      xlab(paste("Variant Position (", unique(DF_gene_INFO$symbol), ")", sep="")) +
-      labs(title = paste(unique(DF_gene_INFO$symbol), " variants from ", 
-                         assay, " (n=",
-                         sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == "All Variants"]),
-                         " total)", sep="")) +
-      
-      # Scaling
-      scale_fill_brewer(palette="Set2") +
-      scale_x_continuous(breaks=seq(0, unique(DF_gene_INFO$gene.end), x_tick)) +
-      scale_y_continuous(breaks=seq(0, yaxis_max, y_tick), limits=c(y_legend_dynamic, yaxis_max)) +
-      
-      # Theme
-      theme_light() +
-      theme(legend.position = "bottom",
-            legend.title=element_blank(),
-            panel.grid.minor = element_blank(),
-            panel.grid.major = element_blank(),
-            axis.title.x=element_blank(),
-            plot.title = element_text(hjust=0.5, vjust=0, face="bold", size=14)
-      )
+    } else {
+      plot_dynamic <- 
+        ggplot(data = data_var_FULL) +
+        # Add points to indicate freq of mutation at each var.pos
+        geom_segment(aes(x = var.pos, xend = var.pos, y = 0, yend = var.freq, color = pathogenicity.status), 
+                     alpha=0.8) +
+        geom_point(aes(x = var.pos, y = var.freq,
+                       color = pathogenicity.status), size=2.5, shape=16, alpha=0.8) +
+        
+        # Plot length of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = 1, xend = unique(DF_gene_INFO$gene.end), 
+                                              y = y_legend_dynamic, yend = y_legend_dynamic), 
+                     color = "gray88", size=6) +
+        # Add domains of transcript
+        geom_segment(data = DF_gene_INFO, aes(x = domain.start, xend = domain.end, 
+                                              y = y_legend_dynamic, yend = y_legend_dynamic, 
+                                              color = domain), size = 6) +
+        
+        # Labels
+        ylab("No. Mutations") +
+        xlab(paste("Variant Position (", unique(DF_gene_INFO$symbol), ")", sep="")) +
+        labs(title = paste(unique(DF_gene_INFO$symbol), " variants from ", 
+                           assay, " (n=",
+                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == "All Variants"]),
+                           " total)", sep="")) +
+        
+        # Scaling
+        scale_fill_brewer(palette="Set2") +
+        scale_x_continuous(breaks=seq(0, unique(DF_gene_INFO$gene.end), x_tick)) +
+        scale_y_continuous(breaks=seq(0, yaxis_max, y_tick), limits=c(y_legend_dynamic, yaxis_max)) +
+        
+        # Theme
+        theme_light() +
+        theme(legend.position = "bottom",
+              legend.title=element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.grid.major = element_blank(),
+              axis.title.x=element_blank(),
+              plot.title = element_text(hjust=0.5, vjust=0, face="bold", size=14)
+        )      
+    }
     
     plot_dynamic_int <- plotly_build(plot_dynamic)
     
@@ -2884,7 +2976,8 @@ Lollipop_Plot <- function(variant_type, assay,
 }
 
 # Assume dataset does not contain benign mutations
-SNV_lollipop_fxn <- function (DF, gene_id, assay, outdir, width, height) {
+SNV_lollipop_fxn <- function (DF, gene_id, assay, outdir, width, height,
+                              promoter_plot = FALSE) {
   
   # Extract gene information
   #----------------------------------------------
@@ -2899,12 +2992,18 @@ SNV_lollipop_fxn <- function (DF, gene_id, assay, outdir, width, height) {
   
   # Extract STAMP entries for gene of interest 
   #----------------------------------------------
-  # Remove STAMP entries with UTR variants i.e. position > AA length of transcript 
-  DF_remove <- DF[which(DF$var.position > unique(DF_gene_INFO$gene.end)),]
-  if (nrow(DF_remove) != 0){
-    DF <- DF[!DF$VariantLabel %in% DF_remove$VariantLabel,]
+  if (isTRUE(promoter_plot)) {
+    # Filter for promoter region domain 
+    DF_gene_INFO <- DF_gene_INFO[which(DF_gene_INFO$domain == "Promoter"),]
+    
+  } else {
+    # Remove STAMP entries with UTR variants i.e. position > AA length of transcript 
+    DF_remove <- DF[which(as.numeric(DF$var.position) > unique(DF_gene_INFO$gene.end)),]
+    if (nrow(DF_remove) != 0){
+      DF <- DF[!DF$VariantLabel %in% DF_remove$VariantLabel,]
+    }
+    remove(DF_remove,row_id)
   }
-  remove(DF_remove,row_id)
   
   # Compile information for plotting STAMP entries 
   #----------------------------------------------
@@ -2960,21 +3059,44 @@ SNV_lollipop_fxn <- function (DF, gene_id, assay, outdir, width, height) {
   # Generate plots for each pathogenicity status
   #----------------------------------------------
   if (as.numeric(table(DF$VariantGene == gene_id)["TRUE"]) > 0) {
-    Lollipop_Plot(variant_type = "All Variants", assay = assay,
-                  dynamic_plot = TRUE)
-    pNum = 1
-    pList[[pNum]] <- plot_static
     
-    if ("Pathogenic" %in% index.sig | "Likely Pathogenic" %in% index.sig) {
-      Lollipop_Plot(variant_type = "Pathogenic Variant", assay = assay)
-      pNum = pNum + 1
+    if (isTRUE(promoter_plot)) {
+      Lollipop_Plot(variant_type = "All Variants", assay = assay,
+                    promoter_plot = TRUE,dynamic_plot = TRUE)
+      pNum = 1
       pList[[pNum]] <- plot_static
-    }
-    
-    if ("Unknown significance" %in% index.sig | "Unknown" %in% index.sig) {
-      Lollipop_Plot(variant_type = "Unknown Significance Variant", assay = assay)
-      pNum = pNum + 1
+      
+      if ("Pathogenic" %in% index.sig | "Likely Pathogenic" %in% index.sig) {
+        Lollipop_Plot(variant_type = "Pathogenic Variant", assay = assay,
+                      promoter_plot = TRUE)
+        pNum = pNum + 1
+        pList[[pNum]] <- plot_static
+      }
+      
+      if ("Unknown significance" %in% index.sig | "Unknown" %in% index.sig) {
+        Lollipop_Plot(variant_type = "Unknown Significance Variant", assay = assay,
+                      promoter_plot = TRUE)
+        pNum = pNum + 1
+        pList[[pNum]] <- plot_static
+      }
+      
+    } else {
+      Lollipop_Plot(variant_type = "All Variants", assay = assay,
+                    dynamic_plot = TRUE)
+      pNum = 1
       pList[[pNum]] <- plot_static
+      
+      if ("Pathogenic" %in% index.sig | "Likely Pathogenic" %in% index.sig) {
+        Lollipop_Plot(variant_type = "Pathogenic Variant", assay = assay)
+        pNum = pNum + 1
+        pList[[pNum]] <- plot_static
+      }
+      
+      if ("Unknown significance" %in% index.sig | "Unknown" %in% index.sig) {
+        Lollipop_Plot(variant_type = "Unknown Significance Variant", assay = assay)
+        pNum = pNum + 1
+        pList[[pNum]] <- plot_static
+      }
     }
     
     file_id = paste(gene_id, "_", assay, sep="")

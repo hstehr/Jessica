@@ -29,12 +29,12 @@ DF_site_count <- DF_site_count[which(DF_site_count$Label %in% c("all",gene.list.
 DF_site_count <- DF_site_count[!is.na(DF_site_count$iframe),]
 
 # sort(setdiff(c("all",gene.list.total),DF_site_count$Label))
-# DF_site_count <- rbind(DF_site_count,
-#                        data.frame(Plot_Name = "top_site_count", 
-#                                   Folder = paste(Folder_root,"/Top_Site_Count",sep=""),
-#                                   Label = sort(setdiff(c("all",gene.list.total),DF_site_count$Label)),
-#                                   iframe = c("5406","5414","5422","5430","5438","5446","5454","3743","5462","5470"),
-#                                   stringsAsFactors = FALSE))
+DF_site_count <- rbind(DF_site_count,
+                       data.frame(Plot_Name = "top_site_count",
+                                  Folder = paste(Folder_root,"/Top_Site_Count",sep=""),
+                                  Label = sort(setdiff(c("all",gene.list.total),DF_site_count$Label)),
+                                  iframe = c("5479","5485","5491","5499","5507"),
+                                  stringsAsFactors = FALSE))
 
 # variant_type_distribution_fxn: cohort="all" & gene_DF
 DF_VariantType_Gene <- mapping_HK[which(mapping_HK$Plot_Name == "var_type_distribution" &
@@ -43,12 +43,12 @@ DF_VariantType_Gene <- DF_VariantType_Gene[which(DF_VariantType_Gene$Label %in% 
 DF_VariantType_Gene <- DF_VariantType_Gene[!is.na(DF_VariantType_Gene$iframe),]
 
 # sort(setdiff(c("all",gene.list.total),DF_VariantType_Gene$Label))
-# DF_VariantType_Gene <- rbind(DF_VariantType_Gene,
-#                              data.frame(Plot_Name = "var_type_distribution", 
-#                                         Folder = paste(Folder_root,"/Var_Type_Distribution",sep=""),
-#                                         Label = sort(setdiff(c("all",gene.list.total),DF_VariantType_Gene$Label)),
-#                                         iframe = c("5404","5412","5420","5428","5436","5444","5452","4475","5460","5468"),
-#                                         stringsAsFactors = FALSE))
+DF_VariantType_Gene <- rbind(DF_VariantType_Gene,
+                             data.frame(Plot_Name = "var_type_distribution",
+                                        Folder = paste(Folder_root,"/Var_Type_Distribution",sep=""),
+                                        Label = sort(setdiff(c("all",gene.list.total),DF_VariantType_Gene$Label)),
+                                        iframe = c("5474","5483","5489","5497","5505"),
+                                        stringsAsFactors = FALSE))
 
 # top_variant_count_fxn: cohort=gene_DF
 DF_variant_count <- mapping_HK[which(mapping_HK$Plot_Name == "top_variant_count" &
@@ -57,12 +57,12 @@ DF_variant_count <- DF_variant_count[which(DF_variant_count$Label %in% gene.list
 DF_variant_count <- DF_variant_count[!is.na(DF_variant_count$iframe),]
 
 # sort(setdiff(gene.list.total,DF_variant_count$Label))
-# DF_variant_count <- rbind(DF_variant_count,
-#                           data.frame(Plot_Name = "top_variant_count", 
-#                                      Folder = paste(Folder_root,"/Top_Variant_Count",sep=""),
-#                                      Label = sort(setdiff(gene.list.total,DF_variant_count$Label)),
-#                                      iframe = c("5402","5410","5418","5426","5434","5442","5450","5398","5458","5466"),
-#                                      stringsAsFactors = FALSE))
+DF_variant_count <- rbind(DF_variant_count,
+                          data.frame(Plot_Name = "top_variant_count",
+                                     Folder = paste(Folder_root,"/Top_Variant_Count",sep=""),
+                                     Label = sort(setdiff(gene.list.total,DF_variant_count$Label)),
+                                     iframe = c("5472","5481","5487","5495","5503"),
+                                     stringsAsFactors = FALSE))
 
 # Lollipop_Plot: cohort=gene_DF
 snv.list <- sort(unique(STAMP_DF$VariantGene))
@@ -73,12 +73,12 @@ DF_lollipop <- DF_lollipop[which(DF_lollipop$Label %in% snv.list),]
 DF_lollipop <- DF_lollipop[!is.na(DF_lollipop$iframe),]
 
 # sort(setdiff(snv.list,DF_lollipop$Label))
-# DF_lollipop <- rbind(DF_lollipop,
-#                      data.frame(Plot_Name = "gene_lollipop",
-#                                 Folder = paste(Folder_root,"/Gene_Lollipop",sep=""),
-#                                 Label = sort(setdiff(snv.list,DF_lollipop$Label)),
-#                                 iframe = c("4015"),
-#                                 stringsAsFactors = FALSE))
+DF_lollipop <- rbind(DF_lollipop,
+                     data.frame(Plot_Name = "gene_lollipop",
+                                Folder = paste(Folder_root,"/Gene_Lollipop",sep=""),
+                                Label = sort(setdiff(snv.list,DF_lollipop$Label)),
+                                iframe = c("5478",NA,"5493","5501","5509"),
+                                stringsAsFactors = FALSE))
 
 # top_fusion_count_fxn: cohort=gene_DF
 fusion.list <- sort(unique(append(STAMP_Fusion$Gene1, STAMP_Fusion$Gene2)))
@@ -298,6 +298,9 @@ DF_iframe_FULL_ordered <- rbind(DF_all,DF_tumor,DF_gene)
 remove(DF_tumor,DF_gene,DF_all,DF_iframe_FULL)
 
 DF_iframe_FULL_ordered <- unique(DF_iframe_FULL_ordered[,])
+
+# Remove rows without iframe code
+DF_iframe_FULL_ordered <- DF_iframe_FULL_ordered[!(is.na(DF_iframe_FULL_ordered$iframe)),]
 
 ## Write to local computer
 #----------------------------------------------

@@ -140,6 +140,16 @@ pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,esoph
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,esophagus,5009
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,esophagus,2734
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,esophagus,2736
+top_variant_count,STAMPEDE/Top_Variant_Count,foot,5340
+top_gene_count,STAMPEDE/Top_Gene_Count,foot,2742
+gender_age_distribution,STAMPEDE/Gender_Age_Distribution,foot,2744
+hist_dx_distribution,STAMPEDE/Hist_Dx_distribution,foot,5342
+test_volume,STAMPEDE/PerTumor_OrderVolume,foot,4166
+tumor_purity_count,STAMPEDE/Tumor_Purity_Count,foot,2752
+specimen_type_count,STAMPEDE/Specimen_Type_Count,foot,2750
+pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,foot,2746
+pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,foot,5338
+pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,foot,2748
 top_variant_count,STAMPEDE/Top_Variant_Count,foreskin,4827
 top_gene_count,STAMPEDE/Top_Gene_Count,foreskin,2754
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,foreskin,2756
@@ -263,6 +273,17 @@ specimen_type_count,STAMPEDE/Specimen_Type_Count,mesenteric mass,2912
 pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,mesenteric mass,2908
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,mesenteric mass,5031
 pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,mesenteric mass,2910
+top_variant_count,STAMPEDE/Top_Variant_Count,nasal cavity and paranasal sinuses,5346
+top_gene_count,STAMPEDE/Top_Gene_Count,nasal cavity and paranasal sinuses,2916
+gender_age_distribution,STAMPEDE/Gender_Age_Distribution,nasal cavity and paranasal sinuses,2918
+hist_dx_distribution,STAMPEDE/Hist_Dx_distribution,nasal cavity and paranasal sinuses,5348
+test_volume,STAMPEDE/PerTumor_OrderVolume,nasal cavity and paranasal sinuses,4190
+tumor_purity_count,STAMPEDE/Tumor_Purity_Count,nasal cavity and paranasal sinuses,2928
+specimen_type_count,STAMPEDE/Specimen_Type_Count,nasal cavity and paranasal sinuses,2926
+pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,nasal cavity and paranasal sinuses,2920
+pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,nasal cavity and paranasal sinuses,5344
+pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,nasal cavity and paranasal sinuses,2922
+pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,nasal cavity and paranasal sinuses,2924
 top_variant_count,STAMPEDE/Top_Variant_Count,nasopharynx,4885
 top_gene_count,STAMPEDE/Top_Gene_Count,nasopharynx,2930
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,nasopharynx,2932
@@ -500,6 +521,17 @@ specimen_type_count,STAMPEDE/Specimen_Type_Count,trachea,3234
 pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,trachea,3230
 pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,trachea,5071
 pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,trachea,3232
+top_variant_count,STAMPEDE/Top_Variant_Count,urethra,5390
+top_gene_count,STAMPEDE/Top_Gene_Count,urethra,3238
+gender_age_distribution,STAMPEDE/Gender_Age_Distribution,urethra,3240
+hist_dx_distribution,STAMPEDE/Hist_Dx_distribution,urethra,5392
+test_volume,STAMPEDE/PerTumor_OrderVolume,urethra,4234
+tumor_purity_count,STAMPEDE/Tumor_Purity_Count,urethra,3250
+specimen_type_count,STAMPEDE/Specimen_Type_Count,urethra,3248
+pt_mutation_count_allvariants,STAMPEDE/Patient_Mutation_Count/All_Variants,urethra,3242
+pt_mutation_count_allvariantstacked,STAMPEDE/Patient_Mutation_Count/All_Variants_Stacked,urethra,5388
+pt_mutation_count_pathovariants,STAMPEDE/Patient_Mutation_Count/Pathogenic_Variants,urethra,3244
+pt_mutation_count_VUS,STAMPEDE/Patient_Mutation_Count/UnknownSignificance_Variants,urethra,3246
 top_variant_count,STAMPEDE/Top_Variant_Count,urinary bladder,4909
 top_gene_count,STAMPEDE/Top_Gene_Count,urinary bladder,3252
 gender_age_distribution,STAMPEDE/Gender_Age_Distribution,urinary bladder,3254
@@ -704,6 +736,10 @@ top_site_count,STAMPEDE/Top_Site_Count,DNMT3A,3445
 top_variant_count,STAMPEDE/Top_Variant_Count,DNMT3A,3447
 gene_lollipop,STAMPEDE/Gene_Lollipop,DNMT3A,3851
 var_type_distribution,STAMPEDE/Var_Type_Distribution,DNMT3A,4311
+top_site_count,STAMPEDE/Top_Site_Count,DPH3,5479
+top_variant_count,STAMPEDE/Top_Variant_Count,DPH3,5472
+gene_lollipop,STAMPEDE/Gene_Lollipop,DPH3,5478
+var_type_distribution,STAMPEDE/Var_Type_Distribution,DPH3,5474
 top_site_count,STAMPEDE/Top_Site_Count,EGFR,3449
 top_variant_count,STAMPEDE/Top_Variant_Count,EGFR,3451
 gene_lollipop,STAMPEDE/Gene_Lollipop,EGFR,3853
@@ -1028,6 +1064,9 @@ top_site_count,STAMPEDE/Top_Site_Count,PIK3R1,3677
 top_variant_count,STAMPEDE/Top_Variant_Count,PIK3R1,4954
 gene_lollipop,STAMPEDE/Gene_Lollipop,PIK3R1,3973
 var_type_distribution,STAMPEDE/Var_Type_Distribution,PIK3R1,4433
+top_site_count,STAMPEDE/Top_Site_Count,PLEKHS1,5485
+top_variant_count,STAMPEDE/Top_Variant_Count,PLEKHS1,5481
+var_type_distribution,STAMPEDE/Var_Type_Distribution,PLEKHS1,5483
 top_site_count,STAMPEDE/Top_Site_Count,POLD1,3679
 top_variant_count,STAMPEDE/Top_Variant_Count,POLD1,4956
 gene_lollipop,STAMPEDE/Gene_Lollipop,POLD1,3975
@@ -1106,6 +1145,10 @@ top_site_count,STAMPEDE/Top_Site_Count,SDC4,5285
 top_variant_count,STAMPEDE/Top_Variant_Count,SDC4,5281
 var_type_distribution,STAMPEDE/Var_Type_Distribution,SDC4,5281
 top_fusion_count,STAMPEDE/Top_Fusion_Count,SDC4,5279
+top_site_count,STAMPEDE/Top_Site_Count,SDHD,5491
+top_variant_count,STAMPEDE/Top_Variant_Count,SDHD,5487
+gene_lollipop,STAMPEDE/Gene_Lollipop,SDHD,5493
+var_type_distribution,STAMPEDE/Var_Type_Distribution,SDHD,5489
 top_site_count,STAMPEDE/Top_Site_Count,SETBP1,3725
 top_variant_count,STAMPEDE/Top_Variant_Count,SETBP1,4972
 gene_lollipop,STAMPEDE/Gene_Lollipop,SETBP1,4003
@@ -1138,6 +1181,10 @@ top_site_count,STAMPEDE/Top_Site_Count,SOX2,3741
 top_variant_count,STAMPEDE/Top_Variant_Count,SOX2,4511
 gene_lollipop,STAMPEDE/Gene_Lollipop,SOX2,4013
 var_type_distribution,STAMPEDE/Var_Type_Distribution,SOX2,4473
+top_site_count,STAMPEDE/Top_Site_Count,SPOP,3743
+top_variant_count,STAMPEDE/Top_Variant_Count,SPOP,5398
+gene_lollipop,STAMPEDE/Gene_Lollipop,SPOP,4015
+var_type_distribution,STAMPEDE/Var_Type_Distribution,SPOP,4475
 top_site_count,STAMPEDE/Top_Site_Count,SRC,3745
 top_variant_count,STAMPEDE/Top_Variant_Count,SRC,4976
 gene_lollipop,STAMPEDE/Gene_Lollipop,SRC,4017
@@ -1162,10 +1209,18 @@ top_site_count,STAMPEDE/Top_Site_Count,TBC1D9,5317
 top_variant_count,STAMPEDE/Top_Variant_Count,TBC1D9,5313
 var_type_distribution,STAMPEDE/Var_Type_Distribution,TBC1D9,5313
 top_fusion_count,STAMPEDE/Top_Fusion_Count,TBC1D9,5311
+top_site_count,STAMPEDE/Top_Site_Count,TERT,5499
+top_variant_count,STAMPEDE/Top_Variant_Count,TERT,5495
+gene_lollipop,STAMPEDE/Gene_Lollipop,TERT,5501
+var_type_distribution,STAMPEDE/Var_Type_Distribution,TERT,5497
 top_site_count,STAMPEDE/Top_Site_Count,TFG,5462
 top_variant_count,STAMPEDE/Top_Variant_Count,TFG,5458
 var_type_distribution,STAMPEDE/Var_Type_Distribution,TFG,5460
 top_fusion_count,STAMPEDE/Top_Fusion_Count,TFG,5456
+top_site_count,STAMPEDE/Top_Site_Count,TIMM8B,5507
+top_variant_count,STAMPEDE/Top_Variant_Count,TIMM8B,5503
+gene_lollipop,STAMPEDE/Gene_Lollipop,TIMM8B,5509
+var_type_distribution,STAMPEDE/Var_Type_Distribution,TIMM8B,5505
 top_site_count,STAMPEDE/Top_Site_Count,TP53,3755
 top_variant_count,STAMPEDE/Top_Variant_Count,TP53,3757
 gene_lollipop,STAMPEDE/Gene_Lollipop,TP53,4023

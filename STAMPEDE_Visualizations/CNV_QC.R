@@ -18,24 +18,26 @@ CNV_Export_timestamp <- format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-]
 # Rename column names of DF
 colnames(STAMP_CNV) <- c("PatientID","report_version","CNV_Gene","Variant_Type")
 
-# Integrate with primary tumor site field
+# Integrate with primary tumor site field from TRF_File
 #----------------------------------------------
 STAMP_CNV <- left_join(STAMP_CNV,
-                       unique(STAMP_DF[,c("PatientID","PatientGender","PatientAge","PrimaryTumorSite",
+                       unique(TRF_DF[,c("PatientID","PatientGender","PatientAge","PrimaryTumorSite",
                                           "AssayDateReceived","smpl.specimenType","smpl.percentTumor","HistologicalDx")]),
                        by = "PatientID")
 
-# STAMP_CNV_missing <- STAMP_CNV[is.na(STAMP_CNV$PrimaryTumorSite),]
-# STAMP_CNV_missing <- left_join(STAMP_CNV_missing[,1:4],
-#                                unique(STAMP_DF[,c("PatientID","PatientGender","PatientAge","PrimaryTumorSite",
-#                                                   "AssayDateReceived","smpl.specimenType","smpl.percentTumor","HistologicalDx")]),
-#                                by = "PatientID")
-# CNV.diff_No <- length(which(is.na(STAMP_CNV_missing$PrimaryTumorSite)))
-# cat(paste("Number of CNV entries missing age: ",CNV.diff_No,sep=""))
+# Restructure fields 
+STAMP_CNV$PrimaryTumorSite <- tolower(STAMP_CNV$PrimaryTumorSite)
+STAMP_CNV$HistologicalDx <- tolower(STAMP_CNV$HistologicalDx)
 
-# Filter for entries with histological dx
-#----------------------------------------------
-STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$HistologicalDx), ]
+STAMP_CNV_missing <- STAMP_CNV[is.na(STAMP_CNV$PrimaryTumorSite),]
+STAMP_CNV_missing <- left_join(STAMP_CNV_missing[,1:4],
+                               unique(TRF_DF[,c("PatientID","PatientGender","PatientAge","PrimaryTumorSite",
+                                                  "AssayDateReceived","smpl.specimenType","smpl.percentTumor","HistologicalDx")]),
+                               by = "PatientID")
+CNV.diff_No <- length(which(is.na(STAMP_CNV_missing$PrimaryTumorSite)))
+cat(paste("Number of CNV entries missing PrimaryTumorSite: ",CNV.diff_No,sep=""))
+
+# 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
 # sort(unique(STAMP_CNV$HistologicalDx))
 
 # Filter for entries with primary tumor site
@@ -56,6 +58,11 @@ STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite == "hematologic and 
 #----------------------------------------------
 STAMP_CNV <- STAMP_CNV[which(!is.na(STAMP_CNV$smpl.percentTumor)),]
 STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$smpl.percentTumor),]
+STAMP_CNV$smpl.percentTumor <- gsub("^>", "", STAMP_CNV$smpl.percentTumor)
+STAMP_CNV$smpl.percentTumor <- gsub("^<", "", STAMP_CNV$smpl.percentTumor)
+STAMP_CNV$smpl.percentTumor <- gsub("%$", "", STAMP_CNV$smpl.percentTumor)
+STAMP_CNV$smpl.percentTumor <- gsub("(^[[:digit:]]+)([-][[:digit:]]+$)", "\\1", STAMP_CNV$smpl.percentTumor)
+STAMP_CNV$smpl.percentTumor <- ceiling(as.numeric(STAMP_CNV$smpl.percentTumor))
 # sort(unique(STAMP_CNV$smpl.percentTumor))
 
 # Filter entries for complete cases = specimen type
@@ -77,8 +84,8 @@ STAMP_CNV$CNV_Gene[which(tolower(STAMP_CNV$CNV_Gene) %in% c("nkx2", "nkx2-1"))] 
 # Examine number of missing fields
 #----------------------------------------------
 CNV.list <- sort(unique(STAMP_CNV$PatientID))
-CNV.diff_No <- length(CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$PatientID)))])
-cat(paste("Number of CNV entries without corresponding PatientID in POST-Filter STAMP_DF: ",
+CNV.diff_No <- length(CNV.list[!(CNV.list %in% sort(unique(TRF_DF$PatientID)))])
+cat(paste("Number of CNV entries without corresponding PatientID in POST-Filter TRF_DF: ",
           CNV.diff_No,sep=""),"\n","\n")
 
 CNV.diff_No <- nrow(unique(STAMP_CNV[is.na(STAMP_CNV$PrimaryTumorSite),c("PatientID","PrimaryTumorSite")]))
@@ -86,10 +93,10 @@ CNV.diff_No <- length(which(is.na(STAMP_CNV$PrimaryTumorSite)))
 cat(paste("Number of CNV entries missing PrimaryTumorSite: ",CNV.diff_No,sep=""),"\n","\n")
 
 CNV.list <- sort(unique(STAMP_CNV$PrimaryTumorSite))
-CNV.diff_No <- length(CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$PrimaryTumorSite)))])
-cat(paste("Number of CNV entries without corresponding PrimaryTumorSite in POST-Filter STAMP_DF: ",
+CNV.diff_No <- length(CNV.list[!(CNV.list %in% sort(unique(tolower(TRF_DF$PrimaryTumorSite))))])
+cat(paste("Number of CNV entries without corresponding PrimaryTumorSite in POST-Filter TRF_DF: ",
           CNV.diff_No,sep=""),"\n",
-    paste(unlist(CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$PrimaryTumorSite)))]),collapse=", "),"\n")
+    paste(unlist(CNV.list[!(CNV.list %in% sort(unique(tolower(TRF_DF$PrimaryTumorSite))))]),collapse=", "),"\n")
 
 # Append elements not found in SNV/Indel DF from CNV DF
 CNV.list <- CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$PrimaryTumorSite)))]
