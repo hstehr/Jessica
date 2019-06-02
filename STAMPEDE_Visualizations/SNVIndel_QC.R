@@ -51,14 +51,7 @@ source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_VariantAnn
 
 cat(paste("POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
-# Filter for entries with histological dx
-#----------------------------------------------
-STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$HistologicalDx), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other (specify)"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy (specify)"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy:malignancy, type cannot be determined"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other/non-classifiable:other(s) (specify)"), ]
+# 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
 # sort(unique(STAMP_DF$HistologicalDx))
 
 # Filter for entries with primary tumor site
@@ -105,10 +98,7 @@ STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable
 # STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]
 # sort(as.numeric(unique(STAMP_DF$PatientAge)))
 
-# Filter for entries with proper HGVS nomenclature
-#----------------------------------------------
-# Format HGVS protein nomenclature
-STAMP_DF <- STAMP_DF[which(grepl("^p.[[:alpha:]]{3}[[:digit:]]+.*", STAMP_DF$VariantHGVSProtein)),]
+# Do not filter for entries with proper HGVS nomenclature = keep mutations in genes such as TERT
 
 # Collapse similar gene names
 STAMP_DF$VariantGene[which(tolower(STAMP_DF$VariantGene) %in% c("nkx2", "nkx2-1"))] <- "NKX2-1"
@@ -123,15 +113,23 @@ cat(paste("POST-Filter counts: ",nrow(STAMP_DF), " total entries and ", length(u
 
 # Convert codons from 3-letter to 1-letter nomenclature
 #----------------------------------------------
-for (row_No in 1:nrow(AminoAcid_Conversion)) {
-  code3 <- gsub("[[:blank:]]$","",AminoAcid_Conversion$Code3[row_No])
-  code1 <- gsub("[[:blank:]]$","",AminoAcid_Conversion$Code1[row_No])
+for (DF_row_No in 1:nrow(STAMP_DF)) {
   
-  STAMP_DF$VariantHGVSProtein <- sub(code3, code1,STAMP_DF$VariantHGVSProtein)
-  
-  remove(code3,code1)
+  if (isTRUE(tolower(STAMP_DF$VariantHGVSProtein[DF_row_No]) != "promoter" &
+             grepl("^p.",STAMP_DF$VariantHGVSProtein[DF_row_No]))) {
+    
+    for (row_No in 1:nrow(AminoAcid_Conversion)) {
+      code3 <- gsub("[[:blank:]]$","",AminoAcid_Conversion$Code3[row_No])
+      code1 <- gsub("[[:blank:]]$","",AminoAcid_Conversion$Code1[row_No])
+      
+      STAMP_DF$VariantHGVSProtein[DF_row_No] <- sub(code3, code1,STAMP_DF$VariantHGVSProtein[DF_row_No])
+    
+      remove(code3,code1)
+    }
+    remove(row_No)
+  }
 }
-remove(row_No)
+remove(DF_row_No)
 
 assign("STAMP_DF", STAMP_DF, envir = .GlobalEnv)
 write.table(STAMP_DF, file = paste(tempdir, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
