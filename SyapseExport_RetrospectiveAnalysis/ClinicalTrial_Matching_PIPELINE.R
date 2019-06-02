@@ -1,15 +1,8 @@
 #!/usr/bin/env Rscript
 
-library(plyr)
-library(dplyr)
-library(Biobase)
-library(eeptools)
-library(splitstackshape)
-library(reshape)
-library(rio)
-library(stringr)
-library(openxlsx)
-library(tidyr)
+suppressMessages(library("easypackages"))
+suppressMessages(libraries("plyr","dplyr","Biobase","eeptools","splitstackshape",
+                           "reshape","rio","stringr","openxlsx","tidyr"))
 
 args = commandArgs(trailingOnly=TRUE)
 # 1. Directory to save output to.

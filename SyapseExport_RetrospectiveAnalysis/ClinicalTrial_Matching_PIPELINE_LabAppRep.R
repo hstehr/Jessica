@@ -1,13 +1,6 @@
-suppressMessages(library(plyr))
-suppressMessages(library(dplyr))
-suppressMessages(library(Biobase))
-suppressMessages(library(eeptools))
-suppressMessages(library(splitstackshape))
-suppressMessages(library(reshape))
-suppressMessages(library(rio))
-suppressMessages(library(stringr))
-suppressMessages(library(openxlsx))
-suppressMessages(library(tidyr))
+suppressMessages(library("easypackages"))
+suppressMessages(libraries("plyr","dplyr","Biobase","eeptools","splitstackshape",
+                           "reshape","rio","stringr","openxlsx","tidyr"))
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
@@ -218,9 +211,9 @@ if (length(patient.list) > 0) {
   }
   
   if (isTRUE(static.plots_FILTER)) {source("ClinicalTrial_Graphics.R")}
-  # source("ClinicalTrial_Output_Details.R")
-  # source("ClinicalTrial_Output_tsv.R")
-  # source("ClinicalTrial_Output_Candidates.R")
+  source("ClinicalTrial_Output_Details.R")
+  source("ClinicalTrial_Output_tsv.R")
+  source("ClinicalTrial_Output_Candidates.R")
   
 }
 

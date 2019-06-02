@@ -76,6 +76,10 @@ DF_upstream <- inner_join(DF[DF$VariantLabel %in% DF_upstream$VariantLabel, ],
                           DF_upstream, by = colname_subset)
 DF_upstream <- cbind(DF_upstream, 
                      data.frame(aa.start = NA, var.position = NA, aa.end = NA))
+DF_upstream$VariantHGVSProtein <- DF_upstream$VariantHGVSCoding
+DF_upstream$var.position <- gsub("(^c.)([-][[:digit:]]{,3})(.*)","\\2",DF_upstream$VariantHGVSCoding)
+DF_upstream$aa.start <- gsub("(^c.[-][[:digit:]]{,3})([[:alpha:]]{1})(.*)","\\2",DF_upstream$VariantHGVSCoding)
+DF_upstream$aa.end <- gsub("(^c..*[>}])(.*$)","\\2",DF_upstream$VariantHGVSCoding)
 
 # Intronic Variants
 DF_intron <- DF_var[DF_var$intron == TRUE, ]
@@ -98,8 +102,9 @@ DF_intron <- cbind(DF_intron,
                    data.frame(aa.start = NA, var.position = NA, aa.end = NA))
 
 # SNV Variants
-DF_SNV <- DF_var[DF_var$SNVprotein == TRUE | DF_var$SNVcoding == TRUE &
-                   DF_var$synonymous == FALSE, 1:5]
+DF_SNV <- DF_var[(DF_var$SNVprotein == TRUE | DF_var$SNVcoding == TRUE) &
+                   DF_var$synonymous == FALSE &
+                   DF_var$intron == FALSE, 1:5]
 DF_SNV$var.type <- "SNV"
 
 # Frameshift Variants
@@ -150,6 +155,15 @@ cat(paste("All cases have been categorized based on type of nucleotide change, a
           nrow(DF) == (nrow(DF_synonymous) + nrow(DF_upstream) + nrow(DF_intron) + nrow(DF_SNV) + 
                          nrow(DF_Frameshift) + nrow(DF_delins) + nrow(DF_ins) + nrow(DF_del) + 
                          nrow(DF_dup)),sep=""),"\n")
+
+# A <- rbind(DF_upstream[,colname_subset],
+#            DF_intron[,colname_subset])
+# colnames(A) <- c("patientid","variant","gene","coding","protein")
+# A$var.type <- NA
+# A <- rbind(A,DF_synonymous,DF_SNV,DF_Frameshift,DF_delins,DF_ins,DF_del,DF_dup)
+# A[duplicated(A[,c("patientid","variant","gene","coding")]),]
+# remove(A)
+
 cat(paste("No. entries not categorized based on type of nucleotide change: n=", nrow(DF_remain), sep=""),"\n")
 
 # Merge entries from Synonymous, SNV, Frameshift & In-Frame mutations 
@@ -164,6 +178,19 @@ DF_Map <- inner_join(DF[DF$VariantLabel %in% DF_Map$VariantLabel,],
 DF_NAprotein <- DF_Map[is.na(DF_Map$VariantHGVSProtein),]
 DF_NAprotein <- cbind(DF_NAprotein, 
                       data.frame(aa.start = NA, var.position = NA, aa.end = NA))
+
+# Extract STAMP genes with coverage in hotspots 
+snv.hotspot.list <- sort(unique(Genes$Name[which(Genes$Coverage == "promoter")]))
+assign("snv.hotspot.list", snv.hotspot.list, envir = .GlobalEnv)
+
+# Promoter
+row.change = which(DF_NAprotein$VariantGene %in% snv.hotspot.list)
+DF_NAprotein$VariantHGVSProtein[row.change] <- "Promoter"
+
+# Subsitute with coding nomenclature
+row.change = which(is.na(DF_NAprotein$VariantHGVSProtein))
+DF_NAprotein$VariantHGVSProtein[row.change] <- DF_NAprotein$VariantHGVSCoding[row.change]
+
 cat(paste("STAMP entries missing VariantHGVSProtein field: n=",(nrow(DF_NAprotein)), sep=""),"\n")
 
 # FUNCTION: Extract variant positions 
@@ -214,8 +241,16 @@ Extract_VarPosition(DF = DF_Map)
 DF_Map <- DF
 cat(paste("STAMP entries mapped to lollipop plots: n=",(nrow(DF_Map[DF_Map$var.type != "Synonymous",])), sep=""),"\n")
 
+row.change = which(is.na(DF_intron$VariantHGVSProtein))
+DF_intron$VariantHGVSProtein[row.change] <- DF_intron$VariantHGVSCoding[row.change]
+
 # Merge all entries 
 #----------------------------------------------
+# which(is.na(DF_Map$VariantHGVSProtein))
+# which(is.na(DF_NAprotein$VariantHGVSProtein))
+# which(is.na(DF_upstream$VariantHGVSProtein))
+# which(is.na(DF_intron$VariantHGVSProtein))
+
 DF_Full <- rbind(DF_Map, DF_NAprotein, DF_intron, DF_upstream)
 
 # Classification of variants for clinical trial matching (var.anno)
@@ -285,21 +320,28 @@ HistologicalDx.key <- sort(unique(HistologicalDxCategory$histologicalDiagnosis))
 # }
 
 # Input Exon Number
+DF_Full$Exon_Number <- NA
 for (row_No in 1:nrow(DF_Full)) {
   gene_id <- DF_Full$VariantGene[row_No]
   genomic_pos <- gsub("(^chr[[:digit:]]{,2}:g.)([[:digit:]]+)([_]*[[:digit:]]*[[:alpha:]]+.*)", "\\2", DF_Full$VariantHGVSGenomic[row_No])
   
-  Gene.ExonTable <- stamp_reference_full[stamp_reference_full$Gene == gene_id,]
+  Gene.ExonTable.list <- sort(unique(stamp_reference_full$Gene))
+  # Remove genes with promoter coverage 
+  Gene.ExonTable.list <- Gene.ExonTable.list[!(Gene.ExonTable.list %in% snv.hotspot.list)]
   
-  for (exon_row_No in 1:nrow(Gene.ExonTable)) {
-    exon_start <- Gene.ExonTable$start[exon_row_No]
-    exon_end <- Gene.ExonTable$end[exon_row_No]
+  if (isTRUE(gene_id %in% Gene.ExonTable.list &
+             # HGVS genomic region CANNOT be NA
+             !is.na(genomic_pos))) {
+    Gene.ExonTable <- stamp_reference_full[stamp_reference_full$Gene == gene_id,]
     
-    if (isTRUE(genomic_pos >= exon_start & genomic_pos <= exon_end)) {
-      DF_Full$Exon_Number[row_No] <- Gene.ExonTable$exon_number[exon_row_No]
-    }
+    DF_Full$Exon_Number[row_No] <- min(Gene.ExonTable$exon_number[which(Gene.ExonTable$start <= genomic_pos)])
   }
+  
+  remove(Gene.ExonTable.list)
 }
+
+cat(paste("No. of genes without annotated exon information: ",
+    length(sort(unique(DF_Full$VariantGene[is.na(DF_Full$Exon_Number)]))), sep=""),"\n")
 
 ## Remove entries with missing information
 #----------------------------------------------
@@ -428,6 +470,6 @@ remove(DF,DF_del,DF_delins,DF_dup,DF_Frameshift,DF_Full,DF_ins,DF_intron,DF_Map,
        DF_remain,DF_SNV,DF_synonymous,DF_upstream,DF_var,colname_subset,DiseaseGroupCategory.name,
        i,primaryTumorSite.key,primaryTumorSite.STAMP,row_No,Extract_VarPosition,
        patient_id,patient_num,patient.list,DF_patient,HistologicalDx.key,HistologicalDx.STAMP,
-       exon_end,exon_row_No,exon_start,gene_id,genomic_pos,Gene.ExonTable,out.DF)
+       gene_id,genomic_pos,Gene.ExonTable,out.DF)
 
 cat("\n")

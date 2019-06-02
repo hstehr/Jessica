@@ -172,6 +172,14 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   row.change = which(DF_Full$sys.label == "CTNNA2 c.1300G>A (N/A)")
   DF_Full$smpl.hgvsProtein[row.change] <- "p.Ala434Thr"
   
+  # https://www.ncbi.nlm.nih.gov/clinvar/variation/133881/
+  row.change = which(DF_Full$sys.label == "CDKN2A c.458-492G>C (N/A)")
+  DF_Full$smpl.hgvsProtein[row.change] <- "p.Arg165Ser"
+  
+  # https://www.ncbi.nlm.nih.gov/clinvar/variation/90833/ 
+  row.change = which(DF_Full$sys.label == "MSH2 c.1A>G (p.?)")
+  DF_Full$smpl.hgvsProtein[row.change] <- "p.Met1Val"
+  
   # Backcalculation and similarity approximation
   #----------------------------------------------
   # Upstream "smpl.hgvsCoding" coordinates assumes no breaks in non-coding region
@@ -196,10 +204,90 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   DF_Full$smpl.hgvsCoding[row.change] <- "c.-154C>T"
   DF_Full$smpl.transcript[row.change] <- "NM_198253.2"
   
+  row.change = which(DF_Full$sys.label == "BRAF c.1798_1799delinsAA (p.Val600Lys)")
+  DF_Full$smpl.genomicDescription[row.change] <- "chr7:g.140453136_140453137delACinsTT"
+  DF_Full$base.chromosome[row.change]  <- "chr7"
+  
+  row.change = which(DF_Full$sys.label == "DNMT3A c.2645G>C (p.Arg882Pro)")
+  DF_Full$base.chromosome[row.change]  <- "chr2"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr2:g.25457242C>G"
+  
+  row.change = which(DF_Full$sys.label == "IDH2 c.419G>T (p.Arg140Leu)")
+  DF_Full$base.chromosome[row.change]  <- "chr15"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr15:g.90631934C>A"
+  
+  row.change = which(DF_Full$sys.label == "TP53 c.265C>G (p.Pro89Ala)")
+  DF_Full$base.chromosome[row.change]  <- "chr17"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr17:g.7579422G>C"
+  
+  row.change = which(DF_Full$sys.label == "VHL c.472C>G (p.Leu158Val)")
+  DF_Full$smpl.genomicDescription[row.change] <- "chr3:g.10191479C>G"
+  
+  row.change = which(DF_Full$sys.label == "TET2 c.1648C>T (p.Arg550Ter)")
+  DF_Full$smpl.transcript[row.change]  <- "NM_001127208.2"
+  DF_Full$base.chromosome[row.change]  <- "chr4"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr4:g.106156747C>T"
+  
+  row.change = which(DF_Full$sys.label == "TET2 c.2645_2646delinsAA (p.Cys882Ter)")
+  DF_Full$base.chromosome[row.change]  <- "chr4"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr4:g.106157744_106157745delinsAA"
+  
+  row.change = which(DF_Full$sys.label == "EGFR c.89-7736_889+41del (p.Leu30_Arg297delinsGly)")
+  DF_Full$base.chromosome[row.change]  <- "chr7"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr7:g.55202243_55221886del"
+  
+  row.change = which(DF_Full$sys.label == "IDH2 c.419G>A (p.Arg140Gln)")
+  DF_Full$base.chromosome[row.change]  <- "chr15"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr15:g.90631934C>T"
+  
+  row.change = which(DF_Full$sys.label == "PIK3CA c.1348_1374del (p.His450_Pro458del)")
+  DF_Full$base.chromosome[row.change]  <- "chr3"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr3:g.1505_1531del"
+  
+  row.change = which(DF_Full$sys.label == "PTCH1 c.3947A>G (p.Tyr1316Cys)")
+  DF_Full$base.chromosome[row.change]  <- "chr9"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr9:g.98209591T>C"
+  
+  row.change = which(DF_Full$sys.label == "TERT c.-138_139delinsTT ()")
+  DF_Full$base.chromosome[row.change]  <- "chr5"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr5:g.1295242_1295243delinsAA"
+  
+  row.change = which(DF_Full$sys.label == "TET2 c.1072A>G (p.Ser358Gly)")
+  DF_Full$base.chromosome[row.change]  <- "chr4"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr4:g.106156171A>G"
+
+  row.change = which(DF_Full$sys.label == "TP53 NM_000546.5:c.856G>A (NP_000537.3:p.Glu286Lys)")
+  DF_Full$smpl.genomicDescription[row.change] <- "chr17:g.7577082C>T"
+  DF_Full$smpl.hgvsGenomic[row.change] <- "g.7577082C>T"
+  
+  # https://mutalyzer.nl/name-checker?description=NM_000077.4%3Ac.26delinsTT+
+  row.change = which(DF_Full$sys.label == "CDKN2A NM_000077.4:c.26delinsTT (Met9fs)")
+  DF_Full$smpl.pathogenicityStatus[row.change] <- "Pathogenic"
+  DF_Full$smpl.hgvsCoding[row.change] <- "c.26dupT"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr9:g.21974801dupA"
+  DF_Full$smpl.hgvsGenomic[row.change] <- "g.21974801dupA"
+  
+  row.change = which(DF_Full$sys.label == "KIT c.1612A>G (p.Ile538Val)")
+  DF_Full$base.chromosome[row.change] <- "chr4"
+  DF_Full$smpl.genomicDescription[row.change] <- "chr4:g.55593455A>G"
+  
+  row.change = which(DF_Full$sys.label == "KIT c.1594G>A (p.Val532Ile)")
+  DF_Full$smpl.genomicDescription[row.change] <- "chr4:g.55593437G>A"
+  
+  row.change = which(DF_Full$sys.label == "TERT c.-146C>T (N/A)")
+  DF_Full$smpl.pathogenicityStatus[row.change] <- "Pathogenic"
+  
+  row.change = which(DF_Full$sys.label == "PIK3CA c.1348_1374del (p.His450_Pro458del)")
+  DF_Full$smpl.genomicDescription[row.change] <- NA
+  DF_Full$smpl.hgvsGenomic[row.change] <- NA
+  
+  row.change = which(DF_Full$sys.label == "RB1 c.1592_1634delinsGCTTTT (p.Val531fs)")
+  DF_Full$smpl.genomicDescription[row.change] <- NA
+  DF_Full$smpl.hgvsGenomic[row.change] <- NA
+  
   # VariantHGVSGenomic correction
   #----------------------------------------------
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "PTCH1 c.3947A>G (p.Tyr1316Cys)")] <-"g.98209591T>C"
-  DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "PIK3CA c.1348_1374del (p.His450_Pro458del)")] <- "g.1505_1531del"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "KIT c.1721_1762dup (p. Thr574_Asn587dup)")] <- "g.55593655_55593696dup"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "TERT c.-138_139delinsTT ()")] <- "g.1295242_1295243delinsAA"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$sys.label == "EGFR c.89-7736_889+41del (p.Leu30_Arg297delinsGly)")] <- "g.55202243_55221886del"
@@ -221,7 +309,23 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr17:g.29527590C>T")] <- "g.29527590C>T"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == ":g.10602467 _10602472dup")] <- "g.10602467_10602472dup"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "g.10191479")] <- "g.10191479C>G"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "chr7:g.55230489_55240217del")] <- "g.55230489_55240217del"
+  DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "NC_000016.9:g.68842671_68842677dup")] <- "g.68842671_68842677dup"
   
+  row.change = which(is.na(DF_Full$smpl.genomicDescription))
+  for (row_No in 1:length(row.change)) {
+    row.change_sub <- row.change[row_No]
+    
+    chr_No = DF_Full$base.chromosome[row.change_sub]
+    gen_No = DF_Full$smpl.hgvsGenomic[row.change_sub]
+    
+    if (isTRUE(!is.na(chr_No) & !is.na(gen_No))) {
+      DF_Full$smpl.genomicDescription[row.change_sub] <- paste(chr_No,":",gen_No,sep="")
+    }
+  }
+  
+  sort(unique(DF_Full$smpl.genomicDescription[row.change]))
+
   DF_Full$smpl.histologicalDiagnosis[which(DF_Full$smpl.histologicalDiagnosis == "Sqaumous cell carcinoma")] <- "Squamous cell carcinoma"
   DF_Full$smpl.histologicalDiagnosis[which(DF_Full$smpl.histologicalDiagnosis == "Carcinoma:Other (specify)")] <- "Carcinoma:Other carcinoma (specify)"
   
@@ -341,8 +445,9 @@ for (row_No in 1:nrow(DF_Full)) {
 }
 
 for (row_No in 1:nrow(DF_Full)) {
-  DF_Full$patient.dob <- as.Date(paste(DF_Full$month, DF_Full$day, DF_Full$year, sep="/"), "%m/%d/%Y")
+  DF_Full$patient.dob[row_No] <- paste(DF_Full$month[row_No], DF_Full$day[row_No], DF_Full$year[row_No], sep="/")
 }
+DF_Full$patient.dob <-  as.Date(DF_Full$patient.dob, "%m/%d/%Y")
 
 # Age rounded down to nearest integer -- relative to smpl.dateReceived
 DF_Full$smpl.dateReceived <- as.Date(gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*)", "\\1", 

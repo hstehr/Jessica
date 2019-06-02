@@ -1,13 +1,6 @@
-suppressMessages(library(plyr))
-suppressMessages(library(dplyr))
-suppressMessages(library(Biobase))
-suppressMessages(library(eeptools))
-suppressMessages(library(splitstackshape))
-suppressMessages(library(reshape))
-suppressMessages(library(rio))
-suppressMessages(library(stringr))
-suppressMessages(library(openxlsx))
-suppressMessages(library(tidyr))
+suppressMessages(library("easypackages"))
+suppressMessages(libraries("plyr","dplyr","Biobase","eeptools","splitstackshape",
+                           "reshape","rio","stringr","openxlsx","tidyr"))
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {Internal_match = FALSE  
@@ -230,9 +223,9 @@ outdir = "~/Desktop/trials_Iterate/FullDataset_AllFilters"
 if (!dir.exists(outdir)){dir.create(outdir)} 
 setwd(outdir)
 
-# out.output.sub = paste(outdir,"/",Sys.Date(),".out",sep="")
-# sink(file = out.output.sub, append = FALSE, split = FALSE)
-# options(max.print=999999)
+out.output.sub = paste(outdir,"/",Sys.Date(),".out",sep="")
+sink(file = out.output.sub, append = FALSE, split = FALSE)
+options(max.print=999999)
 
 cat(paste("Outdirectory: ", outdir, sep=""),"\n")
 
@@ -263,15 +256,7 @@ STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable
 
 cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")
 
-# Filter for entries with histological dx
-STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$HistologicalDx), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy (specify)"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other malignancy:malignancy, type cannot be determined"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "non-classifiable"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other (specify)"), ]
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$HistologicalDx != "other/non-classifiable:other(s) (specify)"), ]
+# 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
 # sort(unique(STAMP_DF$HistologicalDx))
 
 # Filter for entries with primary tumor site
@@ -314,9 +299,9 @@ for (case_No in 1:length(outdir.list)) {
   if (!dir.exists(outdir)){dir.create(outdir)} 
   setwd(outdir)
   
-  # out.output.sub = paste(outdir,"/",Sys.Date(),".out",sep="")
-  # sink(file = out.output.sub, append = FALSE, split = FALSE)
-  # options(max.print=999999)
+  out.output.sub = paste(outdir,"/",Sys.Date(),".out",sep="")
+  sink(file = out.output.sub, append = FALSE, split = FALSE)
+  options(max.print=999999)
   
   cat(paste("Outdirectory: ", outdir, sep=""),"\n")
   cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")
@@ -371,9 +356,9 @@ for (case_No in 1:length(outdir.list)) {
   if (!dir.exists(outdir)){dir.create(outdir)} 
   setwd(outdir)
   
-  # out.output.sub = paste(outdir,"/",Sys.Date(),".out",sep="")
-  # sink(file = out.output.sub, append = FALSE, split = FALSE)
-  # options(max.print=999999)
+  out.output.sub = paste(outdir,"/",Sys.Date(),".out",sep="")
+  sink(file = out.output.sub, append = FALSE, split = FALSE)
+  options(max.print=999999)
   
   cat(paste("Outdirectory: ", outdir, sep=""),"\n")
   cat(paste(nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total patients", sep=""),"\n","\n")

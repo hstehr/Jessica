@@ -1,3 +1,18 @@
+rm(list=ls())
+
+STAMPv2_Annotation <- suppressMessages(import_list(
+  "~/Documents/ClinicalDataScience_Fellowship/STAMP/2016-08-23_STAMPv2_Annotation.xlsx",setclass = "tbl"))
+
+# Generate individual DF per worksheet in excel file
+invisible(capture.output(lapply(names(STAMPv2_Annotation), 
+                                function(x) assign(x, STAMPv2_Annotation[[x]], envir = .GlobalEnv))))
+
+# Re-format protein length INFO 
+colnames(Genes) <- unlist(Genes[2,])
+Genes <- data.frame(Genes[c(3:nrow(Genes)),c(2:ncol(Genes))])
+
+remove(STAMPv2_Annotation,Domains,Tiles,Changes)
+
 #----------------------------------------------
 ## Replication of patients identified in NCI-MATCH Designated Lab Application: SNV/Indels
 #----------------------------------------------
@@ -5,8 +20,6 @@
 ## Switch REF and ALT columns**
 ## Rename "gene" > "Gene Name" for "Inclusion Non-Hotspot Rules" in ARM-H, ARM-U
 ## Modifications to HistologicalDx_CTEP.csv: append "adenocarcinoma,lung,,,Non-small cell lung cancer,"
-
-rm(list=ls())
 
 data.root="~/Desktop/"
 script.root="~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/PIPELINE_scripts/SyapseExport_RetrospectiveAnalysis/"
@@ -52,11 +65,11 @@ remove(VarMatch,NHSMatch,Final,colname_extract,colname_extract_new)
 # Delete temporary directory
 if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)}
 
+closeAllConnections()
+
 #----------------------------------------------
 ## Iteration of difference scenarios 
 #----------------------------------------------
-rm(list=ls())
-
 data.root="~/Documents/ClinicalDataScience_Fellowship/"
 script.root=paste(data.root,"ClinicalTrialMatching/PIPELINE_scripts/SyapseExport_RetrospectiveAnalysis/",sep="")
 outdir.root="~/Desktop/trials_Iterate"
@@ -77,3 +90,5 @@ adult_FILTER = "TRUE"
 
 setwd(script.root)
 source("ClinicalTrial_Matching_PIPELINE_Iterate.R")
+
+closeAllConnections()
