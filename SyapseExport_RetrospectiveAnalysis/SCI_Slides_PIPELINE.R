@@ -1,5 +1,6 @@
 rm(list=ls())
 
+library(rio)
 STAMPv2_Annotation <- suppressMessages(import_list(
   "~/Documents/ClinicalDataScience_Fellowship/STAMP/2016-08-23_STAMPv2_Annotation.xlsx",setclass = "tbl"))
 
