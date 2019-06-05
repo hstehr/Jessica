@@ -10,7 +10,8 @@ invisible(capture.output(lapply(names(STAMPv2_Annotation),
 
 # Re-format protein length INFO 
 colnames(Genes) <- unlist(Genes[2,])
-Genes <- data.frame(Genes[c(3:nrow(Genes)),c(2:ncol(Genes))])
+colnames_keep <- c("Name","Transcript","Tiles","Size","Coverage","MUT","CNV","Fusions","AA Length")   
+Genes <- data.frame(Genes[c(3:nrow(Genes)),colnames_keep])
 
 remove(STAMPv2_Annotation,Domains,Tiles,Changes)
 
