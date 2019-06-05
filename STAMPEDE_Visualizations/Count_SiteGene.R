@@ -28,8 +28,9 @@ remove(row_No,Site_List)
 
 # TABLE: Gene_No.Occurrences
 #----------------------------------------------
-Gene_Summary <- read.csv(file = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_GeneName_Description.csv",
-                         header = FALSE, stringsAsFactors = FALSE, sep = ",")
+#
+Gene_Summary <- read.csv(file = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/STAMPEDE_GeneName_Description.txt",
+                         header = FALSE, stringsAsFactors = FALSE, sep = "\t")
 colnames(Gene_Summary) <- c("VariantGene","Summary")
 
 GeneName_List <- data.frame(VariantGene = sort(unique(gene.list.total)),
