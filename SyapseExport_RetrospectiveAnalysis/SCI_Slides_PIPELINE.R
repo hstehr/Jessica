@@ -13,7 +13,7 @@ colnames(Genes) <- unlist(Genes[2,])
 colnames_keep <- c("Name","Transcript","Tiles","Size","Coverage","MUT","CNV","Fusions","AA Length")   
 Genes <- data.frame(Genes[c(3:nrow(Genes)),colnames_keep])
 
-remove(STAMPv2_Annotation,Domains,Tiles,Changes)
+remove(STAMPv2_Annotation,Domains,Tiles,Changes,colnames_keep)
 
 #----------------------------------------------
 ## Replication of patients identified in NCI-MATCH Designated Lab Application: SNV/Indels
@@ -38,6 +38,7 @@ NCI.ArmRemove="NULL"
 stamp_reference_transcripts="~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/PIPELINE_scripts/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt"
 exons_ensembl="~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/PIPELINE_scripts/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt"
 histoDx.key=paste(script.root,"HistologicalDx_CTEP.csv",sep="")
+AA_key=paste(data.root,"STAMP/AminoAcid_Conversion.csv",sep="")
 
 adult_FILTER = "FALSE"
 pathogenic_FILTER = "TRUE"
@@ -87,6 +88,7 @@ NCI.ArmRemove="ARM-F,ARM-G,ARM-S2,ARM-Z1C,ARM-Z1F"
 stamp_reference_transcripts=paste(data.root,"ClinicalTrialMatching/PIPELINE_scripts/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
 exons_ensembl=paste(data.root,"ClinicalTrialMatching/PIPELINE_scripts/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
 histoDx.key=paste(script.root,"HistologicalDx_CTEP.csv",sep="")
+AA_key=paste(data.root,"STAMP/AminoAcid_Conversion.csv",sep="")
 
 adult_FILTER = "TRUE"
 

@@ -22,6 +22,8 @@ err.output = paste(outdir,Sys.Date(),".err",sep="")
 
 ## Load files and specify timestamps
 #----------------------------------------------
+AA_key_table <- read.csv(file = AA_key, sep = ",")
+
 STAMP_DF <- read.csv(file = STAMP.file, header = TRUE, na.strings = c(""," ","NA"), stringsAsFactors = FALSE, sep = ",")
 Syapse_Export_timestamp <- format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*/", "", STAMP.file))), format= "%Y-%m-%d")
 
@@ -339,6 +341,7 @@ for (case_No in 1:length(outdir.list)) {
     
     remove(OnCoreMatch,DF_tabulate)  
   }
+  remove(case_No)
 }
 
 #----------------------------------------------

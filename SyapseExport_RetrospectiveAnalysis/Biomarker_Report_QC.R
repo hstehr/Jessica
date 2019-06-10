@@ -104,9 +104,30 @@ OnCore_Biomarker_QC$Biomarker_Detail <-
   gsub("^\\*[[:blank:]]*$", "All mutations accepted", OnCore_Biomarker_QC$Biomarker_Detail)
 
 ################################
-## Manual correction: Amino acid change
+## Assume alternative Biomarker_Detail is amino acid change: convert to 3-letter code 
 ################################
-OnCore_Biomarker_QC$Biomarker_Detail[OnCore_Biomarker_QC$Biomarker_Detail == "V600*"] <- "Val600*"
+row.change <- which(grepl("^[[:alpha:]]{1}[[:digit:]]{1,3}.*", OnCore_Biomarker_QC$Biomarker_Detail))
+
+if (length(row.change) > 0) {
+  for (row_No in 1:length(row.change)) {
+    
+    row_id <- row.change[row_No]
+    aa_start <- gsub("(^[[:alpha:]]{1})(.*)","\\1", OnCore_Biomarker_QC$Biomarker_Detail[row_id])
+    pos_id <- gsub("(^[[:alpha:]]{1})([[:digit:]]{1,3})(.*)","\\2", OnCore_Biomarker_QC$Biomarker_Detail[row_id])
+    aa_end <- gsub("(^[[:alpha:]]{1}[[:digit:]]{1,3})(.*)","\\2", OnCore_Biomarker_QC$Biomarker_Detail[row_id])
+    
+    if (isTRUE(aa_end == "*")) {
+      OnCore_Biomarker_QC$Biomarker_Detail[row_id] <- paste(AA_key_table$Code3[which(AA_key_table$Code1 == aa_start)],
+                                                            pos_id,"*",sep="")
+      
+    } else {
+      OnCore_Biomarker_QC$Biomarker_Detail[row_id] <- paste(AA_key_table$Code3[which(AA_key_table$Code1 == aa_start)],
+                                                            pos_id,
+                                                            AA_key_table$Code3[which(AA_key_table$Code1 == aa_end)],
+                                                            sep="")
+    }
+  }
+}
 
 ## CONFIRMATION: Biomarker Gene alterations are within permitted terms
 #----------------------------------------------
@@ -234,6 +255,6 @@ write.table(OnCore_Biomarker_QC, paste(tempdir,OnCore_Biomarker_Report_timestamp
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
 
 remove(alterations_okay,col_No,colname_keep,Disease.Group.key,Disease.Group.Report,
-       DiseaseGroupCategory.name,elem_No,row_No,rowkeep,x)
+       DiseaseGroupCategory.name,elem_No,row_No,rowkeep,x,row.change)
 cat("\n")
 cat(paste("Timestamp of OnCore_Biomarker_Report processing FINISH: ", Sys.time(), sep=""),"\n","\n")

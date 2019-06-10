@@ -132,6 +132,8 @@ if (isTRUE(static.plots_FILTER)) {
                                         No.Orders=sum(DF_Edit$No.Orders[which(DF_Edit$Gender==gender_id)]),
                                         Relative.Frequency=sum(DF_Edit$Relative.Frequency[which(DF_Edit$Gender==gender_id)]),
                                         stringsAsFactors = FALSE))
+    
+    remove(elem_No,gender_id)
   }
   
   DF_tabulate_full_edit <- rbind(DF_Keep,DF_Edit_Summary)
@@ -172,7 +174,10 @@ if (isTRUE(static.plots_FILTER)) {
                heights = c(2, 0.4), ncol = 1, nrow = 2)
   dev.off()
   
-  remove(DF_subset,Output.table,plot,row_No)
+  remove(DF_subset,Output.table,plot,row_No,DF_Edit,DF_Edit_Summary,
+         DF_Keep,DF_tabulate,DF_tabulate_full,DF_tabulate_full_edit,
+         row_append,comment,total.count,cohort.missing,gender.list,
+         gender.missing,ymax,y_increment)
 }
 
 ## STAMP database: pathogenicity status + variant type
@@ -343,6 +348,8 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, cohort, outdir) {
        width = width, height = height, units = "in", res = 350)
   grid.arrange(plot, Output.table, heights = c(2, 0.5), ncol = 1, nrow = 2)
   dev.off()
+  
+  remove(DF_tabulate_full,comment,ymax,y_increment)
 }
 
 if (isTRUE(static.plots_FILTER)) {
@@ -447,6 +454,8 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
        width = width, height = height, units = "in", res = 350)
   print(plot_jpeg)
   dev.off()
+  
+  remove(comment)
 }
 
 if (isTRUE(static.plots_FILTER)) {
@@ -587,6 +596,8 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height, PerSite
        width = width, height = height, units = "in", res = 350)
   grid.arrange(plot, Output.table, widths = c(2, 0.75), ncol = 2, nrow = 1)
   dev.off()
+  
+  remove(comment)
 }
 
 if (isTRUE(static.plots_FILTER)) {
@@ -596,5 +607,6 @@ if (isTRUE(static.plots_FILTER)) {
                            outdir = outdir)
 }
 
-remove(DF,cohort)
+remove(DF,cohort,variant_type_distribution_fxn,test_volume_timeline_fxn,top_site_count_fxn,
+       month.number,month.alpha)
 cat(paste("Timestamp of data visualization generation FINISH: ", Sys.time(), sep=""),"\n")

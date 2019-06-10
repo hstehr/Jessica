@@ -314,6 +314,7 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
     if (isTRUE(!is.na(chr_No) & !is.na(gen_No))) {
       DF_Full$smpl.genomicDescription[row.change_sub] <- paste(chr_No,":",gen_No,sep="")
     }
+    remove(chr_No,gen_No,row.change_sub)
   }
   
   sort(unique(DF_Full$smpl.genomicDescription[row.change]))

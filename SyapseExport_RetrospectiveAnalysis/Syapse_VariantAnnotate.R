@@ -466,6 +466,6 @@ remove(DF,DF_del,DF_delins,DF_dup,DF_Frameshift,DF_Full,DF_ins,DF_intron,DF_Map,
        DF_remain,DF_SNV,DF_synonymous,DF_upstream,DF_var,colname_subset,DiseaseGroupCategory.name,
        i,primaryTumorSite.key,primaryTumorSite.STAMP,row_No,Extract_VarPosition,
        patient_id,patient_num,patient.list,DF_patient,HistologicalDx.key,HistologicalDx.STAMP,
-       gene_id,genomic_pos,Gene.ExonTable,out.DF)
+       gene_id,genomic_pos,Gene.ExonTable,out.DF,row.change)
 
 cat("\n")
