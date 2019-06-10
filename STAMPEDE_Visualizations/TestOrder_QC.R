@@ -63,12 +63,41 @@ remove(date_NA)
 TRF_DF$smpl.dateReceived <- as.Date(gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*)", "\\1", 
                                          TRF_DF$smpl.dateReceived), "%Y-%m-%d")
 
+## Structure patient DOB and input current age
+#----------------------------------------------
+# Extract components of DOB
+TRF_DF$year = gsub("(^[[:digit:]]{4})(.*)", "\\1", TRF_DF$base.dob)
+TRF_DF$month = gsub("(^[[:digit:]]{4}[-])([[:digit:]]{2})(.*)", "\\2", TRF_DF$base.dob)
+TRF_DF$day = gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-])(.*)", "\\2", TRF_DF$base.dob)
+
+for (row_No in 1:nrow(TRF_DF)) {
+  TRF_DF$patient.dob[row_No] <- paste(TRF_DF$month[row_No], TRF_DF$day[row_No], TRF_DF$year[row_No], sep="/")
+}
+TRF_DF$patient.dob <- as.Date( TRF_DF$patient.dob, "%m/%d/%Y")
+
+# Age rounded down to nearest integer -- relative to smpl.dateReceived
+TRF_DF$smpl.dateReceived <- as.Date(gsub("(^[[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*)", "\\1", 
+                                          TRF_DF$smpl.dateReceived), "%Y-%m-%d")
+
+for (row_No in 1:nrow(TRF_DF)) {
+  if (isTRUE(is.na(TRF_DF$patient.dob[row_No]) | is.na(TRF_DF$smpl.dateReceived[row_No]))) {
+    TRF_DF$Age[row_No] <- NA
+  } else {
+    TRF_DF$Age[row_No] <- as.numeric(floor(age_calc(dob = TRF_DF$patient.dob[row_No], 
+                                            enddate = TRF_DF$smpl.dateReceived[row_No], 
+                                            units = "years")))
+  }
+}
+
 # Subset relevant columns
-col_extract  <- c("sys.uniqueId","smpl.dateReceived")
+#----------------------------------------------
+col_extract  <- c("sys.uniqueId","smpl.gender","Age","smpl.primaryTumorSite",
+                  "smpl.dateReceived","smpl.specimenType","smpl.percentTumor","smpl.histologicalDiagnosis")
 TRF_DF <- unique(TRF_DF[,col_extract])
 
-colnames(TRF_DF) <- c("PatientID","AssayDateReceived")
-remove(col_extract)
+colnames(TRF_DF) <- c("PatientID","PatientGender","PatientAge","PrimaryTumorSite",
+                      "AssayDateReceived","smpl.specimenType","smpl.percentTumor","HistologicalDx")
+remove(col_extract,row_No)
 
 assign("TRF_DF", TRF_DF, envir = .GlobalEnv)
 
