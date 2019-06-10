@@ -74,17 +74,14 @@ TRF_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     
     # Y-axis parameters
     ymax <- ceiling(max(DF_tabulate$CumulativeCount)/10)*10
-    if (isTRUE(ymax < 1000)) {
-      if (isTRUE(ymax <= 20)) {y_increment = 1
-      } else if (isTRUE(ymax <= 30)) {y_increment = 2
-      } else if (isTRUE(ymax <= 100)) {y_increment = 5
-      } else if (isTRUE(ymax <= 200)) {y_increment = 10
-      } else if (isTRUE(ymax <= 500)) {y_increment = 50
-      } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-      } else {y_increment = 10
-      }
+    if (isTRUE(ymax <= 10)) {y_increment = 1
+    } else if (isTRUE(ymax <= 50)) {y_increment = 2
+    } else if (isTRUE(ymax <= 100)) {y_increment = 10
+    } else if (isTRUE(ymax <= 250)) {y_increment = 25
+    } else if (isTRUE(ymax <= 500)) {y_increment = 50
+    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
     } else {y_increment = 250
-    } 
+    }
     
     plot_cumulative_dynamic <- ggplot(DF_tabulate[,c(4,3)], aes(x=DateReviewed, y=CumulativeCount)) +
       geom_point(aes(y=CumulativeCount, color="red")) +
@@ -135,15 +132,12 @@ TRF_volume_timeline_fxn <- function (DF, cohort, outdir, width, height) {
     
     # Y-axis parameters
     ymax <- ceiling(max(DF_tabulate$No.Orders)/10)*10
-    if (isTRUE(ymax < 1000)) {
-      if (isTRUE(ymax <= 20)) {y_increment = 1
-      } else if (isTRUE(ymax <= 30)) {y_increment = 2
-      } else if (isTRUE(ymax <= 100)) {y_increment = 5
-      } else if (isTRUE(ymax <= 200)) {y_increment = 10
-      } else if (isTRUE(ymax <= 500)) {y_increment = 50
-      } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-      } else {y_increment = 10
-      }
+    if (isTRUE(ymax <= 10)) {y_increment = 1
+    } else if (isTRUE(ymax <= 50)) {y_increment = 2
+    } else if (isTRUE(ymax <= 100)) {y_increment = 10
+    } else if (isTRUE(ymax <= 250)) {y_increment = 25
+    } else if (isTRUE(ymax <= 500)) {y_increment = 50
+    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
     } else {y_increment = 250
     }
     
@@ -224,15 +218,12 @@ fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Occurrences)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -364,15 +355,12 @@ top_fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Mutations)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -479,15 +467,12 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
   #----------------------------------------------
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Orders)/10)*10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -762,15 +747,12 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     #----------------------------------------------
     # Y-axis parameters
     ymax <- ceiling(max(DF_tabulate$No.Orders)/10)*10
-    if (isTRUE(ymax < 1000)) {
-      if (isTRUE(ymax <= 20)) {y_increment = 1
-      } else if (isTRUE(ymax <= 30)) {y_increment = 2
-      } else if (isTRUE(ymax <= 100)) {y_increment = 5
-      } else if (isTRUE(ymax <= 200)) {y_increment = 10
-      } else if (isTRUE(ymax <= 500)) {y_increment = 50
-      } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-      } else {y_increment = 10
-      }
+    if (isTRUE(ymax <= 10)) {y_increment = 1
+    } else if (isTRUE(ymax <= 50)) {y_increment = 2
+    } else if (isTRUE(ymax <= 100)) {y_increment = 10
+    } else if (isTRUE(ymax <= 250)) {y_increment = 25
+    } else if (isTRUE(ymax <= 500)) {y_increment = 50
+    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
     } else {y_increment = 250
     }
     
@@ -880,15 +862,12 @@ pt_mutation_count_fxn <- function (DF, cohort, outdir) {
     #----------------------------------------------
     # Y-axis parameters
     ymax <- ceiling(max(DF_tabulate$No.Orders)/10)*10
-    if (isTRUE(ymax < 1000)) {
-      if (isTRUE(ymax <= 20)) {y_increment = 1
-      } else if (isTRUE(ymax <= 30)) {y_increment = 2
-      } else if (isTRUE(ymax <= 100)) {y_increment = 5
-      } else if (isTRUE(ymax <= 200)) {y_increment = 10
-      } else if (isTRUE(ymax <= 500)) {y_increment = 50
-      } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-      } else {y_increment = 10
-      }
+    if (isTRUE(ymax <= 10)) {y_increment = 1
+    } else if (isTRUE(ymax <= 50)) {y_increment = 2
+    } else if (isTRUE(ymax <= 100)) {y_increment = 10
+    } else if (isTRUE(ymax <= 250)) {y_increment = 25
+    } else if (isTRUE(ymax <= 500)) {y_increment = 50
+    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
     } else {y_increment = 250
     }
     
@@ -1015,15 +994,12 @@ gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) {
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Occurrences)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -1150,15 +1126,12 @@ top_gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) 
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Mutations)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -1371,15 +1344,12 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohor
   remove(VariantType.list)
   
   ymax <- ceiling(max(ymax)/10)*10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -1565,15 +1535,12 @@ top_variant_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdi
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Mutations)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -1683,15 +1650,12 @@ site_count_fxn <- function (DF, cohort, outdir) {
                                          levels = DF_tabulate$PrimaryTumorSite[order(-DF_tabulate$Percent.Orders)])
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$Percent.Orders)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -1840,15 +1804,12 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$Percent.Orders)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -2035,15 +1996,12 @@ gender_age_distribution_fxn <- function (DF, cohort, outdir) {
   }
   
   ymax <- ceiling(max(ymax)/5)*5
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -2192,15 +2150,12 @@ specimen_type_stacked_fxn <- function(DF, cohort, outdir) {
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Orders)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -2311,15 +2266,12 @@ tumor_purity_count_fxn <- function (DF, cohort, outdir, width, height) {
   #----------------------------------------------
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$No.Orders)/10) * 10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -2421,15 +2373,12 @@ histologicaldx_distribution_fxn <- function (DF, cohort, outdir) {
   
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate_full$No.Orders)/10)*10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   
@@ -2545,15 +2494,12 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height, PerSite
   #----------------------------------------------
   # Y-axis parameters
   ymax <- ceiling(max(DF_tabulate$CumulativeCount)/10)*10
-  if (isTRUE(ymax < 1000)) {
-    if (isTRUE(ymax <= 20)) {y_increment = 1
-    } else if (isTRUE(ymax <= 30)) {y_increment = 2
-    } else if (isTRUE(ymax <= 100)) {y_increment = 5
-    } else if (isTRUE(ymax <= 200)) {y_increment = 10
-    } else if (isTRUE(ymax <= 500)) {y_increment = 50
-    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-    } else {y_increment = 10
-    }
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 50)) {y_increment = 2
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
   } else {y_increment = 250
   }
   

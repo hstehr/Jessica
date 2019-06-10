@@ -4,8 +4,8 @@
 # Load Libraries 
 #----------------------------------------------
 suppressMessages(library("easypackages"))
-suppressMessages(libraries("dplyr","eeptools","gridExtra","reshape","gtable","grid","plotly"))
-suppressMessages(libraries("ggplot2", "ggpubr","rio","devtools","jsonlite"))
+suppressMessages(libraries("dplyr","eeptools","gridExtra","reshape","gtable","grid","plotly",
+                           "ggplot2", "ggpubr","rio","devtools","jsonlite"))
 
 ## Filters
 #----------------------------------------------
@@ -164,7 +164,7 @@ cat("\n",paste("Outdirectory (lollipop plots): ", outdir.lollipop, sep=""),"\n",
 
 source("STAMPEDE_PerGene.R")
 
-sink()
+closeAllConnections()
 
 remove(pathogenic,vus,benign)
 
