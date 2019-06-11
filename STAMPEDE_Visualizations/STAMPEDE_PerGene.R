@@ -76,9 +76,33 @@ for (gene_num in 1:length(gene.list.total)) {
   # Lollipop info per SNV/Indel gene
   #----------------------------------------------
   if (isTRUE(gene_id %in% unlist(snv.list$gene))) {
-    SNV_lollipop_fxn (DF = gene_DF, 
-                      gene_id = gene_id,
-                      assay = "STAMP_v2", outdir = outdir.lollipop) 
+    # Map only SNVs to lollipop plots
+    gene_DF_SNV <- gene_DF[which(gene_DF$var.type == "SNV"),]
+    
+    # Remove intronic mutations 
+    gene_DF_SNV <- gene_DF_SNV[!(grepl("^c.(-)*[[:digit:]]+[-+]{1}[[:digit:]]+.*", gene_DF_SNV$VariantHGVSCoding)),]
+    
+    if (nrow(gene_DF_SNV) > 0) {
+      
+      if (isTRUE(gene_id %in% snv.hotspot.list)) {
+        # Extract position info
+        gene_DF_SNV$var.position <- gsub("(^c.)([-][[:digit:]]{,3})(.*)","\\2",gene_DF_SNV$VariantHGVSCoding)
+        gene_DF_SNV$aa.start <- gsub("(^c.[-][[:digit:]]{,3})([[:alpha:]]{1})(.*)","\\2",gene_DF_SNV$VariantHGVSCoding)
+        gene_DF_SNV$aa.end <- gsub("(^c..*[>}])(.*$)","\\2",gene_DF_SNV$VariantHGVSCoding)
+        
+        SNV_lollipop_fxn (DF = gene_DF_SNV, 
+                          gene_id = gene_id,
+                          promoter_plot = TRUE,
+                          assay = "STAMP_v2", outdir = outdir.lollipop) 
+        
+      } else {
+        # Mutation in genes that are !(Genes$Coverage == "promoter") are NOT mapped if outside domain
+        SNV_lollipop_fxn (DF = gene_DF_SNV, 
+                          gene_id = gene_id,
+                          assay = "STAMP_v2", outdir = outdir.lollipop) 
+      }
+    }
+    remove(gene_DF_SNV)
   }
   
   remove(gene_id,col_extract,gene_DF,gene_Fusion,gene_CNV)

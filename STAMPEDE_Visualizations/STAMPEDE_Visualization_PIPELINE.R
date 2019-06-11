@@ -30,7 +30,7 @@ script.dir = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations
 stamp_reference_transcripts = paste(pipeline.root, 
                                     "Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt", sep="")
 exons_ensembl = paste(pipeline.root, "Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt", sep="")
-aminoAcid_conversion = paste(data.root, "STAMP/AminoAcid_Conversion.csv", sep="")
+AA_key=paste(data.root,"STAMP/AminoAcid_Conversion.csv",sep="")
 
 histoDx.key = paste(pipeline.root,"HistologicalDx_CTEP.csv",sep="")
 
@@ -61,8 +61,7 @@ benign = c("Likely Benign")
 
 ## Generate reference tables
 #----------------------------------------------
-AminoAcid_Conversion <- 
-  read.csv(file = aminoAcid_conversion, header = TRUE, na.strings = c(""," "), stringsAsFactors = FALSE, sep = ",")
+AA_key_table <- read.csv(file = AA_key, sep = ",")
 
 stamp_reference_transcripts <- 
   read.csv(file = stamp_reference_transcripts, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
@@ -98,10 +97,10 @@ source("HistologicalDx_CTEP_Match.R")
 #################################
 ## QC STAMP datasets = SNV/Indels, Fusions, CNVs
 #################################
-setwd(script.dir)
-
 ## STAMP database non-QC PIPELINE
-source("TestOrder_QC.R")
+source("SyapseExport_RetrospectiveAnalysis/STAMPv2_TestOrder_QC.R")
+
+setwd(script.dir)
 
 ## STAMP database QC PIPELINE
 source("SNVIndel_QC.R")

@@ -49,10 +49,22 @@ remove(STAMP_DF_old,column_common,DF_TumorSite)
 source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_Export_QC.R",sep=""))
 source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_VariantAnnotate.R",sep=""))
 
-cat(paste("POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
+# Filter for STAMP v2
+#----------------------------------------------
+STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)"), ]
+# sort(unique(STAMP_DF$AssayName))
+
+# # Filter for adults
+# #----------------------------------------------
+# STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]
+# sort(as.numeric(unique(STAMP_DF$PatientAge)))
+
+# Do not filter for entries with proper HGVS nomenclature = keep mutations in genes such as TERT
 
 # 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
 # sort(unique(STAMP_DF$HistologicalDx))
+
+cat(paste("STAMP v2 POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
 # Filter for entries with primary tumor site
 #----------------------------------------------
@@ -88,49 +100,9 @@ STAMP_DF <- STAMP_DF[which(STAMP_DF$smpl.specimenType != "other"),]
 STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$smpl.specimenType),]
 # sort(unique(STAMP_DF$smpl.specimenType))
 
-# Filter for STAMP v2
-#----------------------------------------------
-STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)"), ]
-# sort(unique(STAMP_DF$AssayName))
-
-# # Filter for adults
-# #----------------------------------------------
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]
-# sort(as.numeric(unique(STAMP_DF$PatientAge)))
-
-# Do not filter for entries with proper HGVS nomenclature = keep mutations in genes such as TERT
-
-# Collapse similar gene names
-STAMP_DF$VariantGene[which(tolower(STAMP_DF$VariantGene) %in% c("nkx2", "nkx2-1"))] <- "NKX2-1"
-# sort(unique(STAMP_DF$VariantGene))
-
-# Remove benign mutations 
-#----------------------------------------------
-STAMP_DF <- STAMP_DF[!(STAMP_DF$VariantPathogenicityStatus %in% benign), ]
-# sort(unique(STAMP_DF$VariantPathogenicityStatus))
-
-cat(paste("POST-Filter counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
-
-# Convert codons from 3-letter to 1-letter nomenclature
-#----------------------------------------------
-for (DF_row_No in 1:nrow(STAMP_DF)) {
-  
-  if (isTRUE(tolower(STAMP_DF$VariantHGVSProtein[DF_row_No]) != "promoter" &
-             grepl("^p.",STAMP_DF$VariantHGVSProtein[DF_row_No]))) {
-    
-    for (row_No in 1:nrow(AminoAcid_Conversion)) {
-      code3 <- gsub("[[:blank:]]$","",AminoAcid_Conversion$Code3[row_No])
-      code1 <- gsub("[[:blank:]]$","",AminoAcid_Conversion$Code1[row_No])
-      
-      STAMP_DF$VariantHGVSProtein[DF_row_No] <- sub(code3, code1,STAMP_DF$VariantHGVSProtein[DF_row_No])
-    
-      remove(code3,code1)
-    }
-    remove(row_No)
-  }
-}
-remove(DF_row_No)
+cat(paste("Post-visualization QC-filter: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
 assign("STAMP_DF", STAMP_DF, envir = .GlobalEnv)
+
 write.table(STAMP_DF, file = paste(tempdir, Syapse_Export_timestamp, "_Syapse_Export_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)

@@ -9,25 +9,9 @@ options(max.print=999999)
 # then either there were no amplifications, or the sample could not be matched for some reason.  
 ## Existence of sites.addition.CNV not addressed 
 
-# Fusion export for STAMP v2 (130 genes)
+# CNV export for STAMP v2 (130 genes)
 #----------------------------------------------
-CNV.file="~/Documents/ClinicalDataScience_Fellowship/STAMP/2019-05-15_stamp_cnvs.txt"
-STAMP_CNV <- read.csv(file = CNV.file, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-CNV_Export_timestamp <- format(as.Date(gsub("([[:digit:]]{4}[-][[:digit:]]{2}[-][[:digit:]]{2})(.*$)", "\\1",sub(".*/", "", CNV.file))), format= "%Y-%m-%d")
-
-# Rename column names of DF
-colnames(STAMP_CNV) <- c("PatientID","report_version","CNV_Gene","Variant_Type")
-
-# Integrate with primary tumor site field from TRF_File
-#----------------------------------------------
-STAMP_CNV <- left_join(STAMP_CNV,
-                       unique(TRF_DF[,c("PatientID","PatientGender","PatientAge","PrimaryTumorSite",
-                                          "AssayDateReceived","smpl.specimenType","smpl.percentTumor","HistologicalDx")]),
-                       by = "PatientID")
-
-# Restructure fields 
-STAMP_CNV$PrimaryTumorSite <- tolower(STAMP_CNV$PrimaryTumorSite)
-STAMP_CNV$HistologicalDx <- tolower(STAMP_CNV$HistologicalDx)
+source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/CNV_Export_QC.R",sep=""))
 
 STAMP_CNV_missing <- STAMP_CNV[is.na(STAMP_CNV$PrimaryTumorSite),]
 STAMP_CNV_missing <- left_join(STAMP_CNV_missing[,1:4],
@@ -37,8 +21,15 @@ STAMP_CNV_missing <- left_join(STAMP_CNV_missing[,1:4],
 CNV.diff_No <- length(which(is.na(STAMP_CNV_missing$PrimaryTumorSite)))
 cat(paste("Number of CNV entries missing PrimaryTumorSite: ",CNV.diff_No,sep=""))
 
+# # Filter for adults
+# #----------------------------------------------
+# STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$PatientAge >= 18),]
+# sort(as.numeric(unique(STAMP_CNV$PatientAge)))
+
 # 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
 # sort(unique(STAMP_CNV$HistologicalDx))
+
+cat(paste("CNV POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
 # Filter for entries with primary tumor site
 #----------------------------------------------
@@ -70,16 +61,6 @@ STAMP_CNV$smpl.percentTumor <- ceiling(as.numeric(STAMP_CNV$smpl.percentTumor))
 STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$smpl.specimenType != "other"),]
 STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$smpl.specimenType),]
 # sort(unique(STAMP_CNV$smpl.specimenType))
-
-# Collapse similar gene names
-#----------------------------------------------
-STAMP_CNV$CNV_Gene[which(tolower(STAMP_CNV$CNV_Gene) %in% c("nkx2", "nkx2-1"))] <- "NKX2-1"
-# sort(unique(STAMP_CNV$CNV_Gene))
-
-# # Filter for adults
-# #----------------------------------------------
-# STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$PatientAge >= 18),]
-# sort(as.numeric(unique(STAMP_CNV$PatientAge)))
 
 # Examine number of missing fields
 #----------------------------------------------
@@ -122,8 +103,9 @@ if (length(CNV.list) > 0) {
 
 remove(CNV.list,CNV.diff_No,CNV.file)
 
-cat(paste("POST-Filter counts: ",nrow(STAMP_CNV), " total entries and ", length(unique(STAMP_CNV[[1]])), " total test orders", sep=""),"\n","\n")
+cat(paste("CNV post-visualization QC-filter: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
 assign("STAMP_CNV", STAMP_CNV, envir = .GlobalEnv)
+
 write.table(STAMP_CNV, file = paste(tempdir, CNV_Export_timestamp, "_CNV_Export_QC.tsv", sep=""),
             append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
