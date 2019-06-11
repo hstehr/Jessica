@@ -2649,42 +2649,42 @@ test_volume_timeline_fxn <- function (DF, cohort, outdir, width, height, PerSite
 #----------------------------------------------
 Lollipop_Plot <- function(variant_type, assay,
                           static_plot = TRUE, dynamic_plot = FALSE,
-                          promoter_plot = FALSE,
-                          loc.freq.max = max(as.numeric(data_var_FULL$var.freq))) {
+                          promoter_plot = FALSE) {
   # Following variable must exist in global environment: data_var_FULL, DF_gene_INFO
   
   # Specify y-axis parameters = yaxis_max, y_tick, y_legend, y_legend_dynamic
-  if (loc.freq.max <= 10) {     # ABCC9
-    yaxis_max = 10
-    y_tick = 1
+  # Y-axis parameters
+  yaxis_max <- ceiling(max(as.numeric(data_var_FULL$var.freq))/10)*10
+  if (isTRUE(yaxis_max <= 10)) {y_tick = 1
+  } else if (isTRUE(yaxis_max <= 20)) {y_tick = 2
+  } else if (isTRUE(yaxis_max <= 50)) {y_tick = 5
+  } else if (isTRUE(yaxis_max <= 100)) {y_tick = 10
+  } else if (isTRUE(yaxis_max <= 250)) {y_tick = 25
+  } else if (isTRUE(yaxis_max <= 500)) {y_tick = 50
+  } else if (isTRUE(yaxis_max <= 1000)) {y_tick = 100
+  } else {y_tick = 250
+  }
+  
+  if (yaxis_max <= 10) {     # ABCC9
     y_legend = -1
     y_legend_dynamic = -0.15
-  } else if (loc.freq.max <= 20) {     # BRAF
-    yaxis_max = 20
-    y_tick = 2
+  } else if (yaxis_max <= 20) {     # BRAF
     y_legend = -1.25
     y_legend_dynamic = -0.35
-  } else if (loc.freq.max <= 50) {     # HTR1A
-    yaxis_max = 50
-    y_tick = 5
+  } else if (yaxis_max <= 50) {     # HTR1A
     y_legend = -5
     y_legend_dynamic = -1
-  } else if (loc.freq.max <= 100) {     # EGFR
-    yaxis_max = 100
-    y_tick = 10
+  } else if (yaxis_max <= 100) {     # EGFR
     y_legend = -10
     y_legend_dynamic = -1.75
-  } else if (loc.freq.max <= 250) {     # KRAS
-    yaxis_max = 250
-    y_tick = 25
+  } else if (yaxis_max <= 250) {     # KRAS
     y_legend = -25
     y_legend_dynamic = -6
   } else {     # KRAS - STAMP_all
-    yaxis_max = loc.freq.max
-    y_tick = 50
     y_legend = -50
     y_legend_dynamic =-10
   }
+  
   text_remove <- paste("/>y_legend_dynamic: ", y_legend_dynamic, "<br ", sep="")
   
   # Specify x-axis parameters = x_tick
@@ -2721,18 +2721,17 @@ Lollipop_Plot <- function(variant_type, assay,
         # Plot length of transcript
         geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = 0, 
                                               y = y_legend, yend = y_legend), 
-                     color = "gray88", size=6) +
+                     color = "gray88", size=2) +
         
         # Add domains of transcript
         geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = domain.start, 
                                               y = y_legend, yend = y_legend, 
-                                              color = domain), size = 6) +
+                                              color = domain), size = 2) +
         
         # Labels
         ylab("No. Mutations") +
-        labs(title = paste(variant_type, " variants (n=",
-                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == variant_type]),
-                           ")", sep="")) +
+        xlab("Amino Acid Position") +
+        labs(title = paste(unique(DF_gene_INFO$symbol), " SNV Indels",sep="")) +
         
         # Scaling
         scale_fill_brewer(palette="Set2") +
@@ -2744,9 +2743,13 @@ Lollipop_Plot <- function(variant_type, assay,
         theme(legend.position = "bottom",
               panel.grid.minor = element_blank(),
               panel.grid.major = element_blank(),
-              axis.title.x=element_blank(),
-              plot.title = element_text(hjust=0, vjust=0, face="bold", size=14)
-        )
+              
+              plot.title = element_text(hjust=0.5, face="bold",size=20),
+              
+              axis.text.y=element_text(size=14),
+              axis.text.x=element_text(angle=0, hjust = 1),
+              axis.title=element_text(size=14,face="bold")
+              )
       
     } else {
       plot_static <- 
@@ -2761,18 +2764,17 @@ Lollipop_Plot <- function(variant_type, assay,
         # Plot length of transcript
         geom_segment(data = DF_gene_INFO, aes(x = 1, xend = unique(DF_gene_INFO$gene.end), 
                                               y = y_legend, yend = y_legend), 
-                     color = "gray88", size=6) +
+                     color = "gray88", size=2) +
         
         # Add domains of transcript
         geom_segment(data = DF_gene_INFO, aes(x = domain.start, xend = domain.end, 
                                               y = y_legend, yend = y_legend, 
-                                              color = domain), size = 6) +
+                                              color = domain), size = 2) +
         
         # Labels
         ylab("No. Mutations") +
-        labs(title = paste(variant_type, " variants (n=",
-                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == variant_type]),
-                           ")", sep="")) +
+        xlab("Amino Acid Position") +
+        labs(title = paste(unique(DF_gene_INFO$symbol), " SNV Indels",sep="")) +
         
         # Scaling
         scale_fill_brewer(palette="Set2") +
@@ -2784,9 +2786,13 @@ Lollipop_Plot <- function(variant_type, assay,
         theme(legend.position = "bottom",
               panel.grid.minor = element_blank(),
               panel.grid.major = element_blank(),
-              axis.title.x=element_blank(),
-              plot.title = element_text(hjust=0, vjust=0, face="bold", size=14)
-        )
+              
+              plot.title = element_text(hjust=0.5, face="bold",size=20),
+              
+              axis.text.y=element_text(size=14),
+              axis.text.x=element_text(angle=0, hjust = 1),
+              axis.title=element_text(size=14,face="bold")
+              )
     }
     
     assign("plot_static", plot_static, envir = .GlobalEnv)
@@ -2806,19 +2812,16 @@ Lollipop_Plot <- function(variant_type, assay,
         # Plot length of transcript
         geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = 0, 
                                               y = y_legend_dynamic, yend = y_legend_dynamic), 
-                     color = "gray88", size=6) +
+                     color = "gray88", size=2) +
         # Add domains of transcript
         geom_segment(data = DF_gene_INFO, aes(x = x_end_promoter, xend = domain.start,
                                               y = y_legend_dynamic, yend = y_legend_dynamic, 
-                                              color = domain), size = 6) +
+                                              color = domain), size = 2) +
         
         # Labels
         ylab("No. Mutations") +
-        xlab(paste("Variant Position (", unique(DF_gene_INFO$symbol), ")", sep="")) +
-        labs(title = paste(unique(DF_gene_INFO$symbol), " variants from ", 
-                           assay, " (n=",
-                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == "All Variants"]),
-                           " total)", sep="")) +
+        xlab("Amino Acid Position") +
+        labs(title = paste(unique(DF_gene_INFO$symbol), " SNV Indels",sep="")) +
         
         # Scaling
         scale_fill_brewer(palette="Set2") +
@@ -2828,11 +2831,14 @@ Lollipop_Plot <- function(variant_type, assay,
         # Theme
         theme_light() +
         theme(legend.position = "bottom",
-              legend.title=element_blank(),
               panel.grid.minor = element_blank(),
               panel.grid.major = element_blank(),
-              axis.title.x=element_blank(),
-              plot.title = element_text(hjust=0.5, vjust=0, face="bold", size=14)
+              
+              plot.title = element_text(hjust=0.5, face="bold",size=20),
+              
+              axis.text.y=element_text(size=14),
+              axis.text.x=element_text(angle=0, hjust = 1),
+              axis.title=element_text(size=14,face="bold")
         )
       
     } else {
@@ -2847,19 +2853,16 @@ Lollipop_Plot <- function(variant_type, assay,
         # Plot length of transcript
         geom_segment(data = DF_gene_INFO, aes(x = 1, xend = unique(DF_gene_INFO$gene.end), 
                                               y = y_legend_dynamic, yend = y_legend_dynamic), 
-                     color = "gray88", size=6) +
+                     color = "gray88", size=2) +
         # Add domains of transcript
         geom_segment(data = DF_gene_INFO, aes(x = domain.start, xend = domain.end, 
                                               y = y_legend_dynamic, yend = y_legend_dynamic, 
-                                              color = domain), size = 6) +
+                                              color = domain), size = 2) +
         
         # Labels
         ylab("No. Mutations") +
-        xlab(paste("Variant Position (", unique(DF_gene_INFO$symbol), ")", sep="")) +
-        labs(title = paste(unique(DF_gene_INFO$symbol), " variants from ", 
-                           assay, " (n=",
-                           sum(data_var_FULL$var.freq[data_var_FULL$pathogenicity.status == "All Variants"]),
-                           " total)", sep="")) +
+        xlab("Amino Acid Position") +
+        labs(title = paste(unique(DF_gene_INFO$symbol), " SNV Indels",sep="")) +
         
         # Scaling
         scale_fill_brewer(palette="Set2") +
@@ -2869,11 +2872,14 @@ Lollipop_Plot <- function(variant_type, assay,
         # Theme
         theme_light() +
         theme(legend.position = "bottom",
-              legend.title=element_blank(),
               panel.grid.minor = element_blank(),
               panel.grid.major = element_blank(),
-              axis.title.x=element_blank(),
-              plot.title = element_text(hjust=0.5, vjust=0, face="bold", size=14)
+              
+              plot.title = element_text(hjust=0.5, face="bold",size=20),
+              
+              axis.text.y=element_text(size=14),
+              axis.text.x=element_text(angle=0, hjust = 1),
+              axis.title=element_text(size=14,face="bold")
         )      
     }
     
@@ -3017,39 +3023,46 @@ SNV_lollipop_fxn <- function (DF, gene_id, assay, outdir, width, height,
   if (as.numeric(table(DF$VariantGene == gene_id)["TRUE"]) > 0) {
     
     if (isTRUE(promoter_plot)) {
-      Lollipop_Plot(variant_type = "All Variants", assay = assay,
-                    promoter_plot = TRUE,dynamic_plot = TRUE)
+      Lollipop_Plot(variant_type = "All Variants", 
+                    assay = assay,
+                    promoter_plot = TRUE,
+                    dynamic_plot = TRUE)
       pNum = 1
       pList[[pNum]] <- plot_static
       
       if ("Pathogenic" %in% index.sig | "Likely Pathogenic" %in% index.sig) {
-        Lollipop_Plot(variant_type = "Pathogenic Variant", assay = assay,
+        Lollipop_Plot(variant_type = "Pathogenic Variant", 
+                      assay = assay,
                       promoter_plot = TRUE)
         pNum = pNum + 1
         pList[[pNum]] <- plot_static
       }
       
       if ("Unknown significance" %in% index.sig | "Unknown" %in% index.sig) {
-        Lollipop_Plot(variant_type = "Unknown Significance Variant", assay = assay,
+        Lollipop_Plot(variant_type = "Unknown Significance Variant", 
+                      assay = assay,
                       promoter_plot = TRUE)
         pNum = pNum + 1
         pList[[pNum]] <- plot_static
       }
       
     } else {
-      Lollipop_Plot(variant_type = "All Variants", assay = assay,
+      Lollipop_Plot(variant_type = "All Variants",
+                    assay = assay,
                     dynamic_plot = TRUE)
       pNum = 1
       pList[[pNum]] <- plot_static
       
       if ("Pathogenic" %in% index.sig | "Likely Pathogenic" %in% index.sig) {
-        Lollipop_Plot(variant_type = "Pathogenic Variant", assay = assay)
+        Lollipop_Plot(variant_type = "Pathogenic Variant", 
+                      assay = assay)
         pNum = pNum + 1
         pList[[pNum]] <- plot_static
       }
       
       if ("Unknown significance" %in% index.sig | "Unknown" %in% index.sig) {
-        Lollipop_Plot(variant_type = "Unknown Significance Variant", assay = assay)
+        Lollipop_Plot(variant_type = "Unknown Significance Variant", 
+                      assay = assay)
         pNum = pNum + 1
         pList[[pNum]] <- plot_static
       }

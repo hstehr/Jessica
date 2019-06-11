@@ -80,6 +80,8 @@ if (length(Fusion.list) > 0) {
 } else {
   sites.addition.Fusion = NULL
 }
+assign("sites.addition.Fusion", sites.addition.Fusion, envir = .GlobalEnv)
+
 
 Fusion.list <- sort(unique(append(STAMP_Fusion$Gene1,STAMP_Fusion$Gene2)))
 Fusion.diff_No <- length(Fusion.list[!(Fusion.list %in% sort(unique(STAMP_DF$VariantGene)))])

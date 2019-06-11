@@ -93,13 +93,15 @@ for (gene_num in 1:length(gene.list.total)) {
         SNV_lollipop_fxn (DF = gene_DF_SNV, 
                           gene_id = gene_id,
                           promoter_plot = TRUE,
-                          assay = "STAMP_v2", outdir = outdir.lollipop) 
+                          assay = "STAMP_v2",
+                          outdir = outdir.lollipop)
         
       } else {
         # Mutation in genes that are !(Genes$Coverage == "promoter") are NOT mapped if outside domain
         SNV_lollipop_fxn (DF = gene_DF_SNV, 
                           gene_id = gene_id,
-                          assay = "STAMP_v2", outdir = outdir.lollipop) 
+                          assay = "STAMP_v2",
+                          outdir = outdir.lollipop)
       }
     }
     remove(gene_DF_SNV)
