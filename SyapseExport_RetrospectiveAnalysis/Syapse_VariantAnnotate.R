@@ -58,12 +58,11 @@ DF_synonymous <- DF_var[DF_var$synonymous == TRUE, 1:5]
 DF_synonymous$var.type <- "Synonymous"
 
 # Upstream Variants
-DF_upstream <- DF_var[DF_var$upstream == TRUE, ]
+DF_upstream <- DF_var[DF_var$upstream == TRUE & DF_var$fs == FALSE, ]
 DF_upstream$var.type <- NA
 for (row_No in 1:nrow(DF_upstream)) {
   if (isTRUE(grepl("^c.(-)[[:digit:]]+[ATCG]>[ATCG]", DF_upstream$coding[row_No]))) {
     DF_upstream$var.type[row_No] <- "SNV"
-  } else if (isTRUE(DF_upstream$fs[row_No])) { DF_upstream$var.type[row_No] <- "Frameshift"
   } else if (isTRUE(DF_upstream$delins[row_No])) { DF_upstream$var.type[row_No] <- "Delins"
   } else if (isTRUE(DF_upstream$ins[row_No])) { DF_upstream$var.type[row_No] <- "Insertion"
   } else if (isTRUE(DF_upstream$del[row_No])) { DF_upstream$var.type[row_No] <- "Deletion"
@@ -82,12 +81,11 @@ DF_upstream$aa.start <- gsub("(^c.[-][[:digit:]]{,3})([[:alpha:]]{1})(.*)","\\2"
 DF_upstream$aa.end <- gsub("(^c..*[>}])(.*$)","\\2",DF_upstream$VariantHGVSCoding)
 
 # Intronic Variants
-DF_intron <- DF_var[DF_var$intron == TRUE, ]
+DF_intron <- DF_var[DF_var$intron == TRUE & DF_var$fs == FALSE, ]
 DF_intron$var.type <- NA
 for (row_No in 1:nrow(DF_intron)) {
   if (isTRUE(grepl("^c.(-)*[[:digit:]]+[-+]{1}[[:digit:]]+[ATCG]>[ATCG]", DF_intron$coding[row_No]))) {
     DF_intron$var.type[row_No] <- "SNV"
-  } else if (isTRUE(DF_intron$fs[row_No])) { DF_intron$var.type[row_No] <- "Frameshift"
   } else if (isTRUE(DF_intron$delins[row_No])) { DF_intron$var.type[row_No] <- "Delins"
   } else if (isTRUE(DF_intron$ins[row_No])) { DF_intron$var.type[row_No] <- "Insertion"
   } else if (isTRUE(DF_intron$del[row_No])) { DF_intron$var.type[row_No] <- "Deletion"
@@ -108,9 +106,7 @@ DF_SNV <- DF_var[(DF_var$SNVprotein == TRUE | DF_var$SNVcoding == TRUE) &
 DF_SNV$var.type <- "SNV"
 
 # Frameshift Variants
-DF_Frameshift <- DF_var[DF_var$fs == TRUE &
-                          DF_var$synonymous == FALSE & DF_var$upstream == FALSE &
-                          DF_var$intron == FALSE, ]
+DF_Frameshift <- DF_var[DF_var$fs == TRUE & DF_var$synonymous == FALSE, ]
 DF_Frameshift$var.type <- "Frameshift"
 for (row_No in 1:nrow(DF_Frameshift)) {
   if (isTRUE(DF_Frameshift$delins[row_No])) { DF_Frameshift$var.type[row_No] <- "Frameshift_Delins"
@@ -318,21 +314,25 @@ HistologicalDx.key <- sort(unique(HistologicalDxCategory$histologicalDiagnosis))
 DF_Full$Exon_Number <- NA
 for (row_No in 1:nrow(DF_Full)) {
   gene_id <- DF_Full$VariantGene[row_No]
-  genomic_pos <- gsub("(^chr[[:digit:]]{,2}:g.)([[:digit:]]+)([_]*[[:digit:]]*[[:alpha:]]+.*)", "\\2", DF_Full$VariantHGVSGenomic[row_No])
   
-  Gene.ExonTable.list <- sort(unique(stamp_reference_full$Gene))
-  # Remove genes with promoter coverage 
-  Gene.ExonTable.list <- Gene.ExonTable.list[!(Gene.ExonTable.list %in% snv.hotspot.list)]
-  
-  if (isTRUE(gene_id %in% Gene.ExonTable.list &
-             # HGVS genomic region CANNOT be NA
-             !is.na(genomic_pos))) {
-    Gene.ExonTable <- stamp_reference_full[stamp_reference_full$Gene == gene_id,]
+  if (isTRUE(!is.na(DF_Full$VariantHGVSGenomic[row_No]))) {
     
-    DF_Full$Exon_Number[row_No] <- min(Gene.ExonTable$exon_number[which(Gene.ExonTable$start <= genomic_pos)])
+    genomic_pos <- as.numeric(gsub("(^chr[[:alnum:]]{,2}:g.)([[:digit:]]+)([_]*[[:alnum:]]+.*)", 
+                                   "\\2", DF_Full$VariantHGVSGenomic[row_No]))
+    
+    Gene.ExonTable.list <- sort(unique(stamp_reference_full$Gene))
+    # Remove genes with promoter coverage 
+    Gene.ExonTable.list <- Gene.ExonTable.list[!(Gene.ExonTable.list %in% snv.hotspot.list)]
+    
+    if (isTRUE(gene_id %in% Gene.ExonTable.list &
+               # HGVS genomic region CANNOT be NA
+               !is.na(genomic_pos))) {
+      Gene.ExonTable <- stamp_reference_full[stamp_reference_full$Gene == gene_id,]
+      
+      DF_Full$Exon_Number[row_No] <- max(Gene.ExonTable$exon_number[which(Gene.ExonTable$start <= genomic_pos)])
+    }
+    remove(Gene.ExonTable.list)
   }
-  
-  remove(Gene.ExonTable.list)
 }
 
 cat(paste("No. of genes without annotated exon information: ",
@@ -343,6 +343,30 @@ print(sort(unique(DF_Full$VariantGene[is.na(DF_Full$Exon_Number)])))
 #----------------------------------------------
 ## Remove entries with Synonymous mutations = 26 entries
 DF_Full <- DF_Full[which(DF_Full$var.anno != "OTHER"),]
+
+# Remove benign mutations 
+#----------------------------------------------
+DF_Full <- DF_Full[which(DF_Full$VariantPathogenicityStatus != "Likely Benign"), ]
+
+# Convert codons from 3-letter to 1-letter nomenclature
+#----------------------------------------------
+for (DF_row_No in 1:nrow(DF_Full)) {
+  
+  if (isTRUE(tolower(DF_Full$VariantHGVSProtein[DF_row_No]) != "promoter" &
+             grepl("^p.",DF_Full$VariantHGVSProtein[DF_row_No]))) {
+    
+    for (row_No in 1:nrow(AA_key_table)) {
+      code3 <- gsub("[[:blank:]]$","",AA_key_table$Code3[row_No])
+      code1 <- gsub("[[:blank:]]$","",AA_key_table$Code1[row_No])
+      
+      DF_Full$VariantHGVSProtein[DF_row_No] <- sub(code3, code1,DF_Full$VariantHGVSProtein[DF_row_No])
+      
+      remove(code3,code1)
+    }
+    remove(row_No)
+  }
+}
+remove(DF_row_No)
 
 ## Overwrite variable in global environment
 #----------------------------------------------
@@ -433,7 +457,7 @@ if (nrow(out.DF) > 0) {
 }
 
 out.DF <- STAMP_DF[which(!is.na(STAMP_DF$VariantHGVSProtein) &
-                           grepl("^p.[[:alpha:]]{3}[[:digit:]]+.*", STAMP_DF$VariantHGVSProtein) == FALSE),]
+                           grepl("^p.[[:alpha:]]{1}[[:digit:]]+.*", STAMP_DF$VariantHGVSProtein) == FALSE),]
 if (nrow(out.DF) > 0) {
   cat("Patient IDs with HGVS protein nomenclature formatted incorrectly:", "\n")
   out.DF <- out.DF[, c("PatientID","VariantHGVSProtein")]
@@ -464,7 +488,7 @@ if (nrow(out.DF) > 0) {
 
 remove(DF,DF_del,DF_delins,DF_dup,DF_Frameshift,DF_Full,DF_ins,DF_intron,DF_Map,DF_NAprotein,
        DF_remain,DF_SNV,DF_synonymous,DF_upstream,DF_var,colname_subset,DiseaseGroupCategory.name,
-       i,primaryTumorSite.key,primaryTumorSite.STAMP,row_No,Extract_VarPosition,
+       i,primaryTumorSite.key,primaryTumorSite.STAMP,Extract_VarPosition,
        patient_id,patient_num,patient.list,DF_patient,HistologicalDx.key,HistologicalDx.STAMP,
        gene_id,genomic_pos,Gene.ExonTable,out.DF,row.change)
 

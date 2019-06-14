@@ -304,6 +304,15 @@ if (isTRUE(Syapse_Export_timestamp  == "2019-04-30")) {
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "g.10191479")] <- "g.10191479C>G"
   DF_Full$smpl.hgvsGenomic[which(DF_Full$smpl.hgvsGenomic == "NC_000016.9:g.68842671_68842677dup")] <- "g.68842671_68842677dup"
   
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "chr7:2562_2563insGGACACCCC")] <- "chr7:g.2562_2563insGGACACCCC"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "g.116411882_116411895del")] <- "chr7:g.116411882_116411895del"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "g.190067365_190067366delinsGT")] <- "chr1:g.190067365_190067366delinsGT"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "g.25398280_25398286delinsACGACCC")] <- "chr12:g.25398280_25398286delinsACGACCC"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "g.55242466_55242478delinsC")] <- "chr7:g.55242466_55242478delinsC"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "chr19:g.10602467 _10602472dup")] <- "chr19:g.10602467_10602472dup"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "chr7:g.2562_2563insGGACACCCC")] <- "chr7:g.55249016_55249017insGGACACCCC"
+  DF_Full$smpl.genomicDescription[which(DF_Full$smpl.genomicDescription == "chr17:g.7579709")] <- "chr17:g.7579709del"
+  
   row.change = which(is.na(DF_Full$smpl.genomicDescription))
   for (row_No in 1:length(row.change)) {
     row.change_sub <- row.change[row_No]
