@@ -146,6 +146,6 @@ source("STAMPEDE_Visualizations/STAMPEDE_Visualization_PIPELINE.R")
 
 ## Retrospective analysis of STAMP entries (SNV Indels, CNVs, Fusions)
 ```
-source("~/Documents/ClinicalDataScience_Fellowship/ClinicalTrialMatching/PIPELINE_scripts/SyapseExport_RetrospectiveAnalysis/ClinicalTrial_Matching_ARGS.R")
+source("ClinicalTrialMatching/SyapseExport_RetrospectiveAnalysis/ClinicalTrial_Matching_ARGS.R")
 
 ```
