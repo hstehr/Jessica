@@ -310,136 +310,139 @@ top_fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
     DF_Fusion[which(DF_Fusion$Gene1 %in% fusion.gene.list.full | DF_Fusion$Gene2 %in% fusion.gene.list.full),
               c("PatientID","Fusion_Detail")]
   
-  # TABLE
-  #----------------------------------------------
-  # Tabulate frequency
-  DF_tabulate <- data.frame(DF_Fusion_Fxn %>% group_by(Fusion_Detail) %>% tally())
-  colnames(DF_tabulate) <- c("Fusion","No.Mutations")
-  DF_tabulate <- DF_tabulate[order(DF_tabulate$No.Mutations, decreasing = TRUE),]
-  
-  continue_checkpoint <- NA
-  if (isTRUE(max(DF_tabulate$No.Mutations) == 1)) {
-    print(paste(cohort, ": all fusions have a frequency of  n=1", sep=""))
-    cat("top_fusion_count plot displays top 20 fusion, as determined alphabetically.","\n")
-    continue_checkpoint <- as.logical("FALSE")
+  if (nrow(DF_Fusion_Fxn) > 0) {
     
-  } else {
-    if (isTRUE(nrow(DF_tabulate) > 20)) {
-      cutoff = 5*floor(DF_tabulate$No.Mutations[[20]]/5) 
+    # TABLE
+    #----------------------------------------------
+    # Tabulate frequency
+    DF_tabulate <- data.frame(DF_Fusion_Fxn %>% group_by(Fusion_Detail) %>% tally())
+    colnames(DF_tabulate) <- c("Fusion","No.Mutations")
+    DF_tabulate <- DF_tabulate[order(DF_tabulate$No.Mutations, decreasing = TRUE),]
+    
+    continue_checkpoint <- NA
+    if (isTRUE(max(DF_tabulate$No.Mutations) == 1)) {
+      print(paste(cohort, ": all fusions have a frequency of  n=1", sep=""))
+      cat("top_fusion_count plot displays top 20 fusion, as determined alphabetically.","\n")
+      continue_checkpoint <- as.logical("FALSE")
       
-      if (isTRUE(cutoff < 2)) {
-        DF_tabulate <- DF_tabulate[which(DF_tabulate$No.Mutations >= 2),]
-      } else {
-        DF_tabulate <- DF_tabulate[which(DF_tabulate$No.Mutations >= cutoff),]
+    } else {
+      if (isTRUE(nrow(DF_tabulate) > 20)) {
+        cutoff = 5*floor(DF_tabulate$No.Mutations[[20]]/5) 
+        
+        if (isTRUE(cutoff < 2)) {
+          DF_tabulate <- DF_tabulate[which(DF_tabulate$No.Mutations >= 2),]
+        } else {
+          DF_tabulate <- DF_tabulate[which(DF_tabulate$No.Mutations >= cutoff),]
+        }
       }
     }
-  }
-  
-  if (isTRUE(continue_checkpoint == "FALSE")) {
     
-    if (isTRUE(unique(DF_tabulate$No.Mutations) != "1")) {
-      DF_tabulate <- DF_tabulate[order(DF_tabulate$Variant, decreasing = FALSE),]
+    if (isTRUE(continue_checkpoint == "FALSE")) {
+      
+      if (isTRUE(unique(DF_tabulate$No.Mutations) != "1")) {
+        DF_tabulate <- DF_tabulate[order(DF_tabulate$Variant, decreasing = FALSE),]
+      }
+      
+      max_row <- min(20, nrow(DF_tabulate))
+      DF_tabulate <- DF_tabulate[1:max_row,]
     }
     
-    max_row <- min(20, nrow(DF_tabulate))
-    DF_tabulate <- DF_tabulate[1:max_row,]
-  }
-  
-  Output.table <- tableGrob(DF_tabulate, rows = NULL, 
-                            theme = ttheme_default(core=list(fg_params=list(hjust=0, x=0.05)),
-                                                   rowhead=list(fg_params=list(hjust=0, x=0)),
-                                                   base_size = 18))
-  Output.table <- gtable_add_grob(Output.table,
-                                  grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
-                                  t = 2, b = nrow(Output.table), l = 1, r = ncol(Output.table))
-  Output.table <- gtable_add_grob(Output.table,
-                                  grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
-                                  t = 1, l = 1, r = ncol(Output.table))
-  
-  # HISTOGRAM
-  #----------------------------------------------
-  DF_tabulate$Fusion <- factor(DF_tabulate$Fusion, 
-                               levels = DF_tabulate$Fusion[order(-DF_tabulate$No.Mutations)])
-  
-  # Y-axis parameters
-  ymax <- ceiling(max(DF_tabulate$No.Mutations)/10) * 10
-  if (isTRUE(ymax <= 10)) {y_increment = 1
-  } else if (isTRUE(ymax <= 20)) {y_increment = 2
-  } else if (isTRUE(ymax <= 50)) {y_increment = 5
-  } else if (isTRUE(ymax <= 100)) {y_increment = 10
-  } else if (isTRUE(ymax <= 250)) {y_increment = 25
-  } else if (isTRUE(ymax <= 500)) {y_increment = 50
-  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
-  } else {y_increment = 250
-  }
-  
-  # Plot parameters
-  height = 15
-  if (nrow(DF_tabulate) <= 10) {
-    if (nrow(DF_tabulate) <= 2) {width = 20
-    } else {width = 25
-    }
-  } else {width = 30
-  }
-  
-  # Subtitle parameters
-  if (isTRUE(sum(DF_tabulate$No.Mutations) == 1)) {comment = "entry"
-  } else {comment = "entries"
-  }
-  
-  plot <- ggplot(DF_tabulate, aes(x=Fusion, y=No.Mutations, fill=Fusion)) +
-    geom_bar(stat="identity") +
+    Output.table <- tableGrob(DF_tabulate, rows = NULL, 
+                              theme = ttheme_default(core=list(fg_params=list(hjust=0, x=0.05)),
+                                                     rowhead=list(fg_params=list(hjust=0, x=0)),
+                                                     base_size = 18))
+    Output.table <- gtable_add_grob(Output.table,
+                                    grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
+                                    t = 2, b = nrow(Output.table), l = 1, r = ncol(Output.table))
+    Output.table <- gtable_add_grob(Output.table,
+                                    grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
+                                    t = 1, l = 1, r = ncol(Output.table))
     
-    labs(title = "Top Fusions",
-         subtitle = paste("N = ", sum(DF_tabulate$No.Mutations), " / ", 
-                          nrow(DF_Fusion), " total STAMP ", comment, sep="")) +
+    # HISTOGRAM
+    #----------------------------------------------
+    DF_tabulate$Fusion <- factor(DF_tabulate$Fusion, 
+                                 levels = DF_tabulate$Fusion[order(-DF_tabulate$No.Mutations)])
     
-    xlab("Fusion") +
-    scale_y_continuous(name="Number of Mutations", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
-    
-    theme_bw() +
-    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
-          plot.subtitle = element_text(hjust=1, face="bold",size=14),
-          
-          axis.text.y=element_text(size=14),
-          axis.text.x=element_text(size=10,angle = 45, hjust = 1),
-          axis.title=element_text(size=14,face="bold"),
-          
-          legend.position = "none") +
-    
-    scale_fill_manual(values = custom.hues.75)
-  
-  # Save to local computer
-  file_id = paste("top_fusion_count_", cohort, sep="")
-  
-  if (isTRUE(saveStaticPlots)) {
-    tiff(filename = paste(outdir, file_id,".tiff", sep=""),
-         width = width, height = height, units = "in", res = 350)
-    grid.arrange(plot, Output.table, widths = c(2, 0.5), ncol = 2, nrow = 1)
-    dev.off()
-  }
-  
-  # Save to cloud
-  if (isTRUE(saveDynamicPlots)) {
-    plot_dynamic_int <- ggplotly(plot)
-    
-    # Autoscale x-axis
-    plot_dynamic_int$x$layout$xaxis$autorange = TRUE
-    
-    # Structure x-axis
-    plot_dynamic_int$x$layout$xaxis$ticktext <- as.list(plot_dynamic_int$x$layout$xaxis$ticktext)
-    plot_dynamic_int$x$layout$xaxis$tickvals <- as.list(plot_dynamic_int$x$layout$xaxis$tickvals)
-    
-    # Customize hover text
-    for (elem_No in 1:length(plot_dynamic_int$x$data)) {
-      plot_dynamic_int$x$data[[elem_No]]$text <- 
-        gsub("<$", "", gsub("(^.*<)(.*)", "\\1", plot_dynamic_int$x$data[[elem_No]]$text))
+    # Y-axis parameters
+    ymax <- ceiling(max(DF_tabulate$No.Mutations)/10) * 10
+    if (isTRUE(ymax <= 10)) {y_increment = 1
+    } else if (isTRUE(ymax <= 20)) {y_increment = 2
+    } else if (isTRUE(ymax <= 50)) {y_increment = 5
+    } else if (isTRUE(ymax <= 100)) {y_increment = 10
+    } else if (isTRUE(ymax <= 250)) {y_increment = 25
+    } else if (isTRUE(ymax <= 500)) {y_increment = 50
+    } else if (isTRUE(ymax <= 1000)) {y_increment = 100
+    } else {y_increment = 250
     }
     
-    p <- ggplotly(plot_dynamic_int)
-    filename_Full = paste("STAMPEDE/Top_Fusion_Count/", file_id, sep="")
-    api_create(p, filename = filename_Full, 
-               fileopt = "overwrite", sharing = "public")
+    # Plot parameters
+    height = 15
+    if (nrow(DF_tabulate) <= 10) {
+      if (nrow(DF_tabulate) <= 2) {width = 20
+      } else {width = 25
+      }
+    } else {width = 30
+    }
+    
+    # Subtitle parameters
+    if (isTRUE(sum(DF_tabulate$No.Mutations) == 1)) {comment = "entry"
+    } else {comment = "entries"
+    }
+    
+    plot <- ggplot(DF_tabulate, aes(x=Fusion, y=No.Mutations, fill=Fusion)) +
+      geom_bar(stat="identity") +
+      
+      labs(title = "Top Fusions",
+           subtitle = paste("N = ", sum(DF_tabulate$No.Mutations), " / ", 
+                            nrow(DF_Fusion), " total STAMP ", comment, sep="")) +
+      
+      xlab("Fusion") +
+      scale_y_continuous(name="Number of Mutations", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
+      
+      theme_bw() +
+      theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+            plot.subtitle = element_text(hjust=1, face="bold",size=14),
+            
+            axis.text.y=element_text(size=14),
+            axis.text.x=element_text(size=10,angle = 45, hjust = 1),
+            axis.title=element_text(size=14,face="bold"),
+            
+            legend.position = "none") +
+      
+      scale_fill_manual(values = custom.hues.75)
+    
+    # Save to local computer
+    file_id = paste("top_fusion_count_", cohort, sep="")
+    
+    if (isTRUE(saveStaticPlots)) {
+      tiff(filename = paste(outdir, file_id,".tiff", sep=""),
+           width = width, height = height, units = "in", res = 350)
+      grid.arrange(plot, Output.table, widths = c(2, 0.5), ncol = 2, nrow = 1)
+      dev.off()
+    }
+    
+    # Save to cloud
+    if (isTRUE(saveDynamicPlots)) {
+      plot_dynamic_int <- ggplotly(plot)
+      
+      # Autoscale x-axis
+      plot_dynamic_int$x$layout$xaxis$autorange = TRUE
+      
+      # Structure x-axis
+      plot_dynamic_int$x$layout$xaxis$ticktext <- as.list(plot_dynamic_int$x$layout$xaxis$ticktext)
+      plot_dynamic_int$x$layout$xaxis$tickvals <- as.list(plot_dynamic_int$x$layout$xaxis$tickvals)
+      
+      # Customize hover text
+      for (elem_No in 1:length(plot_dynamic_int$x$data)) {
+        plot_dynamic_int$x$data[[elem_No]]$text <- 
+          gsub("<$", "", gsub("(^.*<)(.*)", "\\1", plot_dynamic_int$x$data[[elem_No]]$text))
+      }
+      
+      p <- ggplotly(plot_dynamic_int)
+      filename_Full = paste("STAMPEDE/Top_Fusion_Count/", file_id, sep="")
+      api_create(p, filename = filename_Full, 
+                 fileopt = "overwrite", sharing = "public")
+    }
   }
 }
 
@@ -2762,7 +2765,7 @@ Lollipop_Plot <- function(variant_type, assay,
               axis.text.y=element_text(size=14),
               axis.text.x=element_text(angle=0, hjust = 1),
               axis.title=element_text(size=14,face="bold")
-              )
+        )
       
     } else {
       plot_static <- 
@@ -2805,7 +2808,7 @@ Lollipop_Plot <- function(variant_type, assay,
               axis.text.y=element_text(size=14),
               axis.text.x=element_text(angle=0, hjust = 1),
               axis.title=element_text(size=14,face="bold")
-              )
+        )
     }
     
     assign("plot_static", plot_static, envir = .GlobalEnv)
