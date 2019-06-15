@@ -202,6 +202,9 @@ fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
   colnames(DF_tabulate) <- c("Gene","No.Occurrences")
   DF_tabulate <- DF_tabulate[order(DF_tabulate$No.Occurrences, decreasing = TRUE),]
   
+  # Extract listed genes 
+  DF_tabulate <- DF_tabulate[which(DF_tabulate$Gene %in% fusion.gene.list.full),]
+  
   Output.table <- tableGrob(DF_tabulate, rows = NULL, 
                             theme = ttheme_default(core=list(fg_params=list(hjust=0, x=0.05)),
                                                    rowhead=list(fg_params=list(hjust=0, x=0)),
@@ -256,7 +259,7 @@ fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
           plot.subtitle = element_text(hjust=1, face="bold",size=14),
           
           axis.text.y=element_text(size=14),
-          axis.text.x=element_text(size=10,angle = 90, hjust = 1),
+          axis.text.x=element_text(size=14,angle = 90, hjust = 1),
           axis.title=element_text(size=14,face="bold"),
           
           legend.position = "none") +
@@ -303,7 +306,9 @@ fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
 ## If more than 20 unique variants
 # > apply cutoff = round down value of 20th top variant to nearest 5
 top_fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
-  DF_Fusion_Fxn <- DF_Fusion[,c("PatientID","Fusion_Detail")]
+  DF_Fusion_Fxn <- 
+    DF_Fusion[which(DF_Fusion$Gene1 %in% fusion.gene.list.full | DF_Fusion$Gene2 %in% fusion.gene.list.full),
+              c("PatientID","Fusion_Detail")]
   
   # TABLE
   #----------------------------------------------
@@ -964,6 +969,7 @@ gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) {
   DF <- rbind(DF_SNVIndel[,c("PatientID","VariantGene")],
               DF_CNV[,c("PatientID","VariantGene")])
   
+  # Re-format Fusion DF to have "VariantGene" be the STAMP v2 listed gene
   if (nrow(DF_Fusion) > 0) {
     Fusion.1 <- DF_Fusion[,c("PatientID","Gene1")]
     Fusion.2 <- DF_Fusion[,c("PatientID","Gene2")]  
@@ -972,6 +978,7 @@ gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) {
     colnames(Fusion.2) <- c("PatientID","VariantGene")
     
     DF_Fusion <- rbind(Fusion.1,Fusion.2)
+    DF_Fusion <- DF_Fusion[which(DF_Fusion$VariantGene %in% fusion.gene.list.full),]
     
     DF <- rbind(DF, DF_Fusion)
   }
@@ -1088,6 +1095,7 @@ top_gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) 
   DF_Fxn <- rbind(DF_SNVIndel[,c("PatientID","VariantGene")],
                   DF_CNV[,c("PatientID","VariantGene")])
   
+  # Re-format Fusion DF to have "VariantGene" be the STAMP v2 listed gene
   if (nrow(DF_Fusion) > 0) {
     Fusion.1 <- DF_Fusion[,c("PatientID","Gene1")]
     Fusion.2 <- DF_Fusion[,c("PatientID","Gene2")]  
@@ -1096,6 +1104,7 @@ top_gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) 
     colnames(Fusion.2) <- c("PatientID","VariantGene")
     
     DF_Fusion <- rbind(Fusion.1,Fusion.2)
+    DF_Fusion <- DF_Fusion[which(DF_Fusion$VariantGene %in% fusion.gene.list.full),]
     
     DF_Fxn <- rbind(DF_Fxn, DF_Fusion)
   }
@@ -1322,6 +1331,7 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohor
                                        stringsAsFactors = FALSE))
   
   if (nrow(DF_Fusion) > 0) {
+    DF_Fusion <- DF_Fusion[which(DF_Fusion$Gene1 %in% fusion.gene.list.full | DF_Fusion$Gene2 %in% fusion.gene.list.full),]
     fusion.count = nrow(DF_Fusion)
     
     DF_tabulate_full$No.Occurrences[which(DF_tabulate_full$VariantType == "Fusion")] <- fusion.count
@@ -1483,6 +1493,7 @@ top_variant_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdi
   }
   
   # Append Fusions
+  # Re-format Fusion DF to have "VariantGene" be the STAMP v2 listed gene
   if (nrow(DF_Fusion) > 0) {
     Fusion.1 <- DF_Fusion[,c("PatientID","Gene1")]
     Fusion.2 <- DF_Fusion[,c("PatientID","Gene2")]  
@@ -1491,8 +1502,10 @@ top_variant_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdi
     colnames(Fusion.2) <- c("PatientID","VariantGene")
     
     DF_Fusion <- rbind(Fusion.1,Fusion.2)
+    DF_Fusion <- DF_Fusion[which(DF_Fusion$VariantGene %in% fusion.gene.list.full),]
     
     DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(VariantGene) %>% tally())
+    DF_Fusion_tabulate$VariantGene <- paste(DF_Fusion_tabulate$VariantGene, "Fusion",sep=" ")
     
   } else {
     DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(Gene1) %>% tally())

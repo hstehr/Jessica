@@ -3,10 +3,16 @@ options(max.print=999999)
 
 # Specify key table
 #----------------------------------------------
-site.list <- data.frame(PrimaryTumorSite=unique(STAMP_DF$PrimaryTumorSite), stringsAsFactors = FALSE)
+site.list <- sort(unique(append(unique(STAMP_DF$PrimaryTumorSite),
+                                append(unique(STAMP_CNV$PrimaryTumorSite),
+                                       unique(STAMP_Fusion$PrimaryTumorSite[which(STAMP_Fusion$Gene1 %in% fusion.gene.list.full | 
+                                                                                  STAMP_Fusion$Gene2 %in% fusion.gene.list.full)])))))
+
+site.list <- data.frame(PrimaryTumorSite=site.list, stringsAsFactors = FALSE)
 site.list$CohortName <- gsub("[(].*", "", site.list$PrimaryTumorSite)
 site.list$CohortName <- gsub("[[:blank:]]and[[:blank:]]", " ", site.list$CohortName)
 
+# Capitalize first letter of word in "CohortName" column
 for (row_No in 1:nrow(site.list)) {
   s <- strsplit(site.list$CohortName[row_No], " ")[[1]] 
   site.list$CohortName[row_No] <- 
@@ -14,16 +20,9 @@ for (row_No in 1:nrow(site.list)) {
   
   remove(s)
 }
-
+# Remove white space
 site.list$CohortName <- gsub("[[:blank:]]", "", site.list$CohortName)
 site.list <- site.list[order(site.list$PrimaryTumorSite),]
-
-site.list.total = site.list
-if (!is.null(sites.addition.Fusion)) {
-  site.list.total <- rbind(site.list.total,
-                           data.frame(PrimaryTumorSite=sites.addition.Fusion,
-                                      CohortName=gsub(" ","",sites.addition.Fusion)))
-}
 
 assign("site.list.total", site.list.total, envir = .GlobalEnv)
 

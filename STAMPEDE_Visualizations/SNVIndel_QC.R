@@ -50,21 +50,15 @@ source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_Export_QC.
 source(paste(pipeline.root,"SyapseExport_RetrospectiveAnalysis/Syapse_VariantAnnotate.R",sep=""))
 
 # Filter for STAMP v2
-#----------------------------------------------
 STAMP_DF <- STAMP_DF[which(STAMP_DF$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)"), ]
 # sort(unique(STAMP_DF$AssayName))
 
-# # Filter for adults
-# #----------------------------------------------
-# STAMP_DF <- STAMP_DF[which(STAMP_DF$PatientAge >= 18),]
-# sort(as.numeric(unique(STAMP_DF$PatientAge)))
-
+# 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
+# Do not filter for entries from adult patients ie. age >= 18yo
 # Do not filter for entries with proper HGVS nomenclature = keep mutations in genes such as TERT
 
-# 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
-# sort(unique(STAMP_DF$HistologicalDx))
-
-cat(paste("STAMP v2 POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
+cat(paste("STAMP v2 POST-QC counts: ",nrow(STAMP_DF), " total entries and ", 
+          length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
 # Filter for entries with primary tumor site
 #----------------------------------------------
@@ -100,7 +94,8 @@ STAMP_DF <- STAMP_DF[which(STAMP_DF$smpl.specimenType != "other"),]
 STAMP_DF <- STAMP_DF[complete.cases(STAMP_DF$smpl.specimenType),]
 # sort(unique(STAMP_DF$smpl.specimenType))
 
-cat(paste("Post-visualization QC-filter: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
+cat(paste("Post-visualization QC-filter: ",nrow(STAMP_DF), " total entries and ", 
+          length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
 
 assign("STAMP_DF", STAMP_DF, envir = .GlobalEnv)
 

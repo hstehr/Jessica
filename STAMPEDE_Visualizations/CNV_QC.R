@@ -21,15 +21,15 @@ STAMP_CNV_missing <- left_join(STAMP_CNV_missing[,1:4],
 CNV.diff_No <- length(which(is.na(STAMP_CNV_missing$PrimaryTumorSite)))
 cat(paste("Number of CNV entries missing PrimaryTumorSite: ",CNV.diff_No,sep=""))
 
-# # Filter for adults
-# #----------------------------------------------
-# STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$PatientAge >= 18),]
-# sort(as.numeric(unique(STAMP_CNV$PatientAge)))
+# Filter for STAMP v2
+STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$AssayName == "STAMP - Solid Tumor Actionable Mutation Panel (130 genes)"), ]
+# sort(unique(STAMP_CNV$AssayName))
 
 # 2019-05-31 UPDATE: ignore HistologicalDx field for the time being in regards to STAMPEDE
-# sort(unique(STAMP_CNV$HistologicalDx))
+# Do not filter for entries from adult patients ie. age >= 18yo
 
-cat(paste("CNV POST-QC counts: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
+cat(paste("CNV STAMP v2 POST-QC counts: ",nrow(STAMP_CNV), " total entries and ", 
+          length(unique(STAMP_CNV[[1]])), " total test orders", sep=""),"\n","\n")
 
 # Filter for entries with primary tumor site
 #----------------------------------------------
@@ -38,6 +38,7 @@ STAMP_CNV <- STAMP_CNV[!(STAMP_CNV$PrimaryTumorSite %in% c("unknown","none","oth
 
 # Collapse similar primary tumor site
 STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite %in% c("colon","colon and rectum"))] <- "colon and rectum"
+STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite %in% c("liver","hepatocellular (liver)"))] <- "liver"
 STAMP_CNV$PrimaryTumorSite[which(STAMP_CNV$PrimaryTumorSite %in% c("testes","testis"))] <- "testes"
 
 # Abbreviate for visualization
@@ -62,6 +63,8 @@ STAMP_CNV <- STAMP_CNV[which(STAMP_CNV$smpl.specimenType != "other"),]
 STAMP_CNV <- STAMP_CNV[complete.cases(STAMP_CNV$smpl.specimenType),]
 # sort(unique(STAMP_CNV$smpl.specimenType))
 
+cat(paste("CNV post-visualization QC-filter: ",nrow(STAMP_CNV), " total entries and ", length(unique(STAMP_CNV[[1]])), " total test orders", sep=""),"\n","\n")
+
 # Examine number of missing fields
 #----------------------------------------------
 CNV.list <- sort(unique(STAMP_CNV$PatientID))
@@ -73,37 +76,14 @@ CNV.diff_No <- nrow(unique(STAMP_CNV[is.na(STAMP_CNV$PrimaryTumorSite),c("Patien
 CNV.diff_No <- length(which(is.na(STAMP_CNV$PrimaryTumorSite)))
 cat(paste("Number of CNV entries missing PrimaryTumorSite: ",CNV.diff_No,sep=""),"\n","\n")
 
-CNV.list <- sort(unique(STAMP_CNV$PrimaryTumorSite))
-CNV.diff_No <- length(CNV.list[!(CNV.list %in% sort(unique(tolower(TRF_DF$PrimaryTumorSite))))])
-cat(paste("Number of CNV entries without corresponding PrimaryTumorSite in POST-Filter TRF_DF: ",
-          CNV.diff_No,sep=""),"\n",
-    paste(unlist(CNV.list[!(CNV.list %in% sort(unique(tolower(TRF_DF$PrimaryTumorSite))))]),collapse=", "),"\n")
-
-# Append elements not found in SNV/Indel DF from CNV DF
-CNV.list <- CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$PrimaryTumorSite)))]
-if (length(CNV.list) > 0) {
-  sites.addition.CNV = CNV.list
-} else {
-  sites.addition.CNV = NULL
-}
-
+# Identify elements not in STAMP v2 annotation file
 CNV.list <- sort(unique(STAMP_CNV$CNV_Gene))
-CNV.diff_No <- length(CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$VariantGene)))])
-cat(paste("Number of CNV entries without corresponding Variant Gene in POST-Filter STAMP_DF: ",
+CNV.diff_No <- length(CNV.list[!(CNV.list %in% cnv.gene.list.full)])
+cat(paste("Number of CNV entries without corresponding Gene in STAMP v2 file '2016-08-23_STAMP2_regions.xlsx': ",
           CNV.diff_No, sep=""),"\n",
-    paste(unlist(CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$VariantGene)))]),collapse=", "),"\n","\n")
+    paste(unlist(CNV.list[!(CNV.list %in% cnv.gene.list.full)]),collapse=", "),"\n","\n")
 
-# Append elements not found in SNV/Indel DF from Fusion DF
-CNV.list <- CNV.list[!(CNV.list %in% sort(unique(STAMP_DF$VariantGene)))]
-if (length(CNV.list) > 0) {
-  genes.addition.CNV = CNV.list
-} else {
-  genes.addition.CNV = NULL
-}
-
-remove(CNV.list,CNV.diff_No,CNV.file)
-
-cat(paste("CNV post-visualization QC-filter: ",nrow(STAMP_DF), " total entries and ", length(unique(STAMP_DF[[1]])), " total test orders", sep=""),"\n","\n")
+remove(CNV.list,CNV.diff_No)
 
 assign("STAMP_CNV", STAMP_CNV, envir = .GlobalEnv)
 

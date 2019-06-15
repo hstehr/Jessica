@@ -4,16 +4,13 @@ options(max.print=999999)
 # Specify key table
 #----------------------------------------------
 snv.list <- data.frame(gene=sort(unique(STAMP_DF$VariantGene)), stringsAsFactors = FALSE)
-gene.list.total <- snv.list[order(snv.list$gene),]
 
-if (!is.null(genes.addition.Fusion)) {
-  gene.list.total <- append(gene.list.total,genes.addition.Fusion)
-}
+gene.list.total <- append(snv.list$gene,
+                          append(STAMP_CNV$CNV_Gene,
+                                 append(STAMP_Fusion$Gene1[which(STAMP_Fusion$Gene1 %in% fusion.gene.list.full)], 
+                                        STAMP_Fusion$Gene2[which(STAMP_Fusion$Gene2 %in% fusion.gene.list.full)])))
 
-if (!is.null(genes.addition.CNV)) {
-  gene.list.total <- append(gene.list.total,genes.addition.CNV)
-}
-
+gene.list.total <- sort(unique(gene.list.total))
 assign("gene.list.total", gene.list.total, envir = .GlobalEnv)
 
 # Check for missing gene INFO (SNV/Indels)
@@ -109,5 +106,4 @@ for (gene_num in 1:length(gene.list.total)) {
   
   remove(gene_id,col_extract,gene_DF,gene_Fusion,gene_CNV)
 }
-
-remove(gene_num,genes.addition.Fusion,genes.addition.CNV)
+remove(gene_num)

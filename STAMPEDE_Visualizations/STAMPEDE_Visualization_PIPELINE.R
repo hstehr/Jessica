@@ -9,7 +9,7 @@ suppressMessages(libraries("dplyr","eeptools","gridExtra","reshape","gtable","gr
 
 ## Filters
 #----------------------------------------------
-saveStaticPlots = TRUE
+saveStaticPlots = FALSE
 saveDynamicPlots = TRUE
 deleteIntermediateFile = TRUE
 
@@ -32,8 +32,9 @@ stamp_reference_transcripts = paste(pipeline.root,
 exons_ensembl = paste(pipeline.root, "Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt", sep="")
 AA_key=paste(data.root,"STAMP/AminoAcid_Conversion.csv",sep="")
 
-histoDx.key = paste(pipeline.root,"HistologicalDx_CTEP.csv",sep="")
+histoDx.key = paste(pipeline.root,"HistologicalDx_CTEP.tsv",sep="")
 
+# Annotated version has gene domain length for lollipop diagrams
 STAMPv2_Annotation <- suppressMessages(import_list(
   paste(data.root,"STAMP/2016-08-23_STAMPv2_Annotation.xlsx",sep=""),setclass = "tbl"))
 
@@ -98,17 +99,18 @@ source("HistologicalDx_CTEP_Match.R")
 ## QC STAMP datasets = SNV/Indels, Fusions, CNVs
 #################################
 ## STAMP database non-QC PIPELINE
-source("SyapseExport_RetrospectiveAnalysis/STAMPv2_TestOrder_QC.R")
+source("SyapseExport_RetrospectiveAnalysis/STAMP_TestOrder_QC.R")
 
 setwd(script.dir)
-
 ## STAMP database QC PIPELINE
 source("SNVIndel_QC.R")
 
 ## STAMP Fusion database QC PIPELINE
+fusion.gene.list.full <- sort(unique(Genes$Name[which(Genes$Fusions == "yes")]))
 source("Fusion_QC.R")
 
 ## STAMP CNV database QC PIPELINE
+cnv.gene.list.full <- sort(unique(Genes$Name[which(Genes$CNV == "yes")]))
 source("CNV_QC.R")
 
 #################################
@@ -137,8 +139,8 @@ source("STAMPEDE_Functions.R")
 ## Entire Dataset
 #----------------------------------------------
 outdir = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/TIFF_ALL/"
-if (!dir.exists(outdir)){dir.create(outdir)} 
-cat(paste("Outdirectory: ", outdir, sep=""),"\n")
+cat(paste("Outdirectory: ", outdir, sep=""),"\n","\n")
+if (isTRUE(saveStaticPlots)) {if (!dir.exists(outdir)){dir.create(outdir)}}
 
 cohort_id="all"
 source("STAMPEDE_EntireDataset.R")
@@ -146,26 +148,28 @@ source("STAMPEDE_EntireDataset.R")
 ## PrimaryTumorSite: Iterate through list
 #----------------------------------------------
 outdir = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/TIFF_PerSite/"
-if (!dir.exists(outdir)){dir.create(outdir)}
-cat("\n","\n",paste("Outdirectory: ", outdir, sep=""),"\n")
+cat(paste("Outdirectory: ", outdir, sep=""),"\n","\n")
+if (isTRUE(saveStaticPlots)) {if (!dir.exists(outdir)){dir.create(outdir)}}
 
 source("STAMPEDE_PerSite.R")
 
 ## Gene: Iterate through list
 #----------------------------------------------
 outdir = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/TIFF_PerGene/"
-if (!dir.exists(outdir)){dir.create(outdir)} 
 cat("\n",paste("Outdirectory: ", outdir, sep=""))
 
 outdir.lollipop = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations/TIFF_Lollipop/"
-if (!dir.exists(outdir.lollipop)){dir.create(outdir.lollipop)} 
 cat("\n",paste("Outdirectory (lollipop plots): ", outdir.lollipop, sep=""),"\n","\n")
+
+if (isTRUE(saveStaticPlots)) {
+  if (!dir.exists(outdir)){dir.create(outdir)} 
+  if (!dir.exists(outdir.lollipop)){dir.create(outdir.lollipop)} 
+}
 
 source("STAMPEDE_PerGene.R")
 
-closeAllConnections()
-
 remove(pathogenic,vus,benign)
+closeAllConnections()
 
 # Delete temporary directory
 if (dir.exists(tempdir)){unlink(tempdir, recursive = TRUE)} 
