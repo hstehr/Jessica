@@ -82,7 +82,8 @@ DF_lollipop <- DF_lollipop[!is.na(DF_lollipop$iframe),]
 #                                 stringsAsFactors = FALSE))
 
 # top_fusion_count_fxn: cohort=gene_DF
-fusion.list <- sort(unique(append(STAMP_Fusion$Gene1, STAMP_Fusion$Gene2)))
+fusion.list <- sort(unique(append(STAMP_Fusion$Gene1[which(STAMP_Fusion$Gene1 %in% fusion.gene.list.full)], 
+                                  STAMP_Fusion$Gene2[which(STAMP_Fusion$Gene2 %in% fusion.gene.list.full)])))
 
 DF_fusion_count <- mapping_HK[which(mapping_HK$Plot_Name == "top_fusion_count" &
                                   mapping_HK$Folder == paste(Folder_root,"/Top_Fusion_Count",sep="")),]
@@ -103,6 +104,7 @@ remove(DF_site_count,DF_variant_count,DF_lollipop,DF_VariantType_Gene,DF_fusion_
        snv.list,fusion.list)
 
 # Per PrimaryTumorSite
+# 06/17/19: add heart
 #----------------------------------------------
 site.list.total <- site.list.total$PrimaryTumorSite
 
@@ -113,12 +115,12 @@ DF_VariantCount <- DF_VariantCount[which(DF_VariantCount$Label %in% c("all",site
 DF_VariantCount <- DF_VariantCount[!is.na(DF_VariantCount$iframe),]
 
 # sort(setdiff(c("all",site.list.total),DF_VariantCount$Label))
-# DF_VariantCount <- rbind(DF_VariantCount,
-#                          data.frame(Plot_Name = "top_variant_count",
-#                                     Folder = paste(Folder_root,"/Top_Variant_Count",sep=""),
-#                                     Label = sort(setdiff(c("all",site.list.total),DF_VariantCount$Label)),
-#                                     iframe = c("5340","5346","5376","5390"),
-#                                     stringsAsFactors = FALSE))
+DF_VariantCount <- rbind(DF_VariantCount,
+                         data.frame(Plot_Name = "top_variant_count",
+                                    Folder = paste(Folder_root,"/Top_Variant_Count",sep=""),
+                                    Label = sort(setdiff(c("all",site.list.total),DF_VariantCount$Label)),
+                                    iframe = c("5569"),
+                                    stringsAsFactors = FALSE))
 
 # top_gene_count_fxn: cohort="all" & site_DF
 DF_GeneCount <- mapping_HK[which(mapping_HK$Plot_Name == "top_gene_count" &
@@ -127,12 +129,12 @@ DF_GeneCount <- DF_GeneCount[which(DF_GeneCount$Label %in% c("all",site.list.tot
 DF_GeneCount <- DF_GeneCount[!is.na(DF_GeneCount$iframe),]
 
 # sort(setdiff(c("all",site.list.total),DF_GeneCount$Label))
-# DF_GeneCount <- rbind(DF_GeneCount,
-#                       data.frame(Plot_Name = "top_gene_count",
-#                                  Folder = paste(Folder_root,"/Top_Gene_Count",sep=""),
-#                                  Label = sort(setdiff(c("all",site.list.total),DF_GeneCount$Label)),
-#                                  iframe = c("2742","2916","3016","3238"),
-#                                  stringsAsFactors = FALSE))
+DF_GeneCount <- rbind(DF_GeneCount,
+                      data.frame(Plot_Name = "top_gene_count",
+                                 Folder = paste(Folder_root,"/Top_Gene_Count",sep=""),
+                                 Label = sort(setdiff(c("all",site.list.total),DF_GeneCount$Label)),
+                                 iframe = c("5567"),
+                                 stringsAsFactors = FALSE))
 
 # gender_age_distribution_fxn: cohort="all" & site_DF
 DF_GenderAge <- mapping_HK[which(mapping_HK$Plot_Name == "gender_age_distribution" &
@@ -141,12 +143,12 @@ DF_GenderAge <- DF_GenderAge[which(DF_GenderAge$Label %in% c("all",site.list.tot
 DF_GenderAge <- DF_GenderAge[!is.na(DF_GenderAge$iframe),]
 
 # sort(setdiff(c("all",site.list.total),DF_GenderAge$Label))
-# DF_GenderAge <- rbind(DF_GenderAge,
-#                       data.frame(Plot_Name = "gender_age_distribution",
-#                                  Folder = paste(Folder_root,"/Gender_Age_Distribution",sep=""),
-#                                  Label = sort(setdiff(c("all",site.list.total),DF_GenderAge$Label)),
-#                                  iframe = c("2744","2918","3018","3240"),
-#                                  stringsAsFactors = FALSE))
+DF_GenderAge <- rbind(DF_GenderAge,
+                      data.frame(Plot_Name = "gender_age_distribution",
+                                 Folder = paste(Folder_root,"/Gender_Age_Distribution",sep=""),
+                                 Label = sort(setdiff(c("all",site.list.total),DF_GenderAge$Label)),
+                                 iframe = c("5571"),
+                                 stringsAsFactors = FALSE))
 
 # pt_mutation_count_fxn: cohort="all" & site_DF
 DF_Mutation.all <- mapping_HK[which(mapping_HK$Plot_Name == "pt_mutation_count_allvariants" &
@@ -154,6 +156,7 @@ DF_Mutation.all <- mapping_HK[which(mapping_HK$Plot_Name == "pt_mutation_count_a
 DF_Mutation.all <- DF_Mutation.all[which(DF_Mutation.all$Label %in% c("all",site.list.total)),]
 DF_Mutation.all <- DF_Mutation.all[!is.na(DF_Mutation.all$iframe),]
 
+# # NA = heart
 # sort(setdiff(c("all",site.list.total),DF_Mutation.all$Label))
 # DF_Mutation.all <- rbind(DF_Mutation.all,
 #                          data.frame(Plot_Name = "pt_mutation_count_allvariants",
@@ -167,6 +170,7 @@ DF_Mutation.stacked <- mapping_HK[which(mapping_HK$Plot_Name == "pt_mutation_cou
 DF_Mutation.stacked <- DF_Mutation.stacked[which(DF_Mutation.stacked$Label %in% c("all",site.list.total)),]
 DF_Mutation.stacked <- DF_Mutation.stacked[!is.na(DF_Mutation.stacked$iframe),]
 
+# # NA = heart
 # sort(setdiff(c("all",site.list.total),DF_Mutation.stacked$Label))
 # DF_Mutation.stacked <- rbind(DF_Mutation.stacked,
 #                              data.frame(Plot_Name = "pt_mutation_count_allvariantstacked",
@@ -180,7 +184,7 @@ DF_Mutation.patho <- mapping_HK[which(mapping_HK$Plot_Name == "pt_mutation_count
 DF_Mutation.patho <- DF_Mutation.patho[which(DF_Mutation.patho$Label %in% c("all",site.list.total)),]
 DF_Mutation.patho <- DF_Mutation.patho[!is.na(DF_Mutation.patho$iframe),]
 
-# # NA = back, foot, trachea
+# # NA = back, foot, heart, trachea
 # sort(setdiff(c("all",site.list.total),DF_Mutation.patho$Label))
 # DF_Mutation.patho <- rbind(DF_Mutation.patho,
 #                            data.frame(Plot_Name = "pt_mutation_count_pathovariants",
@@ -194,7 +198,7 @@ DF_Mutation.VUS <- mapping_HK[which(mapping_HK$Plot_Name == "pt_mutation_count_V
 DF_Mutation.VUS <- DF_Mutation.VUS[which(DF_Mutation.VUS$Label %in% c("all",site.list.total)),]
 DF_Mutation.VUS <- DF_Mutation.VUS[!is.na(DF_Mutation.VUS$iframe),]
 
-# # NA = mesenteric mass
+# # NA = heart, mesenteric mass
 # sort(setdiff(c("all",site.list.total),DF_Mutation.VUS$Label))
 # DF_Mutation.VUS <- rbind(DF_Mutation.VUS,
 #                          data.frame(Plot_Name = "pt_mutation_count_VUS",
@@ -210,12 +214,12 @@ DF_SpecimenCount <- DF_SpecimenCount[which(DF_SpecimenCount$Label %in% c("all",s
 DF_SpecimenCount <- DF_SpecimenCount[!is.na(DF_SpecimenCount$iframe),]
 
 # sort(setdiff(c("all",site.list.total),DF_SpecimenCount$Label))
-# DF_SpecimenCount <- rbind(DF_SpecimenCount,
-#                           data.frame(Plot_Name = "specimen_type_count",
-#                                      Folder = paste(Folder_root,"/Specimen_Type_Count",sep=""),
-#                                      Label = sort(setdiff(c("all",site.list.total),DF_SpecimenCount$Label)),
-#                                      iframe = c("2750","2926","3026","3248"),
-#                                      stringsAsFactors = FALSE))
+DF_SpecimenCount <- rbind(DF_SpecimenCount,
+                          data.frame(Plot_Name = "specimen_type_count",
+                                     Folder = paste(Folder_root,"/Specimen_Type_Count",sep=""),
+                                     Label = sort(setdiff(c("all",site.list.total),DF_SpecimenCount$Label)),
+                                     iframe = c("5573"),
+                                     stringsAsFactors = FALSE))
 
 # tumor_purity_count_fxn: cohort="all" & site_DF
 DF_TumorPurity <- mapping_HK[which(mapping_HK$Plot_Name == "tumor_purity_count" &
@@ -224,12 +228,12 @@ DF_TumorPurity <- DF_TumorPurity[which(DF_TumorPurity$Label %in% c("all",site.li
 DF_TumorPurity <- DF_TumorPurity[!is.na(DF_TumorPurity$iframe),]
 
 # sort(setdiff(c("all",site.list.total),DF_TumorPurity$Label))
-# DF_TumorPurity <- rbind(DF_TumorPurity,
-#                         data.frame(Plot_Name = "tumor_purity_count",
-#                                    Folder = paste(Folder_root,"/Tumor_Purity_Count",sep=""),
-#                                    Label = sort(setdiff(c("all",site.list.total),DF_TumorPurity$Label)),
-#                                    iframe = c("2752","2928","3028","3250"),
-#                                    stringsAsFactors = FALSE))
+DF_TumorPurity <- rbind(DF_TumorPurity,
+                        data.frame(Plot_Name = "tumor_purity_count",
+                                   Folder = paste(Folder_root,"/Tumor_Purity_Count",sep=""),
+                                   Label = sort(setdiff(c("all",site.list.total),DF_TumorPurity$Label)),
+                                   iframe = c("5575"),
+                                   stringsAsFactors = FALSE))
 
 # histologicaldx_distribution_fxn: cohort="all" & site_DF
 DF_HistologicalDx <- mapping_HK[which(mapping_HK$Plot_Name == "hist_dx_distribution" &
@@ -238,15 +242,16 @@ DF_HistologicalDx <- DF_HistologicalDx[which(DF_HistologicalDx$Label %in% c("all
 DF_HistologicalDx <- DF_HistologicalDx[!is.na(DF_HistologicalDx$iframe),]
 
 # sort(setdiff(c("all",site.list.total),DF_HistologicalDx$Label))
-# DF_HistologicalDx <- rbind(DF_HistologicalDx,
-#                            data.frame(Plot_Name = "hist_dx_distribution",
-#                                       Folder = paste(Folder_root,"/Hist_Dx_distribution",sep=""),
-#                                       Label = sort(setdiff(c("all",site.list.total),DF_HistologicalDx$Label)),
-#                                       iframe = c("5342","5348","5378","5392"),
-#                                       stringsAsFactors = FALSE))
+DF_HistologicalDx <- rbind(DF_HistologicalDx,
+                           data.frame(Plot_Name = "hist_dx_distribution",
+                                      Folder = paste(Folder_root,"/Hist_Dx_distribution",sep=""),
+                                      Label = sort(setdiff(c("all",site.list.total),DF_HistologicalDx$Label)),
+                                      iframe = c("5578"),
+                                      stringsAsFactors = FALSE))
 
 # top_fusion_count_fxn: cohort="all" & site_DF
-fusion.list <- sort(unique(STAMP_Fusion$PrimaryTumorSite))
+fusion.list <- sort(unique(STAMP_Fusion$PrimaryTumorSite[which(STAMP_Fusion$Gene1 %in% fusion.gene.list.full | 
+                                                                 STAMP_Fusion$Gene2 %in% fusion.gene.list.full)]))
 
 DF_fusion_count <- mapping_HK[which(mapping_HK$Plot_Name == "top_fusion_count" &
                                         mapping_HK$Folder == paste(Folder_root,"/Top_Fusion_Count",sep="")),]
@@ -269,12 +274,12 @@ DF_Tumor_TestVolume <- DF_Tumor_TestVolume[which(DF_Tumor_TestVolume$Label %in% 
 DF_Tumor_TestVolume <- DF_Tumor_TestVolume[!is.na(DF_Tumor_TestVolume$iframe),]
 
 # sort(setdiff(site.list.total,DF_Tumor_TestVolume$Label))
-# DF_Tumor_TestVolume <- rbind(DF_Tumor_TestVolume,
-#                              data.frame(Plot_Name = "test_volume",
-#                                         Folder = paste(Folder_root,"/PerTumor_OrderVolume",sep=""),
-#                                         Label = sort(setdiff(site.list.total,DF_Tumor_TestVolume$Label)),
-#                                         iframe = c("4166","4190","4204","4234"),
-#                                         stringsAsFactors = FALSE))
+DF_Tumor_TestVolume <- rbind(DF_Tumor_TestVolume,
+                             data.frame(Plot_Name = "test_volume",
+                                        Folder = paste(Folder_root,"/PerTumor_OrderVolume",sep=""),
+                                        Label = sort(setdiff(site.list.total,DF_Tumor_TestVolume$Label)),
+                                        iframe = c("5580"),
+                                        stringsAsFactors = FALSE))
 
 DF_PerSite <- rbind(DF_VariantCount, DF_GeneCount, DF_GenderAge, DF_HistologicalDx, 
                     DF_Tumor_TestVolume,DF_TumorPurity,DF_SpecimenCount,

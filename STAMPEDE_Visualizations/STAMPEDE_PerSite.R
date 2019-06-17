@@ -24,7 +24,7 @@ for (row_No in 1:nrow(site.list)) {
 site.list$CohortName <- gsub("[[:blank:]]", "", site.list$CohortName)
 site.list <- site.list[order(site.list$PrimaryTumorSite),]
 
-assign("site.list.total", site.list.total, envir = .GlobalEnv)
+assign("site.list.total", site.list, envir = .GlobalEnv)
 
 # Iterate through each unique primary tumor site
 #----------------------------------------------
@@ -39,7 +39,9 @@ for (site_num in 1:nrow(site.list.total)) {
   site_Fusion <- STAMP_Fusion[which(STAMP_Fusion$PrimaryTumorSite == tolower(site_id)),]
   site_CNV <- STAMP_CNV[which(STAMP_CNV$PrimaryTumorSite == tolower(site_id)),]
   
-  pt_mutation_count_fxn (DF = site_DF, cohort = cohort_id, outdir = outdir)
+  if (nrow(site_DF) > 0) {
+    pt_mutation_count_fxn (DF = site_DF, cohort = cohort_id, outdir = outdir)
+  }
   
   # Fusion info per site
   #----------------------------------------------

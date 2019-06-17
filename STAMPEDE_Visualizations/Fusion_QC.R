@@ -85,7 +85,7 @@ cat(paste("Number of fusion entries without corresponding Gene in STAMP v2 file 
           length(fusion.missing.list), sep=""),"\n",
     paste(unlist(fusion.missing.list),collapse=", "),"\n","\n")
 
-remove(Fusion.list,Fusion.diff_No,fusion.missing.list)
+remove(Fusion.diff_No,fusion.missing.list)
 
 assign("STAMP_Fusion", STAMP_Fusion, envir = .GlobalEnv)
 

@@ -30,7 +30,7 @@ script.dir = "~/Documents/ClinicalDataScience_Fellowship/STAMPEDE_Visualizations
 stamp_reference_transcripts = paste(pipeline.root, 
                                     "Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt", sep="")
 exons_ensembl = paste(pipeline.root, "Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt", sep="")
-AA_key=paste(data.root,"STAMP/AminoAcid_Conversion.csv",sep="")
+AA_key=paste(pipeline.root,"AminoAcid_Conversion.csv",sep="")
 
 histoDx.key = paste(pipeline.root,"HistologicalDx_CTEP.tsv",sep="")
 
@@ -89,6 +89,9 @@ Domains <- data.frame(Domains[c(3:nrow(Domains)),c(2:ncol(Domains))])
 colnames(Genes) <- unlist(Genes[2,])
 Genes <- data.frame(Genes[c(3:nrow(Genes)),c(2:ncol(Genes))])
 
+fusion.gene.list.full <- sort(unique(Genes$Name[which(Genes$Fusions == "yes")]))
+cnv.gene.list.full <- sort(unique(Genes$Name[which(Genes$CNV == "yes")]))
+
 # Load Disease & Histological dx ontologies
 #----------------------------------------------
 setwd(pipeline.root)
@@ -106,11 +109,9 @@ setwd(script.dir)
 source("SNVIndel_QC.R")
 
 ## STAMP Fusion database QC PIPELINE
-fusion.gene.list.full <- sort(unique(Genes$Name[which(Genes$Fusions == "yes")]))
 source("Fusion_QC.R")
 
 ## STAMP CNV database QC PIPELINE
-cnv.gene.list.full <- sort(unique(Genes$Name[which(Genes$CNV == "yes")]))
 source("CNV_QC.R")
 
 #################################
@@ -183,4 +184,5 @@ outdir = script.dir
 source("Count_SiteGene.R")
 
 # Generate table of iframe codes **MANUAL curation**
+# Fusion genes are limited to those in fusion.gene.list.full
 source("iframe_codes.R")

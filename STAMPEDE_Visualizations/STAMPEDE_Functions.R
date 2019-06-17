@@ -1517,6 +1517,9 @@ top_variant_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdi
     } else {
       DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(Gene1) %>% tally())
     }
+    
+  } else {
+    DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(Gene1) %>% tally())
   }
   colnames(DF_Fusion_tabulate) <- c("Variant","No.Mutations")
   
