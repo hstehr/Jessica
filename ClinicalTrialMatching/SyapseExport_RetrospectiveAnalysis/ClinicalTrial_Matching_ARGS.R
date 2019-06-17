@@ -14,6 +14,10 @@ colnames(Genes) <- unlist(Genes[2,])
 colnames_keep <- c("Name","Transcript","Tiles","Size","Coverage","MUT","CNV","Fusions","AA Length")   
 Genes <- data.frame(Genes[c(3:nrow(Genes)),colnames_keep])
 
+# Coverage lists
+fusion.gene.list.full <- sort(unique(Genes$Name[which(Genes$Fusions == "yes")]))
+cnv.gene.list.full <- sort(unique(Genes$Name[which(Genes$CNV == "yes")]))
+
 remove(STAMPv2_Annotation,Domains,Tiles,Changes,colnames_keep)
 
 #----------------------------------------------
@@ -34,7 +38,7 @@ NCI.ArmRemove="ARM-F,ARM-G,ARM-S2,ARM-Z1C,ARM-Z1F"
 stamp_reference_transcripts=paste(data.root,"ClinicalTrialMatching/PIPELINE_scripts/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
 exons_ensembl=paste(data.root,"ClinicalTrialMatching/PIPELINE_scripts/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
 histoDx.key=paste(script.root,"HistologicalDx_CTEP.tsv",sep="")
-AA_key=paste(data.root,"STAMP/AminoAcid_Conversion.csv",sep="")
+AA_key=paste(data.root,"ClinicalTrialMatching/PIPELINE_scripts/AminoAcid_Conversion.csv",sep="")
 
 adult_FILTER = "TRUE"
 
