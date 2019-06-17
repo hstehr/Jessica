@@ -6,32 +6,42 @@
 #---------------------------------------------- 
 if (isTRUE(Internal_match)) {
   
-  # Import candidate matches
+  # Import candidate matches and specify empty dataframes
   #---------------------------------------------- 
-  Output_SNVIndel_OnCore <- 
-    read.csv(paste(tempdir,"OnCore_SNVIndel_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
-                   groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+  # SNV Indels
+  file_name = paste(tempdir,"OnCore_SNVIndel_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
+                    groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep="")
   
-  Output_CNV_OnCore <- 
-    read.csv(paste(tempdir,"OnCore_CNV_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
-                   groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-  
-  Output_Fusion_OnCore <- 
-    read.csv(paste(tempdir,"OnCore_Fusion_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
-                   groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-  
-  # Specify empty dataframes
-  #---------------------------------------------- 
-  if (nrow(Output_SNVIndel_OnCore) > 0) {continue_SNVIndel <- as.logical("TRUE")
+  if (file.exists(file_name)) {
+    Output_SNVIndel_OnCore <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_SNVIndel_OnCore) > 0) {continue_SNVIndel <- as.logical("TRUE")
+    } else {continue_SNVIndel <- as.logical("FALSE")}
+    
   } else {continue_SNVIndel <- as.logical("FALSE")}
   
-  if (nrow(Output_CNV_OnCore) > 0) {continue_CNV <- as.logical("TRUE")
+  # CNVs
+  file_name = paste(tempdir,"OnCore_CNV_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
+                    groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    Output_CNV_OnCore <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_CNV_OnCore) > 0) {continue_CNV <- as.logical("TRUE")
+    } else {continue_CNV <- as.logical("FALSE")}
+    
   } else {continue_CNV <- as.logical("FALSE")}
   
-  if (nrow(Output_Fusion_OnCore) > 0) {continue_Fusion <- as.logical("TRUE")
+  # Fusions
+  file_name = paste(tempdir,"OnCore_Fusion_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
+                    groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    Output_Fusion_OnCore <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_Fusion_OnCore) > 0) {continue_Fusion <- as.logical("TRUE")
+    } else {continue_Fusion <- as.logical("FALSE")}
+    
   } else {continue_Fusion <- as.logical("FALSE")}
   
   # Specify relevant columns depending on trial matches
@@ -101,7 +111,7 @@ if (isTRUE(Internal_match)) {
       # Extract patient-specific entries
       Output_Fusion_OnCore_Patient <- Output_Fusion_OnCore[which(Output_Fusion_OnCore$PatientID == patient_id),]
       
-      if (nrow(Output_CNV_OnCore_Patient) > 0) {
+      if (nrow(Output_Fusion_OnCore_Patient) > 0) {
         # Input missing columns 
         Output_Fusion_OnCore_Patient$Variant_Type = "Fusion"
         Output_Fusion_OnCore_Patient$VariantHGVSCoding = NA
@@ -123,14 +133,20 @@ if (isTRUE(Internal_match)) {
     
     if (isTRUE(continue_SNVIndel)) {
       Output_OnCore_FINAL <- rbind(Output_OnCore_FINAL, Output_SNVIndel_OnCore_Patient)
+      
+      remove(Output_SNVIndel_OnCore_Patient)
     }
     
     if (isTRUE(continue_CNV)) {
       Output_OnCore_FINAL <- rbind(Output_OnCore_FINAL, Output_CNV_OnCore_Patient)
+      
+      remove(Output_CNV_OnCore_Patient)
     }
     
     if (isTRUE(continue_Fusion)) {
       Output_OnCore_FINAL <- rbind(Output_OnCore_FINAL, Output_Fusion_OnCore_Patient)
+      
+      remove(Output_Fusion_OnCore_Patient)
     }
     
     if (nrow(Output_OnCore_FINAL) > 0){
@@ -140,9 +156,6 @@ if (isTRUE(Internal_match)) {
                   quote = FALSE, na = ".")
     }
     remove(Output_OnCore_FINAL,patient_id)
-    if (isTRUE(exists("Output_SNVIndel_OnCore_Patient"))){remove(Output_SNVIndel_OnCore_Patient)}
-    if (isTRUE(exists("Output_CNV_OnCore_Patient"))){remove(Output_CNV_OnCore_Patient)}
-    if (isTRUE(exists("Output_Fusion_OnCore_Patient"))){remove(Output_Fusion_OnCore_Patient)}
   }
   remove(patient_num,Output_SNVIndel_OnCore,Output_CNV_OnCore,Output_Fusion_OnCore,
          continue_SNVIndel,continue_CNV,continue_Fusion,colnames.output,
@@ -154,48 +167,66 @@ if (isTRUE(Internal_match)) {
 #---------------------------------------------- 
 if (isTRUE(NCI_match)) {
   
-  # Import candidate matches
+  # Import candidate matches and specify empty dataframes
   #---------------------------------------------- 
-  Output_SNVIndel_Variant <- 
-    read.csv(paste(tempdir,"NCI_SNVIndel_Variant_Matched_", Patient_Variant_Report_timestamp, "_", 
-                   dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+  # SNVIndel_Variant
+  file_name = paste(tempdir,"NCI_SNVIndel_Variant_Matched_", Patient_Variant_Report_timestamp, "_", 
+                    dxName, "_", pathoName, "_",  ageName, ".tsv", sep="")
   
-  Output_CNV_Variant <- 
-    read.csv(paste(tempdir,"NCIMatch_CNV_Variant_Matched_", Patient_Variant_Report_timestamp, "_", 
-                   dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-  
-  Output_Fusion_Variant <- 
-    read.csv(paste(tempdir,"NCI_Fusion_Variant_Matched_", Patient_Variant_Report_timestamp, "_", 
-                   dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-  
-  Output_SNVIndel_NonHotspot <- 
-    read.csv(paste(tempdir,"NCI_SNVIndel_NonHotspot_Matched", Patient_Variant_Report_timestamp, "_", 
-                   dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-  
-  Output_CNV_NonHotspot <- 
-    read.csv(paste(tempdir,"NCI_CNV_NonHotspot_Matched", Patient_Variant_Report_timestamp, "_", 
-                   dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-             header = TRUE, stringsAsFactors = FALSE, sep = "\t")
-  
-  # Specify empty dataframes
-  #---------------------------------------------- 
-  if (nrow(Output_SNVIndel_Variant) > 0) {continue_SNVIndel_Variant <- as.logical("TRUE")
+  if (file.exists(file_name)) {
+    Output_SNVIndel_Variant <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_SNVIndel_Variant) > 0) {continue_SNVIndel_Variant <- as.logical("TRUE")
+    } else {continue_SNVIndel_Variant <- as.logical("FALSE")}
+    
   } else {continue_SNVIndel_Variant <- as.logical("FALSE")}
   
-  if (nrow(Output_CNV_Variant) > 0) {continue_CNV_Variant <- as.logical("TRUE")
+  # CNV_Variant
+  file_name = paste(tempdir,"NCIMatch_CNV_Variant_Matched_", Patient_Variant_Report_timestamp, "_", 
+                    dxName, "_", pathoName, "_",  ageName, ".tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    Output_CNV_Variant <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_CNV_Variant) > 0) {continue_CNV_Variant <- as.logical("TRUE")
+    } else {continue_CNV_Variant <- as.logical("FALSE")}
+    
   } else {continue_CNV_Variant <- as.logical("FALSE")}
   
-  if (nrow(Output_Fusion_Variant) > 0) {continue_Fusion_Variant <- as.logical("TRUE")
+  # Fusion_Variant
+  file_name = paste(tempdir,"NCI_Fusion_Variant_Matched_", Patient_Variant_Report_timestamp, "_", 
+                    dxName, "_", pathoName, "_",  ageName, ".tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    Output_Fusion_Variant <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_Fusion_Variant) > 0) {continue_Fusion_Variant <- as.logical("TRUE")
+    } else {continue_Fusion_Variant <- as.logical("FALSE")}
+    
   } else {continue_Fusion_Variant <- as.logical("FALSE")}
   
-  if (nrow(Output_SNVIndel_NonHotspot) > 0) {continue_SNVIndel_NonHotspot <- as.logical("TRUE")
+  # SNVIndel_NonHotspot
+  file_name = paste(tempdir,"NCI_SNVIndel_NonHotspot_Matched", Patient_Variant_Report_timestamp, "_", 
+                    dxName, "_", pathoName, "_",  ageName, ".tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    Output_SNVIndel_NonHotspot <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_SNVIndel_NonHotspot) > 0) {continue_SNVIndel_NonHotspot <- as.logical("TRUE")
+    } else {continue_SNVIndel_NonHotspot <- as.logical("FALSE")}
+    
   } else {continue_SNVIndel_NonHotspot <- as.logical("FALSE")}
   
-  if (nrow(Output_CNV_NonHotspot) > 0) {continue_CNV_NonHotspot <- as.logical("TRUE")
+  # CNV_NonHotspot
+  file_name = paste(tempdir,"NCI_CNV_NonHotspot_Matched", Patient_Variant_Report_timestamp, "_", 
+                    dxName, "_", pathoName, "_",  ageName, ".tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    Output_CNV_NonHotspot <- read.csv(file = file_name, header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(Output_CNV_NonHotspot) > 0) {continue_CNV_NonHotspot <- as.logical("TRUE")
+    } else {continue_CNV_NonHotspot <- as.logical("FALSE")}
+    
   } else {continue_CNV_NonHotspot <- as.logical("FALSE")}
   
   # Specify relevant columns depending on trial matches
@@ -330,22 +361,32 @@ if (isTRUE(NCI_match)) {
     
     if (isTRUE(continue_SNVIndel_Variant)) {
       Output_NCI_FINAL <- rbind(Output_NCI_FINAL, Output_SNVIndel_Variant_Patient)
+      
+      remove(Output_SNVIndel_Variant_Patient)
     }
     
     if (isTRUE(continue_CNV_Variant)) {
       Output_NCI_FINAL <- rbind(Output_NCI_FINAL, Output_CNV_Variant_Patient)
+      
+      remove(Output_CNV_Variant_Patient)
     }
     
     if (isTRUE(continue_Fusion_Variant)) {
       Output_NCI_FINAL <- rbind(Output_NCI_FINAL, Output_Fusion_Variant_Patient)
+      
+      remove(Output_Fusion_Variant_Patient)
     }
     
     if (isTRUE(continue_SNVIndel_NonHotspot)) {
       Output_NCI_FINAL <- rbind(Output_NCI_FINAL, Output_SNVIndel_NonHotspot_Patient)
+      
+      remove(Output_SNVIndel_NonHotspot_Patient)
     }
     
     if (isTRUE(continue_CNV_NonHotspot)) {
       Output_NCI_FINAL <- rbind(Output_NCI_FINAL, Output_CNV_NonHotspot_Patient)
+      
+      remove(Output_CNV_NonHotspot_Patient)
     }
     
     if (nrow(Output_NCI_FINAL) > 0){
@@ -358,13 +399,8 @@ if (isTRUE(NCI_match)) {
                   quote = FALSE, na = ".")  
     }
     remove(patient_id,Output_NCI_FINAL)
-    if (isTRUE(exists("Output_SNVIndel_Variant_Patient"))){remove(Output_SNVIndel_Variant_Patient)}
-    if (isTRUE(exists("Output_CNV_Variant_Patient"))){remove(Output_CNV_Variant_Patient)}
-    if (isTRUE(exists("Output_Fusion_Variant_Patient"))){remove(Output_Fusion_Variant_Patient)}
-    if (isTRUE(exists("Output_SNVIndel_NonHotspot_Patient"))){remove(Output_SNVIndel_NonHotspot_Patient)}
-    if (isTRUE(exists("Output_CNV_NonHotspot_Patient"))){remove(Output_CNV_NonHotspot_Patient)}
   }
   remove(Output_SNVIndel_Variant,Output_CNV_Variant,Output_Fusion_Variant,Output_SNVIndel_NonHotspot,Output_CNV_NonHotspot,
          continue_SNVIndel_Variant,continue_CNV_Variant,continue_Fusion_Variant,continue_SNVIndel_NonHotspot,continue_CNV_NonHotspot,
-         colnames.SNVIndel.original,colnames.CNV.original,colnames.Fusion.original,colnames.output,patient_num)
+         colnames.SNVIndel.original,colnames.CNV.original,colnames.Fusion.original,colnames.output,patient_num,file_name)
 }

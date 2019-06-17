@@ -389,7 +389,7 @@ if (isTRUE(Internal_match)) {
                             DF_Output_pre <- data.frame(matrix(NA, ncol = ncol(DF_Output_SNVIndel_OnCore)))
                             colnames(DF_Output_pre) <- colnames(DF_Output_SNVIndel_OnCore)
                             
-                            patient <- data.frame(DF_patient[pt_rowNo, c(1:ncol_SNVIndel)])
+                            patient <- data.frame(DF_patient[pt_rowNo, SNVIndel.colnames])
                             DF_Output_pre <- crossing(patient, Trial_INFO)
                             
                             # Append to Output file
@@ -481,7 +481,7 @@ if (isTRUE(Internal_match)) {
   write.table(DF_Output_SNVIndel_OnCore, 
               file = paste(tempdir,"OnCore_SNVIndel_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
                            groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE, quote = TRUE)
   
   remove(genes.OnCore_Biomarker,ncol_OnCore,ncol_SNVIndel,DF_Output_SNVIndel_OnCore,SNVIndel.colnames)
 }

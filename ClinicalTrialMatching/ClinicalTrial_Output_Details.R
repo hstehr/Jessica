@@ -4,27 +4,42 @@
 for (patient_num in 1:length(patient.list)) {
   patient_id <- patient.list[patient_num]
   
-  # Import STAMP entries per patient
+  # Import STAMP entries per patient & specify empty dataframes
   #---------------------------------------------- 
-  DF_patient_SNVIndel <- read.csv(file = paste(tempdir, patient_id, "_SNVIndel.tsv", sep=""),
-                                  header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+  # SNV Indels
+  file_name = paste(tempdir, patient_id, "_SNVIndel.tsv", sep="")
   
-  DF_patient_CNV <- read.csv(file = paste(tempdir, patient_id, "_CNV.tsv", sep=""),
-                             header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
-  
-  DF_patient_Fusion <- read.csv(file = paste(tempdir, patient_id, "_Fusion.tsv", sep=""),
-                                header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
-  
-  # Specify empty dataframes
-  #---------------------------------------------- 
-  if (nrow(DF_patient_SNVIndel) > 0) {continue_SNVIndel <- as.logical("TRUE")
+  if (file.exists(file_name)) {
+    DF_patient_SNVIndel <- read.csv(file = file_name, header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(DF_patient_SNVIndel) > 0) {continue_SNVIndel <- as.logical("TRUE")
+    } else {continue_SNVIndel <- as.logical("FALSE")}
+    
   } else {continue_SNVIndel <- as.logical("FALSE")}
   
-  if (nrow(DF_patient_CNV) > 0) {continue_CNV <- as.logical("TRUE")
+  # CNVs
+  file_name = paste(tempdir, patient_id, "_CNV.tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    DF_patient_CNV <- read.csv(file = file_name, header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(DF_patient_CNV) > 0) {continue_CNV <- as.logical("TRUE")
+    } else {continue_CNV <- as.logical("FALSE")}
+    
   } else {continue_CNV <- as.logical("FALSE")}
   
-  if (nrow(DF_patient_Fusion) > 0) {continue_Fusion <- as.logical("TRUE")
+  # Fusions
+  file_name = paste(tempdir, patient_id, "_Fusion.tsv", sep="")
+  
+  if (file.exists(file_name)) {
+    DF_patient_Fusion <- read.csv(file = file_name, header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+    
+    if (nrow(DF_patient_Fusion) > 0) {continue_Fusion <- as.logical("TRUE")
+    } else {continue_Fusion <- as.logical("FALSE")}
+    
   } else {continue_Fusion <- as.logical("FALSE")}
+  
+  remove(file_name)
   
   # Specify relevant columns depending on trial matches
   #---------------------------------------------- 
@@ -33,6 +48,7 @@ for (patient_num in 1:length(patient.list)) {
   colnames.Fusion <- c("Output")
   
   email.comment <- paste("This email was generated on ", Sys.time(), ".",sep="")
+  trial.comment <- c()
   
   if (isTRUE(Internal_match)) {
     colnames.SNVIndel <- append(colnames.SNVIndel, c("OnCore_SNVIndel_Status"))
@@ -41,6 +57,7 @@ for (patient_num in 1:length(patient.list)) {
     
     email.comment <- paste("OnCore Biomarker Report updated on ", OnCore_Biomarker_Report_timestamp, ". ",
                            email.comment, sep="")
+    trial.comment <- append(trial.comment, "Stanford OnCore")
   }
   
   if (isTRUE(NCI_match)) {
@@ -50,7 +67,11 @@ for (patient_num in 1:length(patient.list)) {
     
     email.comment <- paste("Patient Variant Report updated on ", Patient_Variant_Report_timestamp, ". ",
                            email.comment, sep="")
+    trial.comment <- append(trial.comment, "NCI-MATCH")
   }
+  
+  if (isTRUE(length(trial.comment) > 1)) {trial.comment <- paste(trial.comment[[1]],trial.comment[[2]],sep=" and ")
+  } else {trial.comment <- trial.comment[[1]]}
   
   # Format dataframe for output
   #---------------------------------------------- 
@@ -90,8 +111,8 @@ for (patient_num in 1:length(patient.list)) {
   options(max.print=999999)
   
   # Output patient bio
-  cat(paste(patient_id, " may qualify for the following clinical trial(s) due to mutations identified in STAMP assay.", sep=""),"\n")
-  cat("Feature matching algorithm applied to following clinical trials: Stanford OnCore and NCI-MATCH","\n","\n")
+  cat(paste(patient_id, " may qualify for the following ",trial.comment,
+            " clinical trial(s) due to mutation(s) identified in the STAMP assay.",sep=""),"\n","\n")
   
   if (isTRUE(Internal_match | NCI_match)) {
     if (isTRUE(continue_SNVIndel)) {
@@ -137,8 +158,10 @@ for (patient_num in 1:length(patient.list)) {
     
     cat(email.comment,"\n")
   }
-  remove(patient_id,DF_patient_SNVIndel,DF_patient_CNV,DF_patient_Fusion,
-         continue_SNVIndel,continue_CNV,continue_Fusion,
+  if (exists("DF_patient_SNVIndel")) {remove(DF_patient_SNVIndel)}
+  if (exists("DF_patient_CNV")) {remove(DF_patient_CNV)}
+  if (exists("DF_patient_Fusion")) {remove(DF_patient_Fusion)}
+  remove(patient_id,continue_SNVIndel,continue_CNV,continue_Fusion,
          colnames.SNVIndel,colnames.CNV,colnames.Fusion,email.comment)
   
   sink()

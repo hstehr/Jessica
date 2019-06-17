@@ -1,0 +1,564 @@
+histologicalDiagnosis	primaryTumorSite	CTEP.CATEGORY	CTEP.SUBCATEGORY	CTEP.TERM	SHORT.NAME
+cortical tumors:carcinoma	adrenal	Endocrine Neoplasm	NA	NA	NA
+medullary tumors:neuroblastoma	adrenal	Endocrine Neoplasm	NA	NA	NA
+Cortical Tumors:Carcinoma	Adrenal	Endocrine Neoplasm	NA	NA	NA
+Medullary Tumors:Neuroblastoma	Adrenal	NA	NA	NA	NA
+adenocarcinoma	ampulla of vater	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:adenocarcinoma, intestinal type	ampulla of vater	Gastrointestinal Neoplasm	NA	NA	NA
+NA	ampulla of vater	NA	NA	NA	NA
+adenocarcinoma	Ampulla of Vater	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Adenocarcinoma, intestinal type	Ampulla of Vater	Gastrointestinal Neoplasm	NA	NA	NA
+NA	Ampulla of Vater	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:squamous cell carcinoma	anus	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Squamous cell carcinoma	Anus	Gastrointestinal Neoplasm	NA	NA	NA
+NA	Anus	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:mucinous (colloid) adenocarcinoma (greater than 50% mucinous)	appendix	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:other carcinoma (specify)	appendix	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:signet-ring cell carcinoma (greater than 50% signet-ring cells)	appendix	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Adenocarcinoma	Appendix	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Mucinous (colloid) adenocarcinoma (greater than 50% mucinous)	Appendix	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Other carcinoma (specify)	Appendix	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Signet-ring cell carcinoma (greater than 50% signet-ring cells)	Appendix	Gastrointestinal Neoplasm	NA	NA	NA
+NA	Appendix	Gastrointestinal Neoplasm	NA	NA	NA
+invasive melanoma, spitzoid type	back	Skin Neoplasm	Melanoma	NA	NA
+Invasive melanoma, spitzoid type	Back	Skin Neoplasm	Melanoma	NA	NA
+miscellaneous tumors:ewing sarcoma	bone	NA	NA	NA	NA
+osteoclastic giant cell rich tumors	bone	NA	NA	NA	NA
+osteogenic tumors:malignant	bone	NA	NA	NA	NA
+osteogenic tumors:malignant:conventional osteosarcoma	bone	NA	NA	NA	NA
+osteogenic tumors:malignant:conventional osteosarcoma:chondroblastic	bone	NA	NA	NA	NA
+osteogenic tumors:malignant:conventional osteosarcoma:osteoblastic	bone	NA	NA	NA	NA
+NA	bone	NA	NA	NA	NA
+Miscellaneous Tumors:Ewing sarcoma	Bone	NA	NA	NA	NA
+Osteoclastic Giant Cell Rich Tumors	Bone	NA	NA	NA	NA
+Osteogenic Tumors:Malignant	Bone	NA	NA	NA	NA
+Osteogenic Tumors:Malignant:Conventional osteosarcoma	Bone	NA	NA	NA	NA
+Osteogenic Tumors:Malignant:Conventional osteosarcoma:Chondroblastic	Bone	NA	NA	NA	NA
+Osteogenic Tumors:Malignant:Conventional osteosarcoma:Osteoblastic	Bone	NA	NA	NA	NA
+NA	Bone	NA	NA	NA	NA
+acute leukemia	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+aml	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+b-all	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+cytopenia	bone marrow	NA	NA	NA	NA
+cytopenia - anemia	bone marrow	NA	NA	NA	NA
+mpn	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic syndrome	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasm	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasm (mpn)	bone marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+NA	bone marrow	NA	NA	NA	NA
+Acute leukemia	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute leukemia with ambiguous lineage	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+AML	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+B-ALL	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Cytopenia	Bone Marrow	NA	NA	NA	NA
+Cytopenia - anemia	Bone Marrow	NA	NA	NA	NA
+Diffuse large B cell lymphoma	Bone Marrow	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Diffuse large B-cell lymphoma	Diffuse large B-cell lymphoma
+MPN	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic syndrome	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasm	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasm (MPN)	Bone Marrow	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+NA	Bone Marrow	NA	NA	NA	NA
+invasive carcinoma	breast	Breast Cancer	Breast Cancer - Invasive	Breast cancer, NOS	Breast cancer, NOS
+invasive carcinoma:invasive carcinoma, type cannot be determined	breast	Breast Cancer	Breast Cancer - Invasive	Breast cancer, NOS	Breast cancer, NOS
+invasive carcinoma:invasive ductal carcinoma (no special type or not otherwise specified)	breast	Breast Cancer	Breast Cancer - Invasive	Breast cancer, NOS	Breast cancer, NOS
+invasive carcinoma:invasive lobular carcinoma	breast	Breast Cancer	Breast Cancer - Invasive	Breast cancer, NOS	Breast cancer, NOS
+invasive carcinoma:other(s) (specify)	breast	Breast Cancer	Breast Cancer - Invasive	Breast cancer, NOS	Breast cancer, NOS
+NA	breast	NA	NA	NA	NA
+Ductal Carcinoma In Situ (DCIS)	Breast	Breast Neoplasm	NA	NA	NA
+Invasive Carcinoma	Breast	Breast Neoplasm	Breast Cancer - Invasive	Invasive breast carcinoma	Invasive breast carcinoma
+Invasive Carcinoma:Invasive carcinoma, type cannot be determined	Breast	Breast Neoplasm	Breast Cancer - Invasive	Invasive breast carcinoma	Invasive breast carcinoma
+Invasive Carcinoma:Invasive ductal carcinoma (no special type or not otherwise specified)	Breast	Breast Neoplasm	Breast Cancer - Invasive	Invasive breast carcinoma	Invasive breast carcinoma
+Invasive Carcinoma:Invasive lobular carcinoma	Breast	Breast Neoplasm	Breast Cancer - Invasive	Invasive breast carcinoma	Invasive breast carcinoma
+Invasive Carcinoma:Other(s) (specify)	Breast	Breast Neoplasm	Breast Cancer - Invasive	Invasive breast carcinoma	Invasive breast carcinoma
+NA	Breast	Breast Neoplasm	NA	NA	NA
+astrocytic tumors	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:anaplastic astrocytoma (who grade iii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:astrocytoma, not otherwise characterized (who grades i-iv)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:diffuse astrocytoma (who grade ii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:glioblastoma (who grade iv)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:glioblastoma (who grade iv):giant cell glioblastoma (who grade iv)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:glioblastoma (who grade iv):gliosarcoma (who grade iv)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:pilocytic astrocytoma (who grade i)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:pilomyxoid astrocytoma (who grade ii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+astrocytic tumors:pleomorphic xanthoastrocytoma (who grade ii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+choroid plexus tumors:choroid plexus carcinoma (who grade iii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+diffuse large b-cell lymphoma	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+embryonal tumors	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+embryonal tumors:central nervous system (cns) primitive neuroectodermal tumor (pnet) (who grade iv):ganglioneuroblastoma (who grade iv)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+embryonal tumors:medulloblastoma, not otherwise characterized (who grade iv)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+ependymal tumors:anaplastic ependymoma (who grade iii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+ependymal tumors:ependymoma (who grade ii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+ependymal tumors:myxopapillary ependymoma (who grade i)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+neuronal and mixed neuronal-glial tumors:anaplastic ganglioglioma (who grade iii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+neuronal and mixed neuronal-glial tumors:gangliocytoma (who grade i)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+neuronal and mixed neuronal-glial tumors:ganglioglioma (who grade i)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+oligoastrocytic tumors (mixed glioma)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+oligodendroglial tumors:anaplastic oligodendroglioma (who grade iii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+oligodendroglial tumors:oligodendroglioma (who grade ii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+other/non-classifiable:pediatric low grade glioma (plgg) not otherwise specified (nos) (grade i/ii)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+primary melanotic tumors:malignant melanoma	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+tumors of cranial and paraspinal nerves:schwannoma (who grade i)	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+NA	central nervous system (brain/spinal cord)	NA	NA	NA	NA
+Astrocytic Tumors	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Anaplastic astrocytoma (WHO grade III)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Astrocytoma, not otherwise characterized (WHO grades I-IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Diffuse astrocytoma (WHO grade II)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Glioblastoma (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Glioblastoma (WHO grade IV):Giant cell glioblastoma (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Glioblastoma (WHO grade IV):Gliosarcoma (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Pilocytic astrocytoma (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Pilomyxoid astrocytoma (WHO grade II)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Astrocytic Tumors:Pleomorphic xanthoastrocytoma (WHO grade II)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Choroid Plexus Tumors:Choroid plexus carcinoma (WHO grade III)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Diffuse large B-cell lymphoma	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Embryonal Tumors	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Embryonal Tumors:Atypical teratoid/rhabdoid tumor (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Embryonal Tumors:Central nervous system (CNS) primitive neuroectodermal tumor (PNET) (WHO grade IV):Ganglioneuroblastoma (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Embryonal Tumors:Medulloblastoma, not otherwise characterized (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Embryonal Tumors:Medulloblastoma, not otherwise characterized (WHO grade IV):Anaplastic medulloblastoma (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Embryonal Tumors:Medulloblastoma, not otherwise characterized (WHO grade IV):Desmoplastic/nodular medulloblastoma (WHO grade IV)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Ependymal Tumors	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Ependymal Tumors:Anaplastic ependymoma (WHO grade III)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Ependymal Tumors:Ependymoma (WHO grade II)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Ependymal Tumors:Myxopapillary ependymoma (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Neuronal and Mixed Neuronal-Glial Tumors:Dysembryoplastic neuroepithelial tumor (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Neuronal and Mixed Neuronal-Glial Tumors:Gangliocytoma (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Neuronal and Mixed Neuronal-Glial Tumors:Ganglioglioma (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Oligoastrocytic Tumors (mixed glioma)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Oligodendroglial Tumors:Anaplastic oligodendroglioma (WHO grade III)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Oligodendroglial Tumors:Oligodendroglioma (WHO grade II)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Other Neuroepithelial Tumors	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Other/Non-classifiable	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Other/Non-classifiable:Other(s) (specify)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Other/Non-classifiable:Pediatric low grade glioma (pLGG) not otherwise specified (NOS) (Grade I/II)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Primary Melanotic Tumors:Malignant melanoma	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Tumors of Cranial and Paraspinal Nerves:Ganglioneuroma (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Tumors of Cranial and Paraspinal Nerves:Schwannoma (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Tumors of Cranial and Paraspinal Nerves:Schwannoma (WHO grade I):Melanotic (WHO grade I)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+Tumors of the Pineal Region:Pineal parenchymal tumor of intermediate differentiation (WHO IIIII)	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+NA	Central Nervous System (Brain/Spinal Cord)	NA	NA	NA	NA
+sqaumous cell carcinoma	cervix	NA	NA	NA	NA
+Sqaumous cell carcinoma	Cervix	NA	NA	NA	NA
+NA	colon	NA	NA	NA	NA
+NA	Colon	Gastrointestinal Neoplasm	NA	NA	NA
+adenocarcinoma	colon and rectum	NA	NA	Colorectal Cancer	NA
+adenocarcinoma	colon and rectum	Colorectal Cancer	NA	Adenocarcinoma - colon	NA
+carcinoma:adenocarcinoma	colon and rectum	Colorectal Cancer	NA	Adenocarcinoma - colon	NA
+carcinoma:adenosquamous carcinoma	colon and rectum	Colorectal Cancer	NA	Adenocarcinoma - colon	NA
+NA	colon and rectum	NA	NA	NA	NA
+Adenocarcinoma	Colon and Rectum	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Adenocarcinoma	Colon and Rectum	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Adenosquamous carcinoma	Colon and Rectum	Gastrointestinal Neoplasm	NA	NA	NA
+NA	Colon and Rectum	Gastrointestinal Neoplasm	NA	NA	NA
+adenocarcinoma	esophagus	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the esophagus	Adenocarcinoma - esophagus
+carcinoma:adenosquamous carcinoma	esophagus	Gastrointestinal Neoplasm	Gastroesophageal Cancer	NA	Esophageal cancer, NOS
+carcinoma:verrucous (squamous) carcinoma	esophagus	Gastrointestinal Neoplasm	Gastroesophageal Cancer	NA	Esophageal cancer, NOS
+NA	esophagus	NA	NA	NA	NA
+Adenocarcinoma	Esophagus	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the esophagus	Adenocarcinoma - esophagus
+Carcinoma:Adenosquamous carcinoma	Esophagus	Gastrointestinal Neoplasm	Gastroesophageal Cancer	NA	NA
+Carcinoma:Verrucous (squamous) carcinoma	Esophagus	Gastrointestinal Neoplasm	Gastroesophageal Cancer	NA	NA
+NA	Esophagus	NA	NA	NA	NA
+NA	foot	NA	NA	NA	NA
+NA	Foot	NA	NA	NA	NA
+junctional nevus?	foreskin	Skin Neoplasm	NA	NA	NA
+Junctional nevus?	Foreskin	Skin Neoplasm	NA	NA	NA
+carcinoma:adenocarcinoma	gallbladder	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:adenocarcinoma, intestinal type	gallbladder	Gastrointestinal Neoplasm	NA	NA	NA
+NA	gallbladder	NA	NA	NA	NA
+Carcinoma:Adenocarcinoma	Gallbladder	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Adenocarcinoma, intestinal type	Gallbladder	Gastrointestinal Neoplasm	NA	NA	NA
+NA	Gallbladder	NA	NA	NA	NA
+Angiosarcoma	Heart	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+acute leukemias of ambiguous lineage:mixed phenotype acute leukemia, b-myeloid, nos	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia with myelodysplasia-related changes	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia with recurrent genetic abnormalities:aml with inv(16)(p13.1q22) or t(16;16)(p13.1;q22); cbfb-myh11	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia with recurrent genetic abnormalities:apl with t(15;17)(q22;q12); pml-rara	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia, not otherwise specified	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia, not otherwise specified:acute myelomonocytic leukemia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia, not otherwise specified:aml with maturation	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:acute myeloid leukemia, not otherwise specified:aml without maturation	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:myeloid sarcoma	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+acute myeloid leukemia and related neoplasms:therapy-related myeloid neoplasms	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+cytopenia	hematologic and lymphatic neoplasm	NA	NA	NA	NA
+eosinophilia	hematologic and lymphatic neoplasm	NA	NA	NA	NA
+histiocytic and dendritic cell neoplasms:histiocytic sarcoma	hematologic and lymphatic neoplasm	NA	NA	NA	NA
+histiocytic and dendritic cell neoplasms:tumors derived from langerhans cells:langerhans cell histiocytosis	hematologic and lymphatic neoplasm	NA	NA	NA	NA
+mature b-cell neoplasms	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+mature b-cell neoplasms:chronic lymphocytic leukemia/small lymphocytic lymphoma	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Chronic Lymphoid Leukemia	Chronic lymphocytic leukemia, NOS	Chronic lymphocytic leukemia, NOS
+mature b-cell neoplasms:diffuse large b-cell lymphoma (dlbcl), not otherwise specified (nos)	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+mature b-cell neoplasms:follicular lymphoma	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Non-Hodgkin lymphoma, indolent, NOS	NHL, indolent, NOS
+mature b-cell neoplasms:hairy cell leukemia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+mature b-cell neoplasms:lymphoplasmacytic lymphoma	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Non-Hodgkin lymphoma, indolent, NOS	NHL, indolent, NOS
+mature b-cell neoplasms:plasma cell neoplasms	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Myeloma	Myeloma, NOS	Myeloma, NOS
+mature b-cell neoplasms:plasma cell neoplasms:extraosseous plasmacytoma	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Myeloma	Myeloma, NOS	Myeloma, NOS
+mature b-cell neoplasms:plasma cell neoplasms:monoclonal gammopathy of undetermined significance (mgus)	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	NA	Monoclonal gammopathy of undetermined significance (MGUS)	NA
+mature t- and nk-cell neoplasms:anaplastic large cell lymphoma, alk negative	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Anaplastic large-cell lymphoma, primary systemic type	ALCL, systemic
+mature t- and nk-cell neoplasms:peripheral t-cell lymphoma, nos	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+mature t- and nk-cell neoplasms:t-cell large granular lymphocytic leukemia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+mature t- and nk-cell neoplasms:t-cell prolymphocytic leukemia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+myelodysplastic syndrome (mds)	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic syndrome (mds):refractory anemia with excess blasts	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic syndrome (mds):refractory anemia with ring sideroblasts	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic syndrome (mds):refractory cytopenia with multilineage dysplasia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic/myeloproliferative neoplasms (mds/mpn)	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic/myeloproliferative neoplasms (mds/mpn):atypical chronic myeloid leukemia, bcr-abl1  negative	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myelodysplastic/myeloproliferative neoplasms (mds/mpn):chronic myelomonocytic leukemia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloid and lymphoid neoplasms associated with eosinophilia and abnormalities of pdgfra, pdgfrb, or fgfr1:myeloid and lymphoid neoplasms associated with pdgfra rearrangement	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasms (mpn)	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasms (mpn):chronic myelogenous leukemia, bcr-abl1  positive	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasms (mpn):essential thrombocythemia	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasms (mpn):mastocytosis	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasms (mpn):polycythemia vera	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+myeloproliferative neoplasms (mpn):primary myelofibrosis	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+precursor lymphoid neoplasms:b lymphoblastic leukemia/lymphoma with hypodiploidy (hypodiploid acute lymphoblastic leukemia/lymphoma [all])	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+precursor lymphoid neoplasms:b lymphoblastic leukemia/lymphoma, not otherwise specified (nos)	hematologic and lymphatic neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+NA	hematologic and lymphatic neoplasm	NA	NA	NA	NA
+Acute leukemias of ambiguous lineage	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute leukemias of ambiguous lineage:Mixed phenotype acute leukemia, B-myeloid, NOS	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia with myelodysplasia-related changes	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia with recurrent genetic abnormalities:AML with inv(16)(p13.1q22) or t(16;16)(p13.1;q22); CBFB-MYH11	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia with recurrent genetic abnormalities:AML with mutated CEBPA (Provisional entity)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia with recurrent genetic abnormalities:APL with t(15;17)(q22;q12); PML-RARA	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia, not otherwise specified	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia, not otherwise specified:Acute myelomonocytic leukemia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia, not otherwise specified:AML with maturation	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Acute myeloid leukemia, not otherwise specified:AML without maturation	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Myeloid sarcoma	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Acute myeloid leukemia and related neoplasms:Therapy-related myeloid neoplasms	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+cytopenia	Hematologic and Lymphatic Neoplasm	NA	NA	NA	NA
+eosinophilia	Hematologic and Lymphatic Neoplasm	NA	NA	NA	NA
+Histiocytic and Dendritic Cell Neoplasms	Hematologic and Lymphatic Neoplasm	NA	NA	NA	NA
+Histiocytic and Dendritic Cell Neoplasms:Histiocytic sarcoma	Hematologic and Lymphatic Neoplasm	NA	NA	NA	NA
+Histiocytic and Dendritic Cell Neoplasms:Tumors derived from Langerhans cells:Langerhans cell histiocytosis	Hematologic and Lymphatic Neoplasm	NA	NA	NA	NA
+Mature B-cell Neoplasms	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+Mature B-cell Neoplasms:Chronic lymphocytic leukemia/small lymphocytic lymphoma	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	Chronic Lymphoid Leukemia	Chronic lymphocytic leukemia, NOS	Chronic lymphocytic leukemia, NOS
+Mature B-cell Neoplasms:Diffuse large B-cell lymphoma (DLBCL), not otherwise specified (NOS)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Diffuse large B-cell lymphoma	Diffuse large B-cell lymphoma
+Mature B-cell Neoplasms:Follicular lymphoma	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Follicular lymphoma	Follicular lymphoma
+Mature B-cell Neoplasms:Hairy cell leukemia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Mature B-cell Neoplasms:Lymphoplasmacytic lymphoma	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Lymphoplasmacytic lymphoma (Waldenstrom macroglobulinemia)	Lymphoplasmacytic lymphoma
+Mature B-cell Neoplasms:Plasma cell neoplasms	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Myeloma	NA	NA	NA
+Mature B-cell Neoplasms:Plasma cell neoplasms:Extraosseous plasmacytoma	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Myeloma	Myeloma	Solitary plasmacytoma	Solitary plasmacytoma
+Mature B-cell Neoplasms:Plasma cell neoplasms:Monoclonal gammopathy of undetermined significance (MGUS)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Myeloma	Myeloma	Monoclonal gammopathy of undetermined significance (MGUS)	MGUS
+Mature B-cell Neoplasms:Plasma cell neoplasms:Plasma cell myeloma	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Myeloma	Myeloma	Myeloma, NOS	Myeloma, NOS
+Mature T- and NK-cell Neoplasms:Anaplastic large cell lymphoma, ALK negative	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Anaplastic large-cell lymphoma, primary systemic type	ALCL, systemic
+Mature T- and NK-cell Neoplasms:Peripheral T-cell lymphoma, NOS	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+Mature T- and NK-cell Neoplasms:T-cell large granular lymphocytic leukemia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Mature T- and NK-cell Neoplasms:T-cell prolymphocytic leukemia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic syndrome (MDS)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic syndrome (MDS):Refractory anemia with excess blasts	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic syndrome (MDS):Refractory anemia with ring sideroblasts	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic syndrome (MDS):Refractory cytopenia with multilineage dysplasia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic syndrome (MDS):Refractory cytopenia with unilineage dysplasia:Refractory thrombocytopenia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic/myeloproliferative neoplasms (MDS/MPN)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic/myeloproliferative neoplasms (MDS/MPN):Atypical chronic myeloid leukemia, BCR-ABL1  negative	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myelodysplastic/myeloproliferative neoplasms (MDS/MPN):Chronic myelomonocytic leukemia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloid and lymphoid neoplasms associated with eosinophilia and abnormalities of PDGFRA, PDGFRB, or FGFR1:Myeloid and lymphoid neoplasms associated with PDGFRA rearrangement	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasms (MPN)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasms (MPN):Chronic myelogenous leukemia, BCR-ABL1  positive	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasms (MPN):Essential thrombocythemia	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasms (MPN):Mastocytosis	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasms (MPN):Polycythemia vera	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Myeloproliferative neoplasms (MPN):Primary myelofibrosis	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Precursor Lymphoid Neoplasms:B lymphoblastic leukemia/lymphoma with hyperdiploidy	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Precursor Lymphoid Neoplasms:B lymphoblastic leukemia/lymphoma with hypodiploidy (hypodiploid acute lymphoblastic leukemia/lymphoma [ALL])	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+Precursor Lymphoid Neoplasms:B lymphoblastic leukemia/lymphoma, not otherwise specified (NOS)	Hematologic and Lymphatic Neoplasm	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+NA	Hematologic and Lymphatic Neoplasm	NA	NA	NA	NA
+carcinoma:hepatocellular carcinoma	hepatocellular (liver)	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:undifferentiated carcinoma	hepatocellular (liver)	Gastrointestinal Neoplasm	NA	NA	NA
+NA	hepatocellular (liver)	NA	NA	NA	NA
+Carcinoma:Hepatocellular carcinoma	Hepatocellular (Liver)	NA	NA	NA	NA
+Carcinoma:Undifferentiated carcinoma	Hepatocellular (Liver)	NA	NA	NA	NA
+NA	Hepatocellular (Liver)	NA	NA	NA	NA
+carcinoma:cholangiocarcinoma	intrahepatic bile ducts	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Cholangiocarcinoma	Intrahepatic Bile Ducts	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:clear cell renal cell carcinoma	kidney	Kidney Neoplasm	Renal Cell Carcinoma	Renal cell carcinoma, clear cell adenocarcinoma	RCC, clear cell adenocarcinoma
+carcinoma:papillary renal cell carcinoma	kidney	Kidney Neoplasm	Renal Cell Carcinoma	Papillary renal cell carcinoma	Papillary renal cell carcinoma
+NA	kidney	NA	NA	NA	NA
+Carcinoma:Clear cell renal cell carcinoma	Kidney	Kidney Neoplasm	Renal Cell Carcinoma	Renal cell carcinoma, clear cell adenocarcinoma	RCC, clear cell adenocarcinoma
+Carcinoma:Other (specify)	Kidney	Kidney Neoplasm	Renal Cell Carcinoma	NA	NA
+Carcinoma:Papillary renal cell carcinoma	Kidney	Kidney Neoplasm	Renal Cell Carcinoma	Papillary renal cell carcinoma	Papillary renal cell carcinoma
+NA	Kidney	NA	NA	NA	NA
+giant cell neoplasm	larynx	NA	NA	NA	NA
+NA	larynx	NA	NA	NA	NA
+Giant cell neoplasm	Larynx	NA	NA	NA	NA
+NA	Larynx	NA	NA	NA	NA
+carcinomas of minor salivary glands:adenoid cystic carcinoma	lip and oral cavity	NA	NA	NA	NA
+squamous cell carcinoma	lip and oral cavity	NA	NA	NA	NA
+NA	lip and oral cavity	NA	NA	NA	NA
+Carcinomas of Minor Salivary Glands:Adenoid cystic carcinoma	Lip and Oral Cavity	NA	NA	NA	NA
+Other malignancy:Mucosal  melanoma	Lip and Oral Cavity	NA	NA	NA	NA
+Squamous Cell Carcinoma	Lip and Oral Cavity	NA	NA	NA	NA
+NA	Lip and Oral Cavity	NA	NA	NA	NA
+hepatoblastoma	liver	Gastrointestinal Neoplasm	NA	NA	NA
+NA	liver	NA	NA	NA	NA
+Hepatoblastoma	Liver	NA	NA	NA	NA
+NA	Liver	NA	NA	NA	NA
+adenocarcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Lung adenocarcinoma
+adenocarcinoma, acinar predominant	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Lung adenocarcinoma
+adenocarcinoma, micropapillary predominant	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Lung adenocarcinoma
+adenocarcinoma, papillary predominant	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Lung adenocarcinoma
+adenocarcinoma, solid predominant	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Lung adenocarcinoma
+adenosquamous carcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Non-small cell lung cancer, NOS
+atypical carcinoid tumor	lung	Lung, Mediastinal and Pleural Neoplasm	Neuroendocrine Cancer	NA	NA
+combined large cell neuroendocrine carcinoma (specify type of other non-small cell carcinoma component)	lung	Lung, Mediastinal and Pleural Neoplasm	Neuroendocrine Cancer	NA	NA
+combined small cell carcinoma (small cell carcinoma and non-small cell component) (specify type of non-small cell carcinoma component)	lung	Lung, Mediastinal and Pleural Neoplasm	Neuroendocrine Cancer	NA	NA
+large cell neuroendocrine carcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Neuroendocrine Cancer	NA	NA
+mucinous adenocarcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Lung adenocarcinoma
+non-small cell carcinoma, subtype cannot be determined	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Non-small cell lung cancer, NOS
+sarcomatoid carcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Non-small cell lung cancer, NOS
+spindle cell carcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Non-small cell lung cancer, NOS	Non-small cell lung cancer, NOS
+squamous cell carcinoma	lung	NA	NA	Non-Small Cell Lung Cancer	NA
+squamous cell carcinoma	lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	NA	Squamous cell lung carcinoma
+typical carcinoid tumor	lung	Lung, Mediastinal and Pleural Neoplasm	Neuroendocrine Cancer	NA	NA
+NA	lung	NA	NA	NA	NA
+Adenocarcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Adenocarcinoma in situ	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Adenocarcinoma, acinar predominant	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Adenocarcinoma, micropapillary predominant	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Adenocarcinoma, papillary predominant	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Adenocarcinoma, solid predominant	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Adenosquamous carcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	NA	NA
+Atypical carcinoid tumor	Lung	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Combined large cell neuroendocrine carcinoma (specify type of other non-small cell carcinoma component)	Lung	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Combined small cell carcinoma (small cell carcinoma and non-small cell component) (specify type of non-small cell carcinoma component)	Lung	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Large cell neuroendocrine carcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Mucinous adenocarcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	Lung adenocarcinoma	Lung adenocarcinoma
+Non-small cell carcinoma, subtype cannot be determined	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	NA	NA
+Sarcomatoid carcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	NA	NA
+Spindle cell carcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	NA	NA
+Squamous cell carcinoma	Lung	Lung, Mediastinal and Pleural Neoplasm	Non-Small Cell Lung Cancer	NA	NA
+Typical carcinoid tumor	Lung	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+NA	Lung	NA	NA	NA	NA
+follicular lymphoma	lymph node	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+NA	lymph node	NA	NA	NA	NA
+Follicular lymphoma	Lymph node	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	Follicular lymphoma	Follicular lymphoma
+NA	Lymph node	NA	NA	NA	NA
+desmoid fibromatosis	mesenteric mass	Soft Tissue Neoplasm	NA	NA	NA
+Desmoid fibromatosis	Mesenteric Mass	Soft Tissue Neoplasm	NA	NA	NA
+NA	nasal cavity and paranasal sinuses	NA	NA	NA	NA
+Carcinomas of the Nasal Cavity and Paranasal Sinuses	Nasal Cavity and Paranasal Sinuses	NA	NA	NA	NA
+NA	Nasal Cavity and Paranasal Sinuses	NA	NA	NA	NA
+nonkeratinizing carcinoma	nasopharynx	NA	NA	NA	NA
+NA	nasopharynx	NA	NA	NA	NA
+Nonkeratinizing carcinoma	Nasopharynx	NA	NA	NA	NA
+NA	Nasopharynx	NA	NA	NA	NA
+carcinoma, squamous	neck	NA	NA	NA	NA
+Carcinoma, squamous	Neck	NA	NA	NA	NA
+uveal (or iris) melanoma	ocular tumors	NA	NA	Uveal Melanoma	NA
+uveal (or iris) melanoma:spindle cell type	ocular tumors	NA	NA	Uveal Melanoma	NA
+Uveal (or Iris) Melanoma	Ocular Tumors	Skin Neoplasm	Melanoma	Uveal Melanoma	Uveal Melanoma
+Uveal (or Iris) Melanoma:Spindle cell type	Ocular Tumors	Skin Neoplasm	Melanoma	Uveal Melanoma	Uveal Melanoma
+other malignancy:malignancy, type cannot be determined	other primary site	NA	NA	NA	NA
+NA	other primary site	NA	NA	NA	NA
+Other malignancy:Malignancy, type cannot be determined	Other Primary Site	NA	NA	NA	NA
+NA	Other Primary Site	NA	NA	NA	NA
+NA	Other Primary Site (Including Pediatric)	NA	NA	NA	NA
+carcinoma:endometrioid carcinoma	ovary	NA	NA	NA	NA
+carcinoma:serous, borderline tumor	ovary	NA	NA	NA	NA
+carcinoma:serous, carcinoma	ovary	NA	NA	NA	NA
+germ cell tumors:mixed malignant germ cell tumors (specify types)	ovary	NA	NA	NA	NA
+juvenile granulosa cell tumor	ovary	NA	NA	NA	NA
+NA	ovary	NA	NA	NA	NA
+Carcinoma:Endometrioid carcinoma	Ovary	NA	NA	NA	NA
+Carcinoma:Serous, borderline tumor	Ovary	NA	NA	NA	NA
+Carcinoma:Serous, carcinoma	Ovary	NA	NA	NA	NA
+Germ Cell Tumors:Mixed malignant germ cell tumors (specify types)	Ovary	NA	NA	NA	NA
+Germ Cell Tumors:Other (specify)	Ovary	NA	NA	NA	NA
+Juvenile granulosa cell tumor	Ovary	NA	NA	NA	NA
+Sex Cord-Stromal Tumors	Ovary	NA	NA	NA	NA
+NA	Ovary	NA	NA	NA	NA
+carcinoma of the endocrine pancreas	pancreas	Endocrine Neoplasm	Neuroendocrine Cancer	Pancreatic neuroendocrine tumor	NA
+carcinoma of the endocrine pancreas:pancreatic neuroendocrine tumor, functional status unknown	pancreas	Endocrine Neoplasm	Neuroendocrine Cancer	Pancreatic neuroendocrine tumor	NA
+carcinoma of the endocrine pancreas:pancreatic neuroendocrine tumor, nonfunctional	pancreas	Endocrine Neoplasm	Neuroendocrine Cancer	Pancreatic neuroendocrine tumor	NA
+carcinoma of the exocrine pancreas:adenosquamous carcinoma	pancreas	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma of the exocrine pancreas:ductal adenocarcinoma	pancreas	Gastrointestinal Neoplasm	NA	NA	NA
+NA	pancreas	NA	NA	NA	NA
+Carcinoma of the Endocrine Pancreas	Pancreas	Endocrine Neoplasm	Neuroendocrine Cancer	Pancreatic neuroendocrine tumor	Pancreatic neuroendocrine tumor
+Carcinoma of the Endocrine Pancreas:Pancreatic neuroendocrine tumor, functional status unknown	Pancreas	Endocrine Neoplasm	Neuroendocrine Cancer	Pancreatic neuroendocrine tumor	Pancreatic neuroendocrine tumor
+Carcinoma of the Endocrine Pancreas:Pancreatic neuroendocrine tumor, nonfunctional	Pancreas	Endocrine Neoplasm	Neuroendocrine Cancer	Pancreatic neuroendocrine tumor	Pancreatic neuroendocrine tumor
+Carcinoma of the Exocrine Pancreas	Pancreas	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma of the Exocrine Pancreas:Adenosquamous carcinoma	Pancreas	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma of the Exocrine Pancreas:Ductal adenocarcinoma	Pancreas	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma of the Exocrine Pancreas:Undifferentiated carcinoma with osteoclast-like giant cells	Pancreas	Gastrointestinal Neoplasm	NA	NA	NA
+NA	Pancreas	NA	NA	NA	NA
+invasive carcinoma:squamous cell carcinoma (scc)	penis	NA	NA	NA	NA
+Invasive Carcinoma:Squamous cell carcinoma (SCC)	Penis	NA	NA	NA	NA
+other malignancy (specify)	perihilar bile ducts	Gastrointestinal Neoplasm	NA	NA	NA
+Other malignancy (specify)	Perihilar Bile Ducts	NA	NA	NA	NA
+NA	peripheral blood	NA	NA	NA	NA
+B-lymphoblastic leukemia	Peripheral blood	Hematopoietic Neoplasm/Leukemia	NA	NA	NA
+NA	Peripheral blood	NA	NA	NA	NA
+malignant mesothelioma, biphasic	peritoneum	NA	NA	NA	NA
+NA	peritoneum	NA	NA	NA	NA
+Malignant mesothelioma, biphasic	Peritoneum	NA	NA	NA	NA
+NA	Peritoneum	NA	NA	NA	NA
+carcinomas of the oropharynx and hypopharynx:squamous cell carcinoma, conventional	pharynx	NA	NA	NA	NA
+NA	pharynx	NA	NA	NA	NA
+Carcinomas of the Oropharynx and Hypopharynx:Squamous cell carcinoma, conventional	Pharynx	NA	NA	NA	NA
+NA	Pharynx	NA	NA	NA	NA
+epithelioid mesothelioma	pleura	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Epithelioid mesothelioma	Pleura	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Other (specify)	Pleura	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+NA	Pleura	NA	NA	NA	NA
+carcinoma of the prostate gland	prostate gland	NA	NA	NA	NA
+carcinoma of the prostate gland:adenocarcinoma (conventional, acinar)	prostate gland	NA	NA	NA	NA
+NA	prostate gland	NA	NA	NA	NA
+Carcinoma of the Prostate Gland	Prostate Gland	NA	NA	NA	NA
+Carcinoma of the Prostate Gland:Adenocarcinoma (conventional, acinar)	Prostate Gland	NA	NA	NA	NA
+NA	Prostate Gland	NA	NA	NA	NA
+carcinoma:(hyalinizing) clear cell carcinoma	salivary glands	NA	NA	NA	NA
+carcinoma:carcinoma ex pleomorphic adenoma (malignant mixed tumor):high-grade	salivary glands	NA	NA	NA	NA
+carcinoma:mucoepidermoid carcinoma	salivary glands	NA	NA	NA	NA
+carcinoma:sebaceous adenocarcinoma	salivary glands	NA	NA	NA	NA
+pleomorphic adenoma	salivary glands	NA	NA	NA	NA
+Carcinoma:(Hyalinizing) clear cell carcinoma	Salivary Glands	NA	NA	NA	NA
+Carcinoma:Adenoid cystic carcinoma	Salivary Glands	NA	NA	NA	NA
+Carcinoma:Carcinoma ex pleomorphic adenoma (malignant mixed tumor):High-grade	Salivary Glands	NA	NA	NA	NA
+Carcinoma:Mucoepidermoid carcinoma	Salivary Glands	NA	NA	NA	NA
+Carcinoma:Sebaceous adenocarcinoma	Salivary Glands	NA	NA	NA	NA
+Pleomorphic adenoma	Salivary Glands	NA	NA	NA	NA
+rosai dorfman disease	scalp	Skin Neoplasm	NA	NA	NA
+NA	scalp	NA	NA	NA	NA
+Malignant melanoma	Scalp	Skin Neoplasm	NA	NA	NA
+Rosai Dorfman Disease	Scalp	Skin Neoplasm	NA	NA	NA
+NA	Scalp	NA	NA	NA	NA
+malignant melanoma	skin	NA	NA	Melanoma	Melanoma
+malignant melanoma	skin	Skin Neoplasm	Melanoma	NA	NA
+malignant melanoma:acral lentiginous melanoma	skin	Skin Neoplasm	Melanoma	NA	NA
+merkel cell carcinoma	skin	Skin Neoplasm	NA	NA	NA
+mycosis fungoides	skin	Hematopoietic Neoplasm/Lymphoma	NA	NA	NA
+squamous cell carcinoma (scc)	skin	Skin Neoplasm	NA	NA	NA
+NA	skin	NA	NA	NA	NA
+Malignant Melanoma	Skin	Skin Neoplasm	Melanoma	NA	NA
+Malignant Melanoma:Acral lentiginous melanoma	Skin	Skin Neoplasm	Melanoma	NA	NA
+Malignant Melanoma:Other (specify)	Skin	Skin Neoplasm	Melanoma	NA	NA
+Merkel Cell Carcinoma	Skin	Skin Neoplasm	NA	NA	NA
+Mycosis fungoides	Skin	Hematopoietic Neoplasm/Lymphoma	Non-Hodgkin Lymphoma	NA	NA
+Squamous Cell Carcinoma (SCC)	Skin	Skin Neoplasm	NA	NA	NA
+Squamous Cell Carcinoma (SCC):Extramammary Paget disease	Skin	NA	NA	NA	NA
+NA	Skin	NA	NA	NA	NA
+carcinoma:adenocarcinoma (not otherwise characterized)	small intestine	Gastrointestinal Neoplasm	NA	NA	NA
+carcinoma:carcinoma, not otherwise specified	small intestine	Gastrointestinal Neoplasm	NA	NA	NA
+gist (gastrointestinal stromal tumor):other gist (specify)	small intestine	Gastrointestinal Neoplasm	NA	NA	NA
+NA	small intestine	NA	NA	NA	NA
+Carcinoma:Adenocarcinoma (not otherwise characterized)	Small Intestine	Gastrointestinal Neoplasm	NA	NA	NA
+Carcinoma:Carcinoma, not otherwise specified	Small Intestine	Gastrointestinal Neoplasm	NA	NA	NA
+GIST (gastrointestinal stromal tumor):Other GIST (specify)	Small Intestine	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	Gastrointestinal stromal tumor	Gastrointestinal stromal tumor
+NA	Small Intestine	NA	NA	NA	NA
+fibroblastic / myofibroblastic tumors:intermediate (locally aggressive):desmoid-type fibromatoses	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+fibroblastic / myofibroblastic tumors:malignant:myxofibrosarcoma	soft tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+skeletal muscle tumors	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+skeletal muscle tumors:malignant:embryonal rhabdomyosarcoma (including botryoid, anaplastic)	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+skeletal muscle tumors:malignant:pleomorphic rhabdomyosarcoma	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+tumors of peripheral nerves:malignant:malignant peripheral nerve sheath tumor	soft tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+tumors of uncertain differentiation	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+tumors of uncertain differentiation:malignant	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+tumors of uncertain differentiation:malignant:desmoplastic small round cell tumor	soft tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+vascular tumors	soft tissue	Soft Tissue Neoplasm	NA	NA	NA
+NA	soft tissue	NA	NA	NA	NA
+Chondro-osseous Tumors:Malignant:Extraskeletal mesenchymal chondrosarcoma	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Fibroblastic / Myofibroblastic Tumors:Intermediate (locally aggressive):Desmoid-type fibromatoses	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+Fibroblastic / Myofibroblastic Tumors:Malignant:Myxofibrosarcoma	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Skeletal Muscle Tumors	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+Skeletal Muscle Tumors:Malignant:Alveolar rhabdomyosarcoma (including solid, anaplastic)	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+Skeletal Muscle Tumors:Malignant:Embryonal rhabdomyosarcoma (including botryoid, anaplastic)	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+Skeletal Muscle Tumors:Malignant:Pleomorphic rhabdomyosarcoma	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+Smooth Muscle Tumors:Malignant:Leiomyosarcoma	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Tumors of Peripheral Nerves:Malignant:Malignant peripheral nerve sheath tumor	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Tumors of Uncertain Differentiation	Soft Tissue	NA	NA	NA	NA
+Tumors of Uncertain Differentiation:Malignant	Soft Tissue	NA	NA	NA	NA
+Tumors of Uncertain Differentiation:Malignant:Desmoplastic small round cell tumor	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Tumors of Uncertain Differentiation:Malignant:Extraskeletal Ewing sarcoma	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Tumors of Uncertain Differentiation:Malignant:Synovial sarcoma NOS	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Undifferentiated/Unclassified Sarcomas	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Undifferentiated/Unclassified Sarcomas:Undifferentiated pleomorphic sarcoma	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Undifferentiated/Unclassified Sarcomas:Undifferentiated spindle cell sarcoma	Soft Tissue	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	NA	NA
+Vascular Tumors	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+Vascular Tumors:Intermediate (locally aggressive):Kaposiform hemangioendothelioma	Soft Tissue	Soft Tissue Neoplasm	NA	NA	NA
+NA	Soft Tissue	NA	NA	NA	NA
+adenosquamous carcinoma	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	NA	NA
+carcinoma:adenocarcinoma:diffuse adenocarcinoma (signet-ring carcinoma)	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+carcinoma:adenocarcinoma:intestinal (tubular) adenocarcinoma	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+carcinoma:adenocarcinoma:mixed (approximately equal amounts of intestinal and diffuse)	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+carcinoma:adenocarcinoma:mucinous adenocarcinoma (>50% mucinous)	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+carcinoma:adenocarcinoma:papillary adenocarcinoma	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+carcinoma:adenocarcinoma:poorly cohesive carcinoma (signet-ring carcinoma)	stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+gist (gastrointestinal stromal tumor):mixed gist	stomach	NA	NA	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	Gastrointestinal stromal tumor
+gist (gastrointestinal stromal tumor):mixed gist	stomach	Gastrointestinal Neoplasm	NA	NA	NA
+NA	stomach	NA	NA	NA	NA
+adenosquamous carcinoma	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Gastric cancer, NOS	Gastric cancer, NOS
+Carcinoma:Adenocarcinoma:Diffuse adenocarcinoma (signet-ring carcinoma)	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+Carcinoma:Adenocarcinoma:Intestinal (Tubular) adenocarcinoma	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+Carcinoma:Adenocarcinoma:Mixed (approximately equal amounts of intestinal and diffuse)	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+Carcinoma:Adenocarcinoma:Mucinous adenocarcinoma (>50% mucinous)	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+Carcinoma:Adenocarcinoma:Papillary adenocarcinoma	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+Carcinoma:Adenocarcinoma:Poorly cohesive carcinoma (signet-ring carcinoma)	Stomach	Gastrointestinal Neoplasm	Gastroesophageal Cancer	Adenocarcinoma of the stomach	Adenocarcinoma - stomach
+GIST (gastrointestinal stromal tumor):Mixed GIST	Stomach	Soft Tissue Neoplasm	Non-Rhabdomyosarcoma Soft Tissue Sarcoma	Gastrointestinal stromal tumor	Gastrointestinal stromal tumor
+NA	Stomach	NA	NA	NA	NA
+NA	testes	NA	NA	NA	NA
+NA	Testes	NA	NA	NA	NA
+germ cell tumor:teratoma	testis	NA	NA	NA	NA
+NA	testis	NA	NA	NA	NA
+Germ cell tumor:Teratoma	Testis	NA	NA	NA	NA
+NA	Testis	NA	NA	NA	NA
+thymic carcinoma	thymus	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+thymoma	thymus	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+thymoma:other (specify)	thymus	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Thymic carcinoma	Thymus	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Thymoma	Thymus	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+Thymoma:Other (specify)	Thymus	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+NA	Thymus	NA	NA	NA	NA
+carcinoma, type cannot be determined	thyroid	Endocrine Neoplasm	NA	NA	NA
+carcinoma:follicular carcinoma - variant (required only if applicable):	thyroid	Endocrine Neoplasm	NA	NA	NA
+carcinoma:papillary carcinoma	thyroid	NA	NA	Thyroid Cancer	Papillary thyroid carcinoma
+carcinoma:papillary carcinoma	thyroid	Endocrine Neoplasm	NA	NA	NA
+carcinoma:papillary carcinoma:classic (usual, conventional)	thyroid	NA	NA	Thyroid Cancer	Papillary thyroid carcinoma
+carcinoma:papillary carcinoma:classic (usual, conventional)	thyroid	Endocrine Neoplasm	NA	NA	NA
+carcinoma:papillary carcinoma:follicular variant, infiltrative	thyroid	Endocrine Neoplasm	NA	NA	NA
+undifferentiated (anaplastic) carcinoma	thyroid	Endocrine Neoplasm	NA	NA	NA
+NA	thyroid	NA	NA	NA	NA
+Carcinoma, type cannot be determined	Thyroid	Endocrine Neoplasm	NA	NA	NA
+Carcinoma:Follicular carcinoma - Variant (required only if applicable):	Thyroid	Endocrine Neoplasm	NA	NA	NA
+Carcinoma:Papillary carcinoma	Thyroid	Endocrine Neoplasm	NA	NA	NA
+Carcinoma:Papillary carcinoma:Classic (usual, conventional)	Thyroid	Endocrine Neoplasm	NA	NA	NA
+Carcinoma:Papillary carcinoma:Follicular variant, infiltrative	Thyroid	Endocrine Neoplasm	NA	NA	NA
+Undifferentiated (anaplastic) carcinoma	Thyroid	Endocrine Neoplasm	NA	NA	NA
+NA	Thyroid	Endocrine Neoplasm	NA	NA	NA
+adenoid cystic carcinoma	trachea	Lung, Mediastinal and Pleural Neoplasm	NA	NA	NA
+adenoid cystic carcinoma	Trachea	NA	NA	NA	NA
+adenocarcinoma	unknown	NA	NA	NA	NA
+other	unknown	NA	NA	NA	NA
+NA	unknown	NA	NA	NA	NA
+Adenocarcinoma	Unknown	NA	NA	NA	NA
+Cytopenia	Unknown	NA	NA	NA	NA
+Other	Unknown	NA	NA	NA	NA
+Thrombocytosis	Unknown	NA	NA	NA	NA
+NA	Unknown	NA	NA	NA	NA
+NA	urethra	NA	NA	NA	NA
+NA	Urethra	NA	NA	NA	NA
+urothelial (transitional cell) carcinoma	urinary bladder	Bladder neoplasms	Urothelial Tract/Bladder Cancer	transitional cell carcinoma of the bladder	Transitional cell car. - uroth.
+urothelial (transitional cell) carcinoma with variant histology (signet ring)	urinary bladder	Bladder neoplasms	Urothelial Tract/Bladder Cancer	transitional cell carcinoma of the bladder	Transitional cell car. - uroth.
+NA	urinary bladder	NA	NA	NA	NA
+Urothelial (transitional cell) carcinoma	Urinary Bladder	Bladder neoplasms	NA	transitional cell carcinoma of the bladder	NA
+Urothelial (transitional cell) carcinoma with variant histology (signet ring)	Urinary Bladder	Bladder neoplasms	NA	transitional cell carcinoma of the bladder	NA
+NA	Urinary Bladder	NA	NA	NA	NA
+endometrium carcinoma	uterus	NA	NA	NA	NA
+endometrium carcinoma:endometrioid adenocarcinoma, not otherwise characterized	uterus	NA	NA	NA	NA
+uterine sarcoma	uterus	NA	NA	NA	NA
+Endometrium carcinoma	Uterus	NA	NA	NA	NA
+Endometrium carcinoma:Carcinosarcoma (malignant m llerian mixed tumor)	Uterus	NA	NA	NA	NA
+Endometrium carcinoma:Endometrioid adenocarcinoma, not otherwise characterized	Uterus	NA	NA	NA	NA
+Uterine Sarcoma	Uterus	NA	NA	NA	NA
+Uterine Sarcoma:Leiomyosarcoma	Uterus	NA	NA	NA	NA
+Uterine Sarcoma:Low-grade endometrial stromal sarcoma with::Sex cord elements	Uterus	NA	NA	NA	NA
+melanoma	uvea	NA	NA	Melanoma	Uveal Melanoma
+melanoma	uvea	NA	NA	Uveal Melanoma	NA
+Melanoma	Uvea	Skin Neoplasm	Melanoma	Uveal Melanoma	Uveal Melanoma
+invasive carcinoma:squamous cell carcinoma	vulva	NA	NA	NA	NA
+NA	vulva	NA	NA	NA	NA
+Invasive carcinoma:Squamous cell carcinoma	Vulva	NA	NA	NA	NA
+NA	Vulva	NA	NA	NA	NA

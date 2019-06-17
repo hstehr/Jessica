@@ -59,31 +59,16 @@ if (isTRUE(Internal_match)) {
             DF_Gene_OnCore_Biomarker <- 
               DF_Gene_OnCore_Biomarker[which(DF_Gene_OnCore_Biomarker$Biomarker_Condition == "FUSION"), ]
             
-            ## Assess Pathogenicity Status
+            # Extract unique Fusion_Detail
+            fusion.detail.list <- unique(DF_patient$Fusion_Detail[which(DF_patient$Gene == gene_id &
+                                                                          DF_patient$var.anno == "Fusion")])
+            
+            ## Iterate through each detail_id of gene.patient
             #----------------------------------------------
-            pathogenicity_gate <- NA
-            
-            if (isTRUE(pathogenic_FILTER)) {
-              if (DF_patient$VariantPathogenicityStatus[which(DF_patient$Gene == gene_id &
-                                                              DF_patient$var.anno == "Fusion")] 
-                  %in% pathogenic_accepted) {
-                pathogenicity_gate <- as.logical("TRUE")
-                
-              } else {
-                pathogenicity_gate <- as.logical("FALSE")
-                DF_patient$OnCore_Fusion_Status[which(DF_patient$Gene == gene_id &
-                                                        DF_patient$var.anno == "Fusion")] <-
-                  "Pathogenicity criteria NOT satisfied"
-              }
-            }
-            
-            pathogenic_id <- DF_patient$VariantPathogenicityStatus[which(DF_patient$Gene == gene_id &
-                                                                           DF_patient$var.anno == "Fusion")]
-            
-            ## Match Pathogenicity Status
-            #----------------------------------------------
-            if (isTRUE(pathogenicity_gate == TRUE | is.na(pathogenicity_gate))) {
+            for (detail_num in 1:length(fusion.detail.list)) {
+              detail_id <- fusion.detail.list[detail_num]
               
+              ## Pathogenicity Status NOT ASSESSED - always NULL
               ## Assess Age.Group criteria
               #----------------------------------------------
               age_gate <- NA
@@ -96,7 +81,7 @@ if (isTRUE(Internal_match)) {
                   age_gate <- as.logical("FALSE")
                   DF_patient$OnCore_Fusion_Status[which(DF_patient$Gene == gene_id &
                                                           DF_patient$var.anno == "Fusion" &
-                                                          DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
+                                                          DF_patient$Fusion_Detail == detail_id)] <-
                     "Age criteria NOT satisfied"
                 }
               }
@@ -213,8 +198,8 @@ if (isTRUE(Internal_match)) {
                       # Corresponding row in patient file
                       # PrimaryTumorSite.Category and PrimaryTumorSite is consistent throughout DF_patient
                       pt_rowNo <- which(DF_patient$Gene == gene_id &
-                                          DF_patient$var.anno == "Fusion" &
-                                          DF_patient$VariantPathogenicityStatus %in% pathogenic_id)
+                                          DF_patient$var.anno == "Fusion" & 
+                                          DF_patient$Fusion_Detail == detail_id)
                       
                       ## Match Disease.Site
                       #----------------------------------------------
@@ -235,7 +220,7 @@ if (isTRUE(Internal_match)) {
                         DF_Output_pre <- data.frame(matrix(NA, ncol = ncol(DF_Output_Fusion_OnCore)))
                         colnames(DF_Output_pre) <- colnames(DF_Output_Fusion_OnCore)
                         
-                        patient <- data.frame(DF_patient[pt_rowNo, c(1:ncol_Fusion)])
+                        patient <- data.frame(DF_patient[pt_rowNo, Fusion.colnames])
                         DF_Output_pre <- crossing(patient, Trial_INFO)
                         
                         # Append to Output file
@@ -252,29 +237,19 @@ if (isTRUE(Internal_match)) {
                            Disease.Site.trial,site_num)
                     
                   } else {
-                    if (isTRUE(stop_checkpoint_na)) {
-                      DF_patient$OnCore_Fusion_Status[which(DF_patient$Gene == gene_id &
-                                                              DF_patient$var.anno == bio.cond_id &
-                                                              is.na(DF_patient$VariantHGVSProtein) &
-                                                              DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
-                        "Disease Group Category criteria NOT satisfied"
-                      
-                    } else {
-                      DF_patient$OnCore_Fusion_Status[which(DF_patient$Gene == gene_id &
-                                                              DF_patient$var.anno == bio.cond_id &
-                                                              DF_patient$VariantHGVSProtein == bio.detail_id &
-                                                              DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
-                        "Disease Group Category criteria NOT satisfied"
-                    }
+                    DF_patient$OnCore_Fusion_Status[which(DF_patient$Gene == gene_id &
+                                                            DF_patient$var.anno == "Fusion" & 
+                                                            DF_patient$Fusion_Detail == detail_id)] <-
+                      "Disease Group Category criteria NOT satisfied"
                   }
                   remove(disease.cat_id)
                 }
                 remove(Disease.category.trial,Disease.category.patient,disease_category_name_trial,
                        disease_category_name_patient,cat_num)
               }
-              remove(age_gate)
+              remove(age_gate,detail_id)
             }
-            remove(pathogenicity_gate,pathogenic_id)
+            remove(fusion.detail.list,detail_num)
             
           } else {
             DF_patient$OnCore_Fusion_Status[which(DF_patient$Gene == gene_id &
@@ -302,13 +277,14 @@ if (isTRUE(Internal_match)) {
   ## Remove rows that are all empty
   DF_Output_Fusion_OnCore <- 
     DF_Output_Fusion_OnCore[rowSums(is.na(DF_Output_Fusion_OnCore)) != ncol(DF_Output_Fusion_OnCore),]
+  DF_Output_Fusion_OnCore <- unique(DF_Output_Fusion_OnCore[,])
   
   ## Write to match results for positive candidacy local computer
   #----------------------------------------------
   write.table(DF_Output_Fusion_OnCore, 
               file = paste(tempdir,"OnCore_Fusion_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
                            groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE, quote = TRUE)
   
   remove(genes.OnCore_Biomarker,ncol_OnCore,ncol_Fusion,Fusion.colnames,DF_Output_Fusion_OnCore)
 }

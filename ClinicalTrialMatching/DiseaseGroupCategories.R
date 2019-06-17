@@ -68,7 +68,7 @@ Otolaryngology <- data.frame(Disease.Group.category = "Otolaryngology",
                  stringsAsFactors = FALSE)
 
 Pulmonology <- data.frame(Disease.Group.category = "Pulmonology",
-                 primaryTumorSite =  c("Lung","Pleura","Thymus","Trachea"),
+                 primaryTumorSite =  c("Heart","Lung","Pleura","Thymus","Trachea"),
                  Disease.Group = c("Thoracic Oncology"),
                  stringsAsFactors = FALSE)
 

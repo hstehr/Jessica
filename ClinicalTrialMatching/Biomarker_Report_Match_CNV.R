@@ -51,41 +51,26 @@ if (isTRUE(Internal_match)) {
           DF_Gene_OnCore_Biomarker$Disease.Group.category <- as.character(DF_Gene_OnCore_Biomarker$Disease.Group.category)
           DF_Gene_OnCore_Biomarker$Disease.Site <- as.character(DF_Gene_OnCore_Biomarker$Disease.Site)
           
-          ## Parse Biomarker_Condition
+          # Extract biomarker condition
+          anno.list.pre <- sort(unique(DF_patient$var.anno[which(DF_patient$CNV_Gene == gene_id)]))
+          anno.list <- gsub("AMP","AMPLIFICATION",anno.list.pre)
+          anno.list <- gsub("DEL","DELETION",anno.list)
+          
+          ## Iterate through each element of anno.list
           #----------------------------------------------
-          if (isTRUE("AMPLIFICATION" %in% unique(DF_Gene_OnCore_Biomarker$Biomarker_Condition) |
-                     "DELETION" %in% unique(DF_Gene_OnCore_Biomarker$Biomarker_Condition))) {
+          for (anno_num in 1:length(anno.list)) {
+            anno_id <- anno.list[anno_num]
+            anno_id_pre <- anno.list.pre[anno_num]
             
-            # Specify Biomarker_Condition
-            DF_Gene_OnCore_Biomarker <- DF_Gene_OnCore_Biomarker[which(
-              DF_Gene_OnCore_Biomarker$Biomarker_Condition %in% c("AMPLIFICATION","DELETION")), ]
-            
-            ## Assess Pathogenicity Status
+            ## Parse Biomarker_Condition
             #----------------------------------------------
-            pathogenicity_gate <- NA
-            
-            if (isTRUE(pathogenic_FILTER)) {
-              if (DF_patient$VariantPathogenicityStatus[which(DF_patient$CNV_Gene == gene_id &
-                                                              (DF_patient$var.anno == "AMP" | DF_patient$var.anno == "DEL"))]
-                  %in% pathogenic_accepted) {
-                pathogenicity_gate <- as.logical("TRUE")
-                
-              } else {
-                pathogenicity_gate <- as.logical("FALSE")
-                DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
-                                                     (DF_patient$var.anno == "AMP" | DF_patient$var.anno == "DEL"))] <-
-                  "Pathogenicity criteria NOT satisfied"
-              }
-            }
-            
-            pathogenic_id <- 
-              DF_patient$VariantPathogenicityStatus[which(DF_patient$CNV_Gene == gene_id &
-                                                            (DF_patient$var.anno == "AMP" | DF_patient$var.anno == "DEL"))]   
-            
-            ## Match Pathogenicity Status
-            #----------------------------------------------
-            if (isTRUE(pathogenicity_gate == TRUE | is.na(pathogenicity_gate))) {
+            if (isTRUE(anno_id %in% unique(DF_Gene_OnCore_Biomarker$Biomarker_Condition))) {
               
+              # Specify Biomarker_Condition
+              DF_Gene_OnCore_Biomarker <- 
+                DF_Gene_OnCore_Biomarker[which(DF_Gene_OnCore_Biomarker$Biomarker_Condition == anno_id), ]
+              
+              ## Pathogenicity Status NOT ASSESSED - always NULL
               ## Assess Age.Group criteria
               #----------------------------------------------
               age_gate <- NA
@@ -97,8 +82,7 @@ if (isTRUE(Internal_match)) {
                 } else {
                   age_gate <- as.logical("FALSE")
                   DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
-                                                       (DF_patient$var.anno == "AMP" | DF_patient$var.anno == "DEL") &
-                                                       DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
+                                                       DF_patient$var.anno == anno_id_pre)] <-
                     "Age criteria NOT satisfied"
                 }
               }
@@ -215,8 +199,7 @@ if (isTRUE(Internal_match)) {
                       # Corresponding row in patient file
                       # PrimaryTumorSite.Category and PrimaryTumorSite is consistent throughout DF_patient
                       pt_rowNo <- which(DF_patient$CNV_Gene == gene_id &
-                                          (DF_patient$var.anno == "AMP" | DF_patient$var.anno == "DEL") &
-                                          DF_patient$VariantPathogenicityStatus %in% pathogenic_id)
+                                          DF_patient$var.anno == anno_id_pre)
                       
                       ## Match Disease.Site
                       #----------------------------------------------
@@ -237,7 +220,7 @@ if (isTRUE(Internal_match)) {
                         DF_Output_pre <- data.frame(matrix(NA, ncol = ncol(DF_Output_CNV_OnCore)))
                         colnames(DF_Output_pre) <- colnames(DF_Output_CNV_OnCore)
                         
-                        patient <- data.frame(DF_patient[pt_rowNo, c(1:ncol_CNV)])
+                        patient <- data.frame(DF_patient[pt_rowNo, CNV.colnames])
                         DF_Output_pre <- crossing(patient, Trial_INFO)
                         
                         # Append to Output file
@@ -254,20 +237,9 @@ if (isTRUE(Internal_match)) {
                            Disease.Site.trial,site_num)
                     
                   } else {
-                    if (isTRUE(stop_checkpoint_na)) {
-                      DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
-                                                           DF_patient$var.anno == "MUTATION" &
-                                                           is.na(DF_patient$VariantHGVSProtein) &
-                                                           DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
-                        "Disease Group Category criteria NOT satisfied"
-                      
-                    } else {
-                      DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
-                                                           DF_patient$var.anno == "MUTATION" &
-                                                           DF_patient$VariantHGVSProtein == bio.detail_id &
-                                                           DF_patient$VariantPathogenicityStatus == pathogenic_id)] <-
-                        "Disease Group Category criteria NOT satisfied"
-                    }
+                    DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
+                                                         DF_patient$var.anno == anno_id_pre)] <-
+                      "Disease Group Category criteria NOT satisfied"
                   }
                   remove(disease.cat_id)
                 }
@@ -275,13 +247,12 @@ if (isTRUE(Internal_match)) {
                        disease_category_name_patient,cat_num)
               }
               remove(age_gate)
+              
+            } else {
+              DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
+                                                   DF_patient$var.anno == anno_id_pre)] <-
+                "Biomarker Condition criteria NOT satisfied"
             }
-            remove(pathogenicity_gate,pathogenic_id)
-            
-          } else {
-            DF_patient$OnCore_CNV_Status[which(DF_patient$CNV_Gene == gene_id &
-                                                 (DF_patient$var.anno == "AMP" | DF_patient$var.anno == "DEL"))] <-
-              "Biomarker Condition criteria NOT satisfied"
           }
           remove(DF_Gene_OnCore_Biomarker)
           
@@ -304,13 +275,14 @@ if (isTRUE(Internal_match)) {
   ## Remove rows that are all empty
   DF_Output_CNV_OnCore <- 
     DF_Output_CNV_OnCore[rowSums(is.na(DF_Output_CNV_OnCore)) != ncol(DF_Output_CNV_OnCore),]
+  DF_Output_CNV_OnCore <- unique(DF_Output_CNV_OnCore[,])
   
   ## Write to match results for positive candidacy local computer
   #----------------------------------------------
   write.table(DF_Output_CNV_OnCore, 
               file = paste(tempdir,"OnCore_CNV_Matched_", OnCore_Biomarker_Report_timestamp, "_", 
                            groupName,siteName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE, quote = TRUE)
   
   remove(genes.OnCore_Biomarker,ncol_OnCore,ncol_CNV,DF_Output_CNV_OnCore,CNV.colnames)
 }

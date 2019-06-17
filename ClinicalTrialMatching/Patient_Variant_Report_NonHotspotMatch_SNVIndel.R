@@ -225,18 +225,26 @@ if (isTRUE(NCI_match)) {
                               
                               # Import CNV entries per patient
                               #----------------------------------------------
-                              DF_patient_CNV <- read.csv(file = paste(tempdir, patient_id, "_CNV.tsv", sep=""),
-                                                         header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+                              file_name = paste(tempdir, patient_id, "_CNV.tsv", sep="")
                               
-                              if (nrow(DF_patient_CNV) > 0) {exclusion_CNV_continue <- as.logical("TRUE")  
+                              if (file.exists(file_name)) {
+                                DF_patient_CNV <- read.csv(file = file_name, header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+                                
+                                if (nrow(DF_patient_CNV) > 0) {exclusion_CNV_continue <- as.logical("TRUE")  
+                                } else {exclusion_CNV_continue <- as.logical("FALSE")}
+                                
                               } else {exclusion_CNV_continue <- as.logical("FALSE")}
                               
                               # Import Fusion entries per patient
                               #----------------------------------------------
-                              DF_patient_Fusion <- read.csv(file = paste(tempdir, patient_id, "_Fusion.tsv", sep=""),
-                                                            header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+                              file_name = paste(tempdir, patient_id, "_Fusion.tsv", sep="")
                               
-                              if (nrow(DF_patient_Fusion) > 0) {exclusion_Fusion_continue <- as.logical("TRUE")  
+                              if (file.exists(file_name)) {
+                                DF_patient_Fusion <- read.csv(file = file_name,header = TRUE, na.strings = c("NA"), stringsAsFactors = FALSE, sep = "\t")
+                                
+                                if (nrow(DF_patient_Fusion) > 0) {exclusion_Fusion_continue <- as.logical("TRUE")  
+                                } else {exclusion_Fusion_continue <- as.logical("FALSE")}
+                                
                               } else {exclusion_Fusion_continue <- as.logical("FALSE")}
                               
                               ## Assess Exclusion Variants
@@ -282,6 +290,8 @@ if (isTRUE(NCI_match)) {
                                     
                                     # Checkpoint
                                     exclusion_continue <- as.logical("FALSE")
+                                    
+                                    remove(exclusion_comment)
                                   }
                                 }
                                 
@@ -327,6 +337,8 @@ if (isTRUE(NCI_match)) {
                                     
                                     # Checkpoint
                                     exclusion_continue <- as.logical("FALSE")
+                                    
+                                    remove(exclusion_comment)
                                   }
                                 }
                                 
@@ -365,9 +377,12 @@ if (isTRUE(NCI_match)) {
                                     
                                     # Checkpoint
                                     exclusion_continue <- as.logical("FALSE")
+                                    
+                                    remove(exclusion_comment)
                                   }
                                 }
-                                remove(DF_Exclude_Arm_SNV, DF_Exclude_Arm_CNV, DF_Exclude_Arm_Fusion)
+                                remove(DF_Exclude_Arm_SNV, DF_Exclude_Arm_CNV, DF_Exclude_Arm_Fusion,
+                                       var.patient,var.exclude)
                               }
                               remove(DF_Exclude_Arm)
                               
@@ -446,7 +461,7 @@ if (isTRUE(NCI_match)) {
                                 patient_INFO <- DF_patient[which(DF_patient$VariantGene == gene_id &
                                                                    DF_patient$var.type == var.type_id &
                                                                    DF_patient$Exon_Number == exon_id & 
-                                                                   DF_patient$VariantHGVSGenomic == genomic_id), c(1:ncol_SNVIndel)]
+                                                                   DF_patient$VariantHGVSGenomic == genomic_id), SNVIndel.colnames]
                                 
                                 if (nrow(patient_INFO) > 0) {
                                   
@@ -465,15 +480,13 @@ if (isTRUE(NCI_match)) {
                                 }
                                 remove(patient_INFO)
                               }
-                              remove(exclusion_CNV_continue,exclusion_continue,exclusion_Fusion_continue,
-                                     DF_patient_CNV,DF_patient_Fusion)
+                              if (exists("DF_patient_CNV")) {remove(DF_patient_CNV)}
+                              if (exists("DF_patient_Fusion")) {remove(DF_patient_Fusion)}
+                              remove(exclusion_CNV_continue,exclusion_continue,exclusion_Fusion_continue,file_name)
                             }
                             remove(arm_id,arm_num)
                           }  
-                          remove(arm.match)
-                          if (isTRUE(exists("var.patient.list"))) {remove(var.patient.list)}
-                          if (isTRUE(exists("var.patient"))) {remove(var.patient)}
-                          if (isTRUE(exists("var.exclude"))) {remove(var.exclude)}
+                          remove(arm.match,pt_rowNo)
                         }
                         remove(age_gate)
                       }
@@ -498,7 +511,7 @@ if (isTRUE(NCI_match)) {
                                                                 DF_patient$var.type == var.type_id)] <-
                 "Variant Type criteria NOT satisfied"
             }
-            remove(next_continue)
+            remove(next_continue,var.type_id_syn.patient)
           }
           remove(type_num,DF_Gene_Patient_NonHotspot,var.type.patient,var.group.trial,
                  var.type.trial,var.type_id)
@@ -529,14 +542,9 @@ if (isTRUE(NCI_match)) {
   write.table(DF_Output_Patient_NonHotspot, 
               file = paste(tempdir,"NCI_SNVIndel_NonHotspot_Matched", Patient_Variant_Report_timestamp, "_", 
                            dxName, "_", pathoName, "_",  ageName, ".tsv", sep=""),
-              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+              append = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE, quote = TRUE)
   
   remove(DF_patient,gene_id,gene_num,gene.patient,genes.Inclusion_NonHotspot,
          ncol_InclusionNonHotspot,ncol_SNVIndel,patient_id,patient_num,
          DF_Output_Patient_NonHotspot,SNVIndel.colnames)
-  
-  if (isTRUE(exists("pt_rowNo"))){remove(pt_rowNo)}
-  if (isTRUE(exists("exclusion_comment"))){remove(exclusion_comment)}
-  if (isTRUE(exists("var.type_id_syn.patient"))){remove(var.type_id_syn.patient)}
-  
 }
