@@ -42,6 +42,8 @@ stamp_reference.file = args[12]
 exons_ensembl.file = args[13]
 # 14. File location of disease exclusion key file.
 histoDx.key = args[14]
+# 15. File location of amino acid 3-letter / 1-letter conversion key
+AA.key = args[15]
 
 ## Customize trial output
 if (isTRUE(OnCore.file == "FALSE")) {Internal_match <- as.logical("FALSE")
