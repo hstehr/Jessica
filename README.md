@@ -59,9 +59,10 @@ $ ClinicalTrial_Matching.sh
 ###### args[12]: File location of stamp_reference_transcripts file.
 ###### args[13]: File location of exons_ensembl file.
 ###### args[14]: File location of disease exclusion key file.
+###### args[15]: File location of amino acid 3-letter / 1-letter conversion key.
 
 
-#### EXAMPLE - match to both set of clinical trials.
+#### EXAMPLE - apply algorithn to OnCore and NCI-MATCH clinical trials.
 ```
 #!/bin/bash
 
@@ -70,7 +71,7 @@ data_root="/Users/jessicachen/STAMP_v2.4_reports"
 outdir=${data_root}/trials
 
 OnCore_file=paste(script_root,"/Biomarker_Report_YYYY-MM.csv",sep="")
-OnCore_ArmRemove="ECOG-ACRIN-EAY131"
+OnCore_ArmRemove="ECOG-ACRIN-EAY131-L,ECOG-ACRIN-EAY131-M"
 
 NCI_file=paste(script_root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
 NCI_ArmRemove="ARM-Z1C,ARM-Z1F"
@@ -78,65 +79,34 @@ NCI_ArmRemove="ARM-Z1C,ARM-Z1F"
 stamp_reference_file=paste(script_root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
 exons_ensembl_file=paste(script_root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
 histoDx_key=paste(script_root,"/HistologicalDx_CTEP.csv",sep="")
+AA_key=paste(script_root, "AminoAcid_Conversion.csv", sep="")
 
 patient_id="LastNameFirstName_PatientID"
 STAMP_file=paste(data_root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
 CNV_file=paste(data_root,"/reports/LastNameFirstName_PatientID.cnvs",sep="")
 Fusion_file=paste(data_root,"/reports/LastNameFirstName_PatientID.fusions.filtered.txt",sep="")
 
-Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id $STAMP_file $CNV_file $Fusion_file $OnCore_file $OnCore_ArmRemove $NCI_file $NCI_ArmRemove $script_root $outdir $stamp_reference_file $exons_ensembl_file $histoDx_key
+Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id $STAMP_file $CNV_file $Fusion_file $OnCore_file $OnCore_ArmRemove $NCI_file $NCI_ArmRemove $script_root $outdir $stamp_reference_file $exons_ensembl_file $histoDx_key $AA_key
 ```
 
 #### EXAMPLE - match to Internal clinical trials ONLY.
+##### Lines to modify
 ```
-#!/bin/bash
-
-script_root="/Users/jessicachen/Documents"
-data_root="/Users/jessicachen/STAMP_v2.4_reports"
-outdir=${data_root}/trials
-
 OnCore_file=paste(script_root,"/Biomarker_Report_YYYY-MM.csv",sep="")
-OnCore_ArmRemove="ECOG-ACRIN-EAY131"
+OnCore_ArmRemove="ECOG-ACRIN-EAY131-L,ECOG-ACRIN-EAY131-M"
 
 NCI_file="FALSE"
 NCI_ArmRemove="NULL"
-
-stamp_reference_file=paste(script_root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
-exons_ensembl_file=paste(script_root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script_root,"/HistologicalDx_CTEP.csv",sep="")
-
-patient_id="LastNameFirstName_PatientID"
-STAMP_file=paste(data_root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
-CNV_file=paste(data_root,"/reports/LastNameFirstName_PatientID.cnvs",sep="")
-Fusion_file=paste(data_root,"/reports/LastNameFirstName_PatientID.fusions.filtered.txt",sep="")
-
-Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id $STAMP_file $CNV_file $Fusion_file $OnCore_file $OnCore_ArmRemove $NCI_file $NCI_ArmRemove $script_root $outdir $stamp_reference_file $exons_ensembl_file $histoDx_key
 ```
 
 #### EXAMPLE - match to NCI-MATCH clinical trials ONLY.
+##### Lines to modify
 ```
-#!/bin/bash
-
-script_root="/Users/jessicachen/Documents"
-data_root="/Users/jessicachen/STAMP_v2.4_reports"
-outdir=${data_root}/trials
-
 OnCore_file="FALSE"
 OnCore_ArmRemove="NULL"
 
 NCI_file=paste(script_root,"/PATIENT_VARIANT_REPORT_TEMPLATE_YYYY-MM-DD.xlsx",sep="")
 NCI_ArmRemove="ARM-Z1C,ARM-Z1F"
-
-stamp_reference_file=paste(script_root,"/Ensembl-Gene-Exon-Annotations/stamp_reference_transcripts.txt",sep="")
-exons_ensembl_file=paste(script_root,"/Ensembl-Gene-Exon-Annotations/exons_ensembl75.txt",sep="")
-histoDx_key=paste(script_root,"/HistologicalDx_CTEP.csv",sep="")
-
-patient_id="LastNameFirstName_PatientID"
-STAMP_file=paste(data_root,"/reports/LastNameFirstName_PatientID.variant_report.txt",sep="")
-CNV_file=paste(data_root,"/reports/LastNameFirstName_PatientID.cnvs",sep="")
-Fusion_file=paste(data_root,"/reports/LastNameFirstName_PatientID.fusions.filtered.txt",sep="")
-
-Rscript ${script_root}/ClinicalTrial_Matching_PIPELINE.R $data_root $patient_id $STAMP_file $CNV_file $Fusion_file $OnCore_file $OnCore_ArmRemove $NCI_file $NCI_ArmRemove $script_root $outdir $stamp_reference_file $exons_ensembl_file $histoDx_key
 ```
 
 ## Visualization Graphics for STAMPEDE 
