@@ -9,7 +9,7 @@ suppressMessages(libraries("dplyr","eeptools","gridExtra","reshape","gtable","gr
 
 ## Filters
 #----------------------------------------------
-saveStaticPlots = FALSE
+saveStaticPlots = TRUE
 saveDynamicPlots = TRUE
 deleteIntermediateFile = TRUE
 

@@ -98,4 +98,4 @@ for (site_num in 1:nrow(site.list.total)) {
   
   remove(cohort_id,site_id,col_extract,site_DF,site_Fusion,site_CNV)
 }
-remove(row_No,site_num,sites.addition.Fusion,site.list)
+remove(row_No,site_num,site.list)
