@@ -134,10 +134,13 @@ remove(assay_select)
 # Apply abbreviated primary tumor sites
 shorthand_visual_fxn (DF = STAMP_DF_QC)
 STAMP_DF_plot <- DF
-shorthand_visual_fxn (DF = STAMP_Fusion_QC)
-STAMP_Fusion_plot <- unique(DF[,!names(DF) %in% "Gene"])
 shorthand_visual_fxn (DF = STAMP_CNV_QC)
 STAMP_CNV_plot <- DF
+
+# Exclude genes not in fusion.gene.list.full
+shorthand_visual_fxn (DF = STAMP_Fusion_QC)
+STAMP_Fusion_plot <- DF[which(DF$Gene %in% fusion.gene.list.full),]
+STAMP_Fusion_plot <- unique(STAMP_Fusion_plot[,!names(STAMP_Fusion_plot) %in% "Gene"])
 
 # Data visualizations
 cohort_id = "STAMPv2"
@@ -167,10 +170,13 @@ remove(assay_select)
 # Apply abbreviated primary tumor sites
 shorthand_visual_fxn (DF = STAMP_DF_complete)
 STAMP_DF_plot <- DF
-shorthand_visual_fxn (DF = STAMP_Fusion_complete)
-STAMP_Fusion_plot <- unique(DF[,!names(DF) %in% "Gene"])
 shorthand_visual_fxn (DF = STAMP_CNV_complete)
 STAMP_CNV_plot <- DF
+
+# Exclude genes not in fusion.gene.list.full
+shorthand_visual_fxn (DF = STAMP_Fusion_complete)
+STAMP_Fusion_plot <- DF[which(DF$Gene %in% fusion.gene.list.full),]
+STAMP_Fusion_plot <- unique(STAMP_Fusion_plot[,!names(STAMP_Fusion_plot) %in% "Gene"])
 
 # Data visualizations
 cohort_id = "STAMPv2complete"
@@ -187,10 +193,13 @@ STAMP_CNV_age <- STAMP_CNV_complete[which(STAMP_CNV_complete$PatientAge >= 18),]
 # Apply abbreviated primary tumor sites
 shorthand_visual_fxn (DF = STAMP_DF_age)
 STAMP_DF_plot <- DF
-shorthand_visual_fxn (DF = STAMP_Fusion_age)
-STAMP_Fusion_plot <- unique(DF[,!names(DF) %in% "Gene"])
 shorthand_visual_fxn (DF = STAMP_CNV_age)
 STAMP_CNV_plot <- DF
+
+# Exclude genes not in fusion.gene.list.full
+shorthand_visual_fxn (DF = STAMP_Fusion_age)
+STAMP_Fusion_plot <- DF[which(DF$Gene %in% fusion.gene.list.full),]
+STAMP_Fusion_plot <- unique(STAMP_Fusion_plot[,!names(STAMP_Fusion_plot) %in% "Gene"])
 
 # Data visualizations
 cohort_id = "STAMPv2ageFILTER"
@@ -260,10 +269,13 @@ STAMP_CNV_noLung <- STAMP_CNV_age[which(tolower(STAMP_CNV_age$PrimaryTumorSite) 
 # Apply abbreviated primary tumor sites
 shorthand_visual_fxn (DF = STAMP_DF_noLung)
 STAMP_DF_plot <- DF
-shorthand_visual_fxn (DF = STAMP_Fusion_noLung)
-STAMP_Fusion_plot <- unique(DF[,!names(DF) %in% "Gene"])
 shorthand_visual_fxn (DF = STAMP_CNV_noLung)
 STAMP_CNV_plot <- DF
+
+# Exclude genes not in fusion.gene.list.full
+shorthand_visual_fxn (DF = STAMP_Fusion_noLung)
+STAMP_Fusion_plot <- DF[which(DF$Gene %in% fusion.gene.list.full),]
+STAMP_Fusion_plot <- unique(STAMP_Fusion_plot[,!names(STAMP_Fusion_plot) %in% "Gene"])
 
 # Data visualizations
 cohort_id = "STAMPv2noLung"

@@ -1,8 +1,4 @@
-library("gridExtra")
-library("gtable")
-library("grid")
-library("ggrepel")
-library("RColorBrewer")
+suppressMessages(libraries("gridExtra","gtable","grid","ggrepel","RColorBrewer"))
 
 # Specify outdir
 #----------------------------------------------
@@ -28,18 +24,18 @@ month.alpha <- c("Jan 2014","Feb 2014","Mar 2014","Apr 2014","May 2014","Jun 201
 ## STAMP database: age distribution by gender
 #----------------------------------------------
 col_extract <- c("PatientID","PatientGender","PatientAge")
-gender_age_distribution_fxn (DF = rbind(STAMP_DF_plot[,col_extract],
+gender_age_AbsValue_fxn (DF = rbind(STAMP_DF_plot[,col_extract],
                                         STAMP_Fusion_plot[,col_extract],
                                         STAMP_CNV_plot[!is.na(STAMP_CNV_plot$PatientAge),col_extract]),
-                             cohort=cohort_id, 
+                             cohort=cohort_id,
                              outdir = visual.outdir)
 
 ## STAMP database: pathogenicity status + variant type
 #----------------------------------------------
-variant_type_distribution_fxn (DF_SNVIndel = STAMP_DF_plot, 
+variant_type_distribution_fxn (DF_SNVIndel = STAMP_DF_plot,
                                DF_Fusion = STAMP_Fusion_plot,
                                DF_CNV = STAMP_CNV_plot,
-                               cohort=cohort_id, 
+                               cohort=cohort_id,
                                outdir = visual.outdir)
 
 
@@ -49,7 +45,7 @@ col_extract <- c("PatientID","PrimaryTumorSite")
 top_site_count_fxn (DF = rbind(STAMP_DF_plot[,col_extract],
                            STAMP_Fusion_plot[,col_extract],
                            STAMP_CNV_plot[!is.na(STAMP_CNV_plot$PrimaryTumorSite),col_extract]),
-                cohort=cohort_id, 
+                cohort=cohort_id,
                 outdir = visual.outdir)
 
 

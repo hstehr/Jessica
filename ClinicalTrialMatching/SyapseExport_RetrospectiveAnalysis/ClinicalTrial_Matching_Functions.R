@@ -36,6 +36,112 @@ custom.hues.2 = c("#a2001e","#9acd46")
 #################################
 ## FUNCTIONS
 #################################
+gender_age_AbsValue_fxn <- function (DF, cohort, outdir) {
+  DF_Fxn <- unique(DF[,c("PatientID","PatientGender","PatientAge")])
+  
+  # Subtitle parameters
+  if (isTRUE(nrow(DF_Fxn) == 1)) {comment = "test order"
+  } else {comment = "test orders"}
+  
+  # TABLE
+  #----------------------------------------------
+  # Tabulate frequency = age of patient
+  DF_tabulate_full <- data.frame(DF_Fxn %>% group_by(PatientAge,PatientGender) %>% tally())
+  colnames(DF_tabulate_full) <- c("PatientAge","Gender","No.Orders")
+  row_append <- data.frame(PatientAge=setdiff(seq(1,100), unique(DF_tabulate_full$PatientAge)),
+                           Gender=unique(DF_tabulate_full$Gender[[1]]),
+                           No.Orders=0, stringsAsFactors = FALSE)
+  DF_tabulate_full <- rbind(DF_tabulate_full,row_append)
+  DF_tabulate_full <- DF_tabulate_full[order(DF_tabulate_full$PatientAge, decreasing = FALSE),]
+  
+  gender.missing <- setdiff(c("Female","Male"), unique(DF_tabulate_full$Gender))
+  if (length(gender.missing) > 0) {
+    DF_tabulate_full <- rbind(DF_tabulate_full,
+                              data.frame(PatientAge=50, Gender=gender.missing,No.Orders=0, stringsAsFactors = FALSE))
+  }
+  
+  # Y-axis parameters
+  ymax <- c()
+  for (row_No in 1:length(seq(0,100))) {
+    ymax <- append(ymax, 
+                   sum(DF_tabulate_full$No.Orders[which(DF_tabulate_full$PatientAge == seq(0,100)[row_No])]))
+  }
+  
+  ymax <- ceiling(max(ymax)/5)*5
+  if (isTRUE(ymax <= 10)) {y_increment = 1
+  } else if (isTRUE(ymax <= 20)) {y_increment = 2
+  } else if (isTRUE(ymax <= 50)) {y_increment = 5
+  } else if (isTRUE(ymax <= 100)) {y_increment = 10
+  } else if (isTRUE(ymax <= 250)) {y_increment = 25
+  } else if (isTRUE(ymax <= 500)) {y_increment = 50
+  } else if (isTRUE(ymax <= 1000)) {y_increment = 100
+  } else {y_increment = 250
+  }
+  
+  # HISTOGRAM
+  #----------------------------------------------
+  # Address age >90yo is PHI
+  DF_Keep <- DF_tabulate_full[which(DF_tabulate_full$PatientAge < 90),]
+  DF_Keep$PatientAge <- formatC(DF_Keep$PatientAge,0,format="f")
+  
+  DF_Edit <- DF_tabulate_full[which(DF_tabulate_full$PatientAge >= 90),]
+  DF_Edit_Summary <- data.frame()
+  gender.list <-c("Female","Male")
+  for (elem_No in 1:length(gender.list)) {
+    gender_id = gender.list[elem_No]
+    
+    DF_Edit_Summary <- rbind(DF_Edit_Summary,
+                             data.frame(PatientAge="90+",
+                                        Gender=gender_id,
+                                        No.Orders=sum(DF_Edit$No.Orders[which(DF_Edit$Gender==gender_id)]),
+                                        stringsAsFactors = FALSE))
+  }
+  
+  DF_tabulate_full_edit <- rbind(DF_Keep,DF_Edit_Summary)
+  DF_tabulate_full_edit$PatientAge <- factor(DF_tabulate_full_edit$PatientAge,
+                                             levels=c(formatC(seq(0,89,1),0,format="f"),"90+"))
+  
+  plot <- ggplot(DF_tabulate_full_edit, aes(x=PatientAge, y=No.Orders, fill=Gender)) +
+    geom_bar(stat="identity") +
+    
+    labs(title = "Age and Gender Distribution",
+         subtitle = paste("N = ", nrow(DF_Fxn), " ", comment, sep="")) +
+    
+    scale_x_discrete(name="Age",breaks=c(as.character(seq(0,89,5)),"90+")) +
+    scale_y_continuous(name="Number of Test Orders", breaks = seq(0,ymax,y_increment), limits=c(0, ymax)) +
+    scale_fill_discrete(name = "Gender") +
+    
+    theme_bw() +
+    theme(plot.title = element_text(hjust=0.5, face="bold",size=20),
+          plot.subtitle = element_text(hjust=1, face="bold",size=14),
+          
+          legend.background = 
+            element_rect(color = "black", fill = "white", size = 0.3, linetype = "solid"),
+          legend.position = c(0.955, 0.90),
+          legend.text=element_text(size=10),
+          
+          axis.text.x=element_text(size=14,angle = 0),
+          axis.text.y=element_text(size=14),
+          axis.title=element_text(size=14,face="bold")) +
+    
+    guides(fill=guide_legend(nrow=2,byrow=TRUE))
+  
+  # Save to local computer
+  file_id = paste("gender_age_distribution_", cohort, sep="")
+  
+  if (isTRUE(saveStaticPlots)) {
+    # Static plot parameters
+    height = 7.5
+    width = 15
+    
+    # Export to local computer
+    tiff(filename = paste(outdir, file_id,".tiff", sep=""),
+         width = width, height = height, units = "in", res = 350)
+    print(plot)
+    dev.off()
+  }
+}
+
 shorthand_visual_fxn <- function (DF) {
   # Collapse similar primary tumor site
   DF$PrimaryTumorSite[which(DF$PrimaryTumorSite %in% c("colon","colon and rectum"))] <- "colon and rectum"
