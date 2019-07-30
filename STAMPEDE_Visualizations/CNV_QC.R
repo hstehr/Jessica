@@ -81,7 +81,7 @@ CNV.list <- sort(unique(STAMP_CNV$CNV_Gene))
 CNV.diff_No <- length(CNV.list[!(CNV.list %in% cnv.gene.list.full)])
 cat(paste("Number of CNV entries without corresponding Gene in STAMP v2 file '2016-08-23_STAMP2_regions.xlsx': ",
           CNV.diff_No, sep=""),"\n",
-    paste(unlist(CNV.list[!(CNV.list %in% cnv.gene.list.full)]),collapse=", "),"\n","\n")
+    paste(unlist(CNV.list[!(CNV.list %in% cnv.gene.list.full)]),collapse=", "),"\n")
 
 remove(CNV.list,CNV.diff_No)
 
