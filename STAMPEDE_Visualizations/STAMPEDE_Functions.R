@@ -1,3 +1,76 @@
+## FUNCTION from eeptools package: will not download
+#----------------------------------------------
+age_calc <- function(dob, enddate=Sys.Date(), units='months', precise=TRUE){
+  if (!inherits(dob, "Date") | !inherits(enddate, "Date")) {
+    stop("Both dob and enddate must be Date class objects")
+  }
+  if (any(enddate < dob)) {
+    stop("End date must be a date after date of birth")
+  }
+  start <- as.POSIXlt(dob)
+  end <- as.POSIXlt(enddate)
+  if (precise) {
+    start_is_leap <- ifelse(start$year %% 400 == 0, TRUE, 
+                            ifelse(start$year %% 100 == 0, FALSE,
+                                   ifelse(start$year %% 4 == 0, TRUE, FALSE)))
+    end_is_leap <- ifelse(end$year %% 400 == 0, TRUE, 
+                          ifelse(end$year %% 100 == 0, FALSE,
+                                 ifelse(end$year %% 4 == 0, TRUE, FALSE)))
+  }
+  if (units == 'days') {
+    result <- difftime(end, start, units = 'days')
+  } else if (units == 'months') {
+    months <- vapply(mapply(seq, as.POSIXct(start), as.POSIXct(end), 
+                            by = 'months', SIMPLIFY = FALSE), 
+                     length, FUN.VALUE = length(start)) - 1
+    # length(seq(start, end, by='month')) - 1
+    if (precise) {
+      month_length_end <- ifelse(end$mon == 1 & end_is_leap, 29,
+                                 ifelse(end$mon == 1, 28, 
+                                        ifelse(end$mon %in% c(3, 5, 8, 10), 
+                                               30, 31)))
+      month_length_prior <- ifelse((end$mon - 1) == 1 & start_is_leap, 29, 
+                                   ifelse((end$mon - 1) == 1, 28, 
+                                          ifelse((end$mon - 1) %in% c(3, 5, 8, 10), 
+                                                 30, 31)))
+      month_frac <- ifelse(end$mday > start$mday,
+                           (end$mday - start$mday) / month_length_end,
+                           ifelse(end$mday < start$mday, 
+                                  (month_length_prior - start$mday) / 
+                                    month_length_prior + 
+                                    end$mday/month_length_end, 0.0))
+      result <- months + month_frac
+    }else{
+      result <- months
+    }
+  } else if (units == 'years') {
+    years <- vapply(mapply(seq, as.POSIXct(start), as.POSIXct(end), 
+                           by = 'years', SIMPLIFY = FALSE), 
+                    length, FUN.VALUE = length(start)) - 1
+    if (precise) {
+      start_length <- ifelse(start_is_leap, 366, 365)
+      end_length <- ifelse(end_is_leap, 366, 365)
+      start_day <- ifelse(start_is_leap & start$yday >= 60,
+                          start$yday - 1,
+                          start$yday)
+      end_day <- ifelse(end_is_leap & end$yday >= 60,
+                        end$yday - 1,
+                        end$yday)
+      year_frac <- ifelse(start_day < end_day,
+                          (end_day - start_day)/end_length,
+                          ifelse(start_day > end_day, 
+                                 (start_length - start_day) / start_length +
+                                   end_day / end_length, 0.0))
+      result <- years + year_frac
+    }else{
+      result <- years
+    }
+  }else{
+    stop("Unrecognized units. Please choose years, months, or days.")
+  }
+  return(result)
+}
+
 ## FUNCTIONS: incorporates only raw Syapse export for timeline mapping
 #----------------------------------------------
 # Static plots not generated 
@@ -202,9 +275,10 @@ fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
   colnames(DF_tabulate) <- c("Gene","No.Occurrences")
   DF_tabulate <- DF_tabulate[order(DF_tabulate$No.Occurrences, decreasing = TRUE),]
   
-  # Extract listed genes 
+  # Extract fusion genes in list only
   DF_tabulate <- DF_tabulate[which(DF_tabulate$Gene %in% fusion.gene.list.full),]
   
+  # Extract listed genes 
   Output.table <- tableGrob(DF_tabulate, rows = NULL, 
                             theme = ttheme_default(core=list(fg_params=list(hjust=0, x=0.05)),
                                                    rowhead=list(fg_params=list(hjust=0, x=0)),
@@ -306,9 +380,7 @@ fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
 ## If more than 20 unique variants
 # > apply cutoff = round down value of 20th top variant to nearest 5
 top_fusion_count_fxn <- function (DF_Fusion, cohort, outdir) {
-  DF_Fusion_Fxn <- 
-    DF_Fusion[which(DF_Fusion$Gene1 %in% fusion.gene.list.full | DF_Fusion$Gene2 %in% fusion.gene.list.full),
-              c("PatientID","Fusion_Detail")]
+  DF_Fusion_Fxn <- DF_Fusion[,c("PatientID","Fusion_Detail")]
   
   if (nrow(DF_Fusion_Fxn) > 0) {
     
@@ -981,8 +1053,6 @@ gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) {
     colnames(Fusion.2) <- c("PatientID","VariantGene")
     
     DF_Fusion <- rbind(Fusion.1,Fusion.2)
-    DF_Fusion <- DF_Fusion[which(DF_Fusion$VariantGene %in% fusion.gene.list.full),]
-    
     DF <- rbind(DF, DF_Fusion)
   }
   
@@ -1107,8 +1177,6 @@ top_gene_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdir) 
     colnames(Fusion.2) <- c("PatientID","VariantGene")
     
     DF_Fusion <- rbind(Fusion.1,Fusion.2)
-    DF_Fusion <- DF_Fusion[which(DF_Fusion$VariantGene %in% fusion.gene.list.full),]
-    
     DF_Fxn <- rbind(DF_Fxn, DF_Fusion)
   }
   
@@ -1334,7 +1402,6 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohor
                                        stringsAsFactors = FALSE))
   
   if (nrow(DF_Fusion) > 0) {
-    DF_Fusion <- DF_Fusion[which(DF_Fusion$Gene1 %in% fusion.gene.list.full | DF_Fusion$Gene2 %in% fusion.gene.list.full),]
     fusion.count = nrow(DF_Fusion)
     
     DF_tabulate_full$No.Occurrences[which(DF_tabulate_full$VariantType == "Fusion")] <- fusion.count
@@ -1343,7 +1410,7 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohor
   
   DF_tabulate_full$Variant.Type <- paste(DF_tabulate_full$VariantType,DF_tabulate_full$PathogenicityStatus, sep=" ")
   
-  Output.table <- tableGrob(DF_tabulate_full[,1:4], rows = NULL,
+  Output.table <- tableGrob(DF_tabulate_full[,1:3], rows = NULL,
                             theme = ttheme_default(core=list(fg_params=list(hjust=0, x=0.1)),
                                                    rowhead=list(fg_params=list(hjust=0, x=0)),
                                                    base_size = 10))
@@ -1376,14 +1443,9 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohor
   } else {y_increment = 250
   }
   
-  # Plot parameters
-  height = 12
-  width = 10
-  
   # Subtitle parameters
   if (isTRUE(sum(DF_tabulate_full$No.Occurrences) == 1)) {comment = "entry"
-  } else {comment = "entries"
-  }
+  } else {comment = "entries"}
   
   DF_tabulate_full$VariantType <- factor(DF_tabulate_full$VariantType,
                                          levels = c("SNV","In-Frame Indel","Frameshift Indel","CNV","Fusion"))
@@ -1412,6 +1474,11 @@ variant_type_distribution_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohor
   file_id = paste("var_type_distribution_", cohort, sep="")
   
   if (isTRUE(saveStaticPlots)) {
+    # Plot parameters
+    height = 12
+    width = 10
+    
+    # Export to local computer
     tiff(filename = paste(outdir, file_id,".tiff", sep=""),
          width = width, height = height, units = "in", res = 350)
     grid.arrange(plot, Output.table, heights = c(2, 0.5), ncol = 1, nrow = 2)
@@ -1497,11 +1564,6 @@ top_variant_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdi
   
   # Append Fusions
   if (nrow(DF_Fusion) > 0) {
-    DF_Fusion <- DF_Fusion[which(DF_Fusion$Gene1 %in% fusion.gene.list.full |
-                                   DF_Fusion$Gene2 %in% fusion.gene.list.full),]
-    
-    # Re-format Fusion DF to have "VariantGene" be the STAMP v2 listed gene
-    if (nrow(DF_Fusion) > 0) {
       Fusion.1 <- DF_Fusion[,c("PatientID","Gene1")]
       Fusion.2 <- DF_Fusion[,c("PatientID","Gene2")]  
       
@@ -1509,18 +1571,12 @@ top_variant_count_fxn <- function (DF_SNVIndel, DF_Fusion, DF_CNV, cohort, outdi
       colnames(Fusion.2) <- c("PatientID","VariantGene")
       
       DF_Fusion <- rbind(Fusion.1,Fusion.2)
-      DF_Fusion <- DF_Fusion[which(DF_Fusion$VariantGene %in% fusion.gene.list.full),]
-      
       DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(VariantGene) %>% tally())
       DF_Fusion_tabulate$VariantGene <- paste(DF_Fusion_tabulate$VariantGene, "Fusion",sep=" ")
       
     } else {
       DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(Gene1) %>% tally())
     }
-    
-  } else {
-    DF_Fusion_tabulate <- data.frame(DF_Fusion %>% group_by(Gene1) %>% tally())
-  }
   colnames(DF_Fusion_tabulate) <- c("Variant","No.Mutations")
   
   # Merge mutations
@@ -1850,17 +1906,9 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   } else {y_increment = 250
   }
   
-  # Plot parameters
-  height = 15
-  if (nrow(DF_tabulate) <= 2) {width = 12
-  } else if (nrow(DF_tabulate) <= 10) {width = 20
-  } else {width = 35
-  }
-  
   # Subtitle parameters
   if (isTRUE(sum(DF_tabulate$No.Orders) == 1)) {comment = "test order"
-  } else {comment = "test orders"
-  }
+  } else {comment = "test orders"}
   
   plot_jpeg <- ggplot(DF_tabulate, aes(x=PrimaryTumorSite, y=Percent.Orders, fill=PrimaryTumorSite)) +
     geom_bar(stat="identity") +
@@ -1908,6 +1956,14 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
   file_id = paste("top_site_count_", cohort, sep="")
   
   if (isTRUE(saveStaticPlots)) {
+    # Plot parameters
+    height = 15
+    if (nrow(DF_tabulate) <= 2) {width = 12
+    } else if (nrow(DF_tabulate) <= 10) {width = 20
+    } else {width = 35
+    }
+    
+    # Export to local computer
     tiff(filename = paste(outdir, file_id,".tiff", sep=""),
          width = width, height = height, units = "in", res = 350)
     grid.arrange(plot_jpeg, Output.table, widths = c(2, 0.5), ncol = 2, nrow = 1)
@@ -1948,14 +2004,9 @@ top_site_count_fxn <- function (DF, cohort, outdir) {
 gender_age_distribution_fxn <- function (DF, cohort, outdir) {
   DF_Fxn <- unique(DF[,c("PatientID","PatientGender","PatientAge")])
   
-  # Plot parameters
-  height = 7.5
-  width = 15
-  
   # Subtitle parameters
   if (isTRUE(nrow(DF_Fxn) == 1)) {comment = "test order"
-  } else {comment = "test orders"
-  }
+  } else {comment = "test orders"}
   
   # TABLE
   #----------------------------------------------
@@ -2096,8 +2147,14 @@ gender_age_distribution_fxn <- function (DF, cohort, outdir) {
   file_id = paste("gender_age_distribution_", cohort, sep="")
   
   if (isTRUE(saveStaticPlots)) {
+    # Static plot parameters
+    height = 7.5
+    width = 15
+    
+    # Export to local computer
     tiff(filename = paste(outdir, file_id,".tiff", sep=""),
          width = width, height = height, units = "in", res = 350)
+    print(plot)
     grid.arrange(plot, Output.table, heights = c(2, 0.4), ncol = 1, nrow = 2)
     dev.off()
   }

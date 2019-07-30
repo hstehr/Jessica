@@ -4,7 +4,7 @@
 # Load Libraries 
 #----------------------------------------------
 suppressMessages(library("easypackages"))
-suppressMessages(libraries("dplyr","eeptools","gridExtra","reshape","gtable","grid","plotly",
+suppressMessages(libraries("dplyr","gridExtra","reshape","gtable","grid","plotly",
                            "ggplot2", "ggpubr","rio","devtools","jsonlite"))
 
 ## Filters
@@ -89,14 +89,24 @@ Domains <- data.frame(Domains[c(3:nrow(Domains)),c(2:ncol(Domains))])
 colnames(Genes) <- unlist(Genes[2,])
 Genes <- data.frame(Genes[c(3:nrow(Genes)),c(2:ncol(Genes))])
 
-fusion.gene.list.full <- sort(unique(Genes$Name[which(Genes$Fusions == "yes")]))
-cnv.gene.list.full <- sort(unique(Genes$Name[which(Genes$CNV == "yes")]))
+## Fusion list
+# Includes all fusions where at least one of the genes is in the list of 130 STAMP genes
+# Does not need to have "Fusion=yes" in annotation spreadsheet '2016-08-23_STAMP2_regions.xlsx'
+fusion.gene.list.full <- sort(unique(Genes$Name[which(Genes$Fusions %in% c("yes","no"))]))
+
+## CNV list 
+# Same rules apply as for that of fusion genes 
+cnv.gene.list.full <- sort(unique(Genes$Name[which(Genes$CNV %in% c("yes","no"))]))
 
 # Load Disease & Histological dx ontologies
 #----------------------------------------------
 setwd(pipeline.root)
 source("DiseaseGroupCategories.R")
 source("HistologicalDx_CTEP_Match.R")
+
+# Load functions
+#----------------------------------------------
+source(paste(script.dir,"STAMPEDE_Functions.R",sep=""))
 
 #################################
 ## QC STAMP datasets = SNV/Indels, Fusions, CNVs
@@ -132,10 +142,6 @@ month.alpha <- c("Jan 2014","Feb 2014","Mar 2014","Apr 2014","May 2014","Jun 201
                  "Jan 2017","Feb 2017","Mar 2017","Apr 2017","May 2017","Jun 2017","Jul 2017","Aug 2017","Sep 2017","Oct 2017","Nov 2017","Dec 2017",
                  "Jan 2018","Feb 2018","Mar 2018","Apr 2018","May 2018","Jun 2018","Jul 2018","Aug 2018","Sep 2018","Oct 2018","Nov 2018","Dec 2018",
                  "Jan 2019","Feb 2019","Mar 2019","Apr 2019")
-
-# Load functions
-#----------------------------------------------
-source("STAMPEDE_Functions.R")
 
 ## Entire Dataset
 #----------------------------------------------
