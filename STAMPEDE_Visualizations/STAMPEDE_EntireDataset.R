@@ -6,7 +6,6 @@ options(max.print=999999)
 pt_mutation_count_fxn (DF = STAMP_DF, cohort=cohort_id, outdir = outdir)
 
 # Fusion info
-# fusion.gene.list.full = only genes listed in '2016-08-23_STAMP2_regions.xlsx'
 #----------------------------------------------
 fusion_count_fxn (DF_Fusion = STAMP_Fusion, 
                   cohort=cohort_id, 
