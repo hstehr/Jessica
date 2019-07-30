@@ -83,9 +83,15 @@ fusion.missing.list <- STAMP_Fusion$Fusion_Detail[!(STAMP_Fusion$Gene1 %in% fusi
                                                       STAMP_Fusion$Gene2 %in% fusion.gene.list.full)]
 cat(paste("Number of fusion entries without corresponding Gene in STAMP v2 file '2016-08-23_STAMP2_regions.xlsx': ",
           length(fusion.missing.list), sep=""),"\n",
-    paste(unlist(fusion.missing.list),collapse=", "),"\n","\n")
+    paste(unlist(fusion.missing.list),collapse=", "),"\n")
 
 remove(Fusion.diff_No,fusion.missing.list)
+
+# Exclude non-listed fusion genes
+# fusion.gene.list.full = only genes listed in '2016-08-23_STAMP2_regions.xlsx'
+#----------------------------------------------
+STAMP_Fusion <- STAMP_Fusion[which(STAMP_Fusion$Gene1 %in% fusion.gene.list.full |
+                                     STAMP_Fusion$Gene2 %in% fusion.gene.list.full),]
 
 assign("STAMP_Fusion", STAMP_Fusion, envir = .GlobalEnv)
 
